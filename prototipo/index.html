@@ -174,7 +174,8 @@ const MAP = 40;
 const HOUSE = { x0: -6, x1: 6, z0: -15, z1: -6 };
 const H0 = 0.2, FLOOR_H = 3.0, H1 = H0 + FLOOR_H;
 const MAX_HP = 100;
-const SHOT_H = 1.0;   // altura do tiro: cobertura com 1,2 m (barreira, sacos de areia) protege de verdade
+const SHOT_H = 1.0;
+const BODY_R = 0.42, HIT_R = 0.36;   // área de acerto menor que o corpo: nunca fica para fora da parede   // altura do tiro: cobertura com 1,2 m (barreira, sacos de areia) protege de verdade
 const WEAPONS = {
   ak:    { id: 'ak', name: 'AK-47', kind: 'gun', mag: 30, reserve: 90, rate: 0.1, dmg: [27, 36], spread: 0.03, range: 32, reload: 2.4, speed: 5.0, snd: [3200, 150, 0.38] },
   m4:    { id: 'm4', name: 'Colt M4', kind: 'gun', mag: 30, reserve: 90, rate: 0.085, dmg: [22, 29], spread: 0.019, range: 34, reload: 2.1, speed: 5.2, snd: [4300, 190, 0.3] },
@@ -690,7 +691,7 @@ class Soldier {
     const l = Math.hypot(dx, dz); this.moving = l > 0.05 && this.alive;
     if (!this.moving) return;
     this.pos.x += dx * speed * dt; this.pos.z += dz * speed * dt;
-    collide(this.pos, 0.38, this.y);
+    collide(this.pos, BODY_R, this.y);
   }
   physics(dt) {
     const g = groundAt(this.pos.x, this.pos.z, this.y);
@@ -719,6 +720,13 @@ class Soldier {
     const kn = this.m.guns.knife.g;
     if (this.swingT > 0) { this.swingT -= dt; const t = 1 - this.swingT / 0.22; kn.rotation.y = Math.sin(t * Math.PI) * -1.3; kn.position.x = 0.24 - Math.sin(t * Math.PI) * 0.3; }
     else { kn.rotation.y = 0; kn.position.x = 0.24; }
+    // encostado na parede: recolhe a arma para ela não atravessar
+    if (this.alive) {
+      const o = eye(this, 1.26), f = new V3(o.x + Math.sin(this.facing) * 1.2, o.y, o.z + Math.cos(this.facing) * 1.2);
+      const h = firstHit(o, f), pull = h < 1.2 ? 1.2 - h : 0;
+      this.gunPull = lerp(this.gunPull || 0, pull, Math.min(1, dt * 20));
+      for (const k of ['ak', 'm4']) { const g = this.m.guns[k].g; g.position.z = 0.35 - this.gunPull; g.rotation.x = -this.gunPull * 0.9; }
+    }
     if (this.flashT > 0) { this.flashT -= dt; this.light.intensity = this.flashT > 0 ? 18 : 0; }
   }
   muzzlePos() { this.m.root.updateMatrixWorld(true); return this.m.guns[this.weapon].mz.getWorldPosition(new V3()); }
@@ -742,8 +750,8 @@ class Soldier {
       if (!t.alive) continue;
       const ox = t.pos.x - origin.x, oz = t.pos.z - origin.z, proj = ox * dx + oz * dz;
       if (proj < 0 || proj > bestT) continue;
-      const perp2 = ox * ox + oz * oz - proj * proj; if (perp2 > 0.45 * 0.45) continue;
-      best = t; bestT = Math.max(0.1, proj - Math.sqrt(0.2025 - perp2));
+      const perp2 = ox * ox + oz * oz - proj * proj; if (perp2 > HIT_R * HIT_R) continue;
+      best = t; bestT = Math.max(0.1, proj - Math.sqrt(HIT_R * HIT_R - perp2));
     }
     let end;
     if (best) {
