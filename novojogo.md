@@ -63,12 +63,12 @@ Protótipo jogável no navegador: mapa pequeno com relevo + uma casa de 2 andare
 controles estilo Brawl Stars (mira já atira), um bot inimigo e a AK. Sem gastar créditos;
 imagens e sons entram depois que a jogabilidade for aprovada.
 
-## Referências (imagens anexadas)
-- ref01 — cidade deserto top-down
-- ref02 — personagem frente/costas
-- ref03 — conceito HUD/modos/classes
-- ref04 — noite com chuva
-- ref05 — casa com telhado cortado e chuva
-- ref06–08 — Thunder Tier One (dia)
-
-> As imagens de referência ainda não estão no repositório. Quando forem adicionadas, salvar em `referencias/`.
+## Referências (pasta `referencias/`)
+- [ref01 — cidade deserto top-down](referencias/ref01-cidade-deserto-topdown.jpg)
+- [ref02 — personagem frente/costas](referencias/ref02-personagem-frente-costas.jpg)
+- [ref03 — conceito HUD/modos/classes](referencias/ref03-conceito-hud-modos-classes.png) (outra versão: [ref03b](referencias/ref03b-conceito-hud-modos-classes.jpg))
+- [ref04 — noite com chuva](referencias/ref04-noite-chuva.jpg)
+- [ref05 — casa com telhado cortado e chuva](referencias/ref05-casa-telhado-cortado-chuva.jpg)
+- [ref06 — Thunder Tier One (dia, pátio industrial)](referencias/ref06-thunder-dia-patio-industrial.jpg)
+- [ref07 — Thunder Tier One (dia, rua com chuva)](referencias/ref07-thunder-dia-rua-chuva.jpg)
+- [ref08 — Thunder Tier One (rua, entardecer)](referencias/ref08-thunder-rua-entardecer.jpg)
