@@ -94,6 +94,13 @@ body.is-touch.medic #healBtn{display:block}
   background:rgba(20,18,15,.25);border:2px solid rgba(241,233,216,.25);z-index:7;color:var(--fg);font-size:10px;font-weight:700;
   display:none;align-items:center;justify-content:center;pointer-events:auto;opacity:.8}
 body.is-touch #reloadBtn{display:flex}
+/* controles 70% transparentes; ficam um pouco mais visíveis enquanto usados */
+#joy,#aimBtn,.rbtn,#reloadBtn{opacity:.3!important}
+#joy:not(.idle),#aimBtn.on,#nadeBtn.on{opacity:.55!important}
+#actBtn{position:fixed;right:calc(var(--ctl-x) - 30px);top:calc(var(--ctl-y) + 74px);z-index:8;padding:9px 16px;border-radius:20px;
+  background:rgba(232,163,58,.85);color:#1d1a16;font-weight:800;font-size:13px;letter-spacing:.04em;cursor:pointer;display:none;pointer-events:auto;white-space:nowrap}
+body:not(.is-touch) #actBtn{right:50%;transform:translateX(50%);top:auto;bottom:70px}
+.lootTag{position:absolute;left:0;top:0;padding:3px 8px;border-radius:5px;background:rgba(18,16,13,.75);color:#ffe28a;font-size:12px;font-weight:800;white-space:nowrap;pointer-events:none}
 
 #start{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,rgba(29,26,22,.75),rgba(29,26,22,.95))}
@@ -141,6 +148,7 @@ body.is-touch #reloadBtn{display:flex}
 <div id="nadeBtn" class="touch rbtn"><span><i id="nadeLbl" style="font-style:normal">FLASH</i><b id="nadeCount">1</b></span><div id="nadeKnob"></div></div>
 <div id="healBtn" class="rbtn"><span>CURA<b id="healCd">✚</b></span></div>
 <div id="reloadBtn">RECAR.</div>
+<div id="actBtn"></div>
 
 <div id="start">
   <div class="card panel">
@@ -234,10 +242,16 @@ function rawHeight(x, z) {
   h = lerp(h, -0.5 + 0.035 * x - 0.03 * z, roadFactor(x, z) * 0.75);
   return h;
 }
-function terrainHeight(x, z) {
-  const dx = Math.max(HOUSE.x0 - x, 0, x - HOUSE.x1), dz = Math.max(HOUSE.z0 - z, 0, z - HOUSE.z1);
-  return lerp(H0, rawHeight(x, z), smooth(0.4, 5, Math.hypot(dx, dz)));
+const BARN = { x0: 10, x1: 22, z0: -31, z1: -21 };
+let BARN_Y = 0;
+function flatten(h, x, z, R, y) {
+  const dx = Math.max(R.x0 - x, 0, x - R.x1), dz = Math.max(R.z0 - z, 0, z - R.z1);
+  return lerp(y, h, smooth(0.4, 5, Math.hypot(dx, dz)));
 }
+function terrainHeight(x, z) {
+  return flatten(flatten(rawHeight(x, z), x, z, BARN, BARN_Y), x, z, HOUSE, H0);
+}
+BARN_Y = rawHeight(16, -26);
 function terrainColor(x, z) {
   const n = 0.5 + 0.5 * Math.sin(x * 0.37 + Math.sin(z * 0.23) * 2) * Math.cos(z * 0.31 - x * 0.11);
   const n2 = 0.5 + 0.5 * Math.sin(x * 1.7 + z * 1.3) * Math.sin(z * 1.9 - x * 0.7);
@@ -380,7 +394,7 @@ function windowWall(x0, x1, z0, z1, y0, y1) { wall(x0, x1, z0, z1, y0, y0 + 1.0)
   box(3.2, x1, z0, -12.6, H1 - 0.25, H1, SL, { collide: false, upper: true });
   surfaces.push({ x0, x1: 3.2, z0, z1, h: () => H1 });
   surfaces.push({ x0: 3.2, x1, z0, z1: -12.6, h: () => H1 });
-  const PT = 0.25, py0 = H1, py1 = H1 + 0.9, PC = 0xcbb895;
+  const PT = 0.25, py0 = H1, py1 = H1 + 1.15, PC = 0xcbb895;
   wall(x0, x1, z1 - PT, z1, py0, py1, { upper: true, color: PC });
   wall(x0, x1, z0, z0 + PT, py0, py1, { upper: true, color: PC });
   wall(x0, x0 + PT, z0, z1, py0, py1, { upper: true, color: PC });
@@ -487,6 +501,26 @@ pole(-30, 8.6); pole(-4, 8.6); pole(14, 8.6); pole(30, 8.6);
 barrel(-9, -20); barrel(-8.3, -20.4, 0x4a5a3a); barrel(23, 4); barrel(-18, 24, 0x5a3a2a);
 fence(-9.5, -20, -11); fence(-9.5, -9, -4);
 
+// ---------- barracão de chapa com 4 portas (uma em cada lado) ----------
+{
+  const { x0, x1, z0, z1 } = BARN, T = 0.25, y0 = BARN_Y - 0.3, y1 = BARN_Y + 3.0, D = 0.9, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+  const MW = 0x7f8279;
+  box(x0, x1, z0, z1, BARN_Y - 0.2, BARN_Y + 0.03, 0x6d6a62, { collide: false, solid: false, cast: false });   // piso de concreto
+  wall(x0, cx - D, z0, z0 + T, y0, y1, { color: MW }); wall(cx + D, x1, z0, z0 + T, y0, y1, { color: MW });   // norte
+  wall(x0, cx - D, z1 - T, z1, y0, y1, { color: MW }); wall(cx + D, x1, z1 - T, z1, y0, y1, { color: MW });   // sul
+  wall(x0, x0 + T, z0, cz - D, y0, y1, { color: MW }); wall(x0, x0 + T, cz + D, z1, y0, y1, { color: MW });   // oeste
+  wall(x1 - T, x1, z0, cz - D, y0, y1, { color: MW }); wall(x1 - T, x1, cz + D, z1, y0, y1, { color: MW });   // leste
+  for (const [a, b, c, d] of [[cx - D, cx + D, z0, z0 + T], [cx - D, cx + D, z1 - T, z1], [x0, x0 + T, cz - D, cz + D], [x1 - T, x1, cz - D, cz + D]])
+    box(a, b, c, d, BARN_Y + 2.3, y1, MW, { fade: true });                                                   // vergas das portas
+  // cobertura dentro: pilhas de caixas e paletes
+  const Y = BARN_Y;
+  box(11, 13, -30.5, -29, Y, Y + 1.2, 0x9e7a48); box(11, 12, -30.5, -29.5, Y + 1.2, Y + 2.3, 0x8f6c40);
+  box(19, 21.4, -30.5, -29.2, Y, Y + 1.2, 0x9e7a48);
+  box(11, 12.3, -23, -21.6, Y, Y + 1.2, 0x8f6c40);
+  box(19.8, 21.4, -22.8, -21.6, Y, Y + 1.2, 0x9e7a48); box(20.4, 21.4, -22.8, -21.8, Y + 1.2, Y + 2.3, 0x8f6c40);
+  box(14, 15.2, -27.3, -24.7, Y, Y + 1.15, 0x6b5a44); box(17.4, 18.6, -27.3, -24.7, Y, Y + 1.15, 0x6b5a44);
+}
+
 {
   const near = (x, z, m) => colliders.some(c => x > c.x0 - m && x < c.x1 + m && z > c.z0 - m && z < c.z1 + m);
   const inHouse = (x, z) => x > HOUSE.x0 - 1 && x < HOUSE.x1 + 1 && z > HOUSE.z0 - 1 && z < HOUSE.z1 + 1;
@@ -578,8 +612,11 @@ function smokeBlocks(a, b) {
 }
 const eye = (s, h = 1.5) => new V3(s.pos.x, s.y + h, s.pos.z);
 const los = (a, b) => { const A = eye(a), B = eye(b); return !smokeBlocks(A, B) && firstHit(A, B) === Infinity; };
-function aimPoint(t, x, z) { return new V3(x ?? t.pos.x, t.y + SHOT_H + rand(-0.05, 0.1), z ?? t.pos.z); }
-const canShoot = (a, b) => shotBlock(eye(a, SHOT_H), aimPoint(b)) === Infinity;
+// no alto (terraço/escada) quem atira se inclina por cima da mureta; o alvo no alto só expõe a cabeça quando está atirando
+const lean = (a, b) => (a.y - b.y > 1.5 ? 0.35 : 0);
+const peek = (t, from) => (t.y - from.y > 1.5 ? (now - t.lastShot < 0.7 ? 0.3 : -0.1) : 0);
+function aimPoint(t, x, z, from) { return new V3(x ?? t.pos.x, t.y + SHOT_H + (from ? peek(t, from) : 0) + rand(-0.05, 0.1), z ?? t.pos.z); }
+const canShoot = (a, b) => shotBlock(eye(a, SHOT_H + lean(a, b)), aimPoint(b, null, null, a)) === Infinity;
 
 // ================= efeitos =================
 function radialTex(soft = false) {
@@ -823,7 +860,8 @@ class Soldier {
     }
     let end;
     if (best) {
-      const P = aimPoint(best, origin.x + dx * bestT, origin.z + dz * bestT);
+      origin.y = this.y + SHOT_H + lean(this, best);
+      const P = aimPoint(best, origin.x + dx * bestT, origin.z + dz * bestT, this);
       const block = shotBlock(origin, P), dist = origin.distanceTo(P);
       if (block < dist - 0.2) { end = origin.clone().add(P.sub(origin).normalize().multiplyScalar(block)); impact(end); }
       else { end = P; damage(best, randInt(w.dmg[0], w.dmg[1]) * (this.isBot ? 0.75 : 1), this, w.pen); blood(P); }
@@ -868,7 +906,7 @@ let now = 0, started = false, kills = 0, deaths = 0, mode = 'treino', teamScore 
 const TDM_GOAL = 20;
 let player, bots = [], soldiers = [];
 const enemiesOf = s => soldiers.filter(o => o.alive && o.team !== s.team);
-const SPAWNS = { A: [[0, 22], [-24, 20], [27, 4], [-6, 30], [12, 28]], B: [[-19, -22], [24, -18], [-28, -4], [2, -26], [14, -30]] };
+const SPAWNS = { A: [[0, 22], [-24, 20], [27, 4], [-6, 30], [12, 28]], B: [[-19, -22], [24, -18], [-28, -4], [2, -26], [16, -35]] };
 function farSpawn(s) {
   let best = SPAWNS[s.team][0], bd = -Infinity;
   for (const p of SPAWNS[s.team]) {
@@ -1035,61 +1073,99 @@ function updateSmokes(dt) {
   }
 }
 
-// ---------- caixas de loot ----------
-const LOOT_SPOTS = [[-8, -24], [20, -3], [-20, 16], [3, 28], [-2.4, -8.6], [-3, -12.2, H1], [28, 20], [-30, -14], [14, -16], [-12, 30]];
+// ---------- baús de loot: chegue perto, ABRIR (F), veja o item e PEGAR (F) ----------
+const LOOT_SPOTS = [[-8, -24], [20, -3], [-20, 16], [3, 28], [-4.8, -11], [-3, -12.2, H1], [28, 20], [-30, -14], [16, -26], [-12, 30], [12, -16]];
 const LOOT_TABLE = [['colete', 24], ['capacete', 18], ['medkit', 20], ['municao', 14], ['arma', 14], ['granada', 10]];
+const ITEM_COLOR = { colete: 0x4c5a6a, capacete: 0x3d4a3a, medkit: 0xe8e2d6, municao: 0xb08a3a, arma: 0x222222, granada: 0x4a5a36 };
 const loots = [];
 {
   const bodyMat = new THREE.MeshStandardMaterial({ color: srgb(0x4d5a35), roughness: 0.8 }), lidMat = new THREE.MeshStandardMaterial({ color: srgb(0x5e6c40), roughness: 0.8 });
   const strip = new THREE.MeshStandardMaterial({ color: srgb(0xd9c25a), roughness: 0.6, emissive: srgb(0x332a00) });
+  const inner = new THREE.MeshStandardMaterial({ color: srgb(0x1e2216), roughness: 1 });
   for (const [x, z, yy] of LOOT_SPOTS) {
-    const y = yy ?? terrainHeight(x, z) - 0.02;
-    const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rand(0, 3);
-    const b = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.42, 0.55), bodyMat); b.position.y = 0.21; b.castShadow = b.receiveShadow = true; g.add(b);
-    const s = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.06, 0.1), strip); s.position.y = 0.3; g.add(s);
-    const lid = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.1, 0.57), lidMat); lid.position.y = 0.47; lid.castShadow = true; g.add(lid);
+    const y = yy ?? (x > BARN.x0 && x < BARN.x1 && z > BARN.z0 && z < BARN.z1 ? BARN_Y : terrainHeight(x, z) - 0.02);
+    const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rand(-0.4, 0.4);
+    const b = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.62, 0.85), bodyMat); b.position.y = 0.31; b.castShadow = b.receiveShadow = true; g.add(b);
+    const ins = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.02, 0.75), inner); ins.position.y = 0.63; g.add(ins);
+    const s = new THREE.Mesh(new THREE.BoxGeometry(1.42, 0.08, 0.14), strip); s.position.y = 0.45; g.add(s);
+    const hinge = new THREE.Group(); hinge.position.set(0, 0.62, -0.43); g.add(hinge);
+    const lid = new THREE.Mesh(new THREE.BoxGeometry(1.42, 0.12, 0.87), lidMat); lid.position.set(0, 0.06, 0.43); lid.castShadow = true; hinge.add(lid);
+    const item = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.22, 0.35), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, emissive: srgb(0x222200) }));
+    item.position.y = 0.85; item.visible = false; g.add(item);
     scene.add(g);
-    if (yy) upper.push(b, s, lid);
-    loots.push({ x, z, y, g, lid, open: false, t: 0 });
+    if (yy) upper.push(b, s, lid, ins, item);
+    const tag = document.createElement('div'); tag.className = 'lootTag'; tag.style.display = 'none'; $('#tags').appendChild(tag);
+    colliders.push({ x0: x - 0.7, x1: x + 0.7, z0: z - 0.43, z1: z + 0.43, y0: y, y1: y + 0.62 });
+    loots.push({ x, z, y, g, hinge, item, tag, state: 'closed', loot: null, t: 0, ang: 0 });
   }
 }
-function rollLoot() { let r = rand(0, LOOT_TABLE.reduce((a, b) => a + b[1], 0)); for (const [k, w] of LOOT_TABLE) if ((r -= w) <= 0) return k; return 'medkit'; }
-function giveLoot(s, k) {
-  let msg = '';
-  if (k === 'colete') { s.armor = 100; msg = '+ Colete (100)'; }
-  else if (k === 'capacete') { s.helmet = true; msg = '+ Capacete'; }
-  else if (k === 'medkit') { s.hp = Math.min(MAX_HP, s.hp + 50); msg = '+ Kit médico (+50 vida)'; }
-  else if (k === 'municao') { s.refill(); msg = '+ Munição'; }
-  else if (k === 'granada') { const t = pick(NADE_ORDER); s.nades[t] = (s.nades[t] || 0) + 1; if (!(s.nades[s.nadeSel] > 0)) s.nadeSel = t; msg = `+ Granada ${NADES[t].name}`; }
+function rollLoot() {
+  let r = rand(0, LOOT_TABLE.reduce((a, b) => a + b[1], 0)), k = 'medkit';
+  for (const [kk, w] of LOOT_TABLE) if ((r -= w) <= 0) { k = kk; break; }
+  const sub = k === 'arma' ? pick(['ak', 'm4', 'awp', 'awp']) : k === 'granada' ? pick(NADE_ORDER) : null;
+  return { k, sub };
+}
+const lootName = L => L.k === 'colete' ? 'Colete' : L.k === 'capacete' ? 'Capacete' : L.k === 'medkit' ? 'Kit médico' : L.k === 'municao' ? 'Munição'
+  : L.k === 'arma' ? WEAPONS[L.sub].name : 'Granada ' + NADES[L.sub].name;
+for (const l of loots) l.loot = rollLoot();
+function giveLoot(s, L) {
+  if (typeof L === 'string') L = { k: L, sub: L === 'arma' ? 'awp' : L === 'granada' ? 'he' : null };
+  const k = L.k;
+  if (k === 'colete') s.armor = 100;
+  else if (k === 'capacete') s.helmet = true;
+  else if (k === 'medkit') s.hp = Math.min(MAX_HP, s.hp + 50);
+  else if (k === 'municao') s.refill();
+  else if (k === 'granada') { s.nades[L.sub] = (s.nades[L.sub] || 0) + 1; if (!(s.nades[s.nadeSel] > 0)) s.nadeSel = L.sub; }
   else if (k === 'arma') {
-    const id = pick(['ak', 'm4', 'awp', 'awp']);
     const wasPrimary = s.weapon === s.inv.primary;
-    s.inv.primary = id; s.giveAmmo(id);
-    if (wasPrimary) { s.weapon = id; s.reloadT = 0; }
-    msg = `+ ${WEAPONS[id].name}`;
+    s.inv.primary = L.sub; s.giveAmmo(L.sub);
+    if (wasPrimary) { s.weapon = L.sub; s.reloadT = 0; }
   }
   s.showGear();
-  if (s === player) { toast(msg); if (actx) tone(520, 880, 0.15, 0.1); }
+  if (s === player) { toast('+ ' + lootName(L) + (k === 'medkit' ? ' (+50 vida)' : k === 'colete' ? ' (100)' : '')); if (actx) tone(520, 880, 0.15, 0.1); }
 }
+function openLoot(l) {
+  l.state = 'open'; l.item.material.color.set(ITEM_COLOR[l.loot.k]); l.item.visible = true;
+  if (actx) { noise(0.25, 0.12, 'lowpass', 900); tone(180, 120, 0.2, 0.08); }
+}
+function takeLoot(l, s) { giveLoot(s, l.loot); l.state = 'empty'; l.t = 30; l.item.visible = false; l.tag.style.display = 'none'; }
+let nearLoot = null;
+function lootAction() {
+  const l = nearLoot; if (!l || !player.alive) return;
+  if (l.state === 'closed') openLoot(l); else if (l.state === 'open') takeLoot(l, player);
+}
+const actBtn = $('#actBtn');
+actBtn.addEventListener('pointerdown', e => { e.stopPropagation(); lastTouch = e.pointerType === 'mouse' ? lastTouch : now; lootAction(); });
 function updateLoot(dt) {
+  nearLoot = null; let nd = 1.7;
   for (const l of loots) {
-    if (l.open) {
-      l.t -= dt; l.lid.position.set(0, 0.5, -0.45); l.lid.rotation.x = -1.2;
-      if (l.t <= 0) { l.open = false; l.lid.position.set(0, 0.47, 0); l.lid.rotation.x = 0; }
-      continue;
-    }
+    l.ang = lerp(l.ang, l.state === 'closed' ? 0 : -1.9, Math.min(1, dt * 10)); l.hinge.rotation.x = l.ang;
+    if (l.state === 'empty') { if ((l.t -= dt) <= 0) { l.state = 'closed'; l.loot = rollLoot(); } continue; }
+    if (l.state === 'open') { l.item.rotation.y += dt * 2; l.item.position.y = 0.85 + Math.sin(now * 3) * 0.05; }
     for (const s of soldiers) {
-      if (!s.alive || Math.abs(s.y - l.y) > 1 || Math.hypot(s.pos.x - l.x, s.pos.z - l.z) > 1.1) continue;
-      l.open = true; l.t = 30; giveLoot(s, rollLoot()); break;
+      if (!s.alive || Math.abs(s.y - l.y) > 1) continue;
+      const d = Math.hypot(s.pos.x - l.x, s.pos.z - l.z);
+      if (s === player) { if (d < nd) { nd = d; nearLoot = l; } }
+      else if (d < 1.4) { if (l.state === 'closed') openLoot(l); takeLoot(l, s); break; }   // bots abrem e pegam direto
     }
+    // etiqueta com o nome do item quando aberto
+    if (l.state === 'open') {
+      const [x, y, ok] = toScreen(new V3(l.x, l.y + 1.4, l.z));
+      const hidden = !ok || (upper.includes(l.item) && !upper[0].visible);
+      l.tag.style.display = hidden ? 'none' : ''; l.tag.textContent = lootName(l.loot);
+      l.tag.style.transform = `translate(${x}px,${y}px) translate(-50%,-100%)`;
+    } else l.tag.style.display = 'none';
   }
+  const txt = nearLoot && player.alive ? (nearLoot.state === 'closed' ? 'ABRIR BAÚ' : 'PEGAR ' + lootName(nearLoot.loot).toUpperCase()) + (isTouch ? '' : '  (F)') : '';
+  if (actBtn.textContent !== txt) actBtn.textContent = txt;
+  actBtn.style.display = txt ? 'block' : 'none';
 }
 
 // ---------- IA dos bots ----------
 const WP = [
   [-3.3, -3.0], [-3.3, -7.8], [-2.5, -10.5], [0.5, -10.5], [2.5, -7.0], [4.5, -6.9], [4.5, -12.2], [4.6, -13.8],
   [0, -11], [-4.5, -7.6, 3], [0, -11], [4.6, -13.8], [4.5, -12.2], [4.5, -7.0], [2.5, -7.0], [2.5, -9], [1.7, -13.6],
-  [1.7, -17], [11, -22], [20, -17], [26, -12], [24, 0, 1.5], [10, 10], [-8, 12], [-20, 6], [-22, -10, 1.5], [-8, -2],
+  [1.7, -17], [8, -18], [16, -18.5], [16, -23.5], [16, -18.5], [20, -17], [26, -12], [24, 0, 1.5], [10, 10], [-8, 12], [-20, 6], [-22, -10, 1.5], [-8, -2],
 ];
 const newAI = () => ({ state: 'patrol', wp: 0, wait: 0, last: new V3(), seenT: 0, searchT: 0, strafe: 1, strafeT: 0, burst: 0, burstCd: 0,
   stuckT: 0, stuckPos: new V3(), target: null, scanT: 0, clear: false, clearT: 0, blindDir: 0, nadeCd: rand(6, 12) });
@@ -1216,7 +1292,7 @@ function applyWeather(w) {
   terrainMat.roughness = wet ? 0.55 : 1; terrainMat.color.setScalar(wet ? 0.72 : 1);
   for (const m of allMats) m.roughness = wet ? Math.min(m.userData.rough, 0.5) : m.userData.rough;
   rain.material.opacity = night ? 0.3 : 0.45;
-  if (rainGain) rainGain.gain.value = wet ? 0.07 : 0;
+  if (rainGain) rainGain.gain.value = wet ? 0.018 : 0;
 }
 function updateRain(dt) {
   if (!rain.visible) return;
@@ -1328,6 +1404,7 @@ addEventListener('keydown', e => {
   if (e.code === 'Digit4') cycleNade();
   if (e.code === 'KeyG') throwSelected();
   if (e.code === 'KeyE') player.heal();
+  if (e.code === 'KeyF') lootAction();
 });
 addEventListener('keyup', e => { keys[e.code] = false; });
 addEventListener('wheel', e => {

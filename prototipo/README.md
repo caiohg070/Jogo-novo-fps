@@ -24,7 +24,7 @@ AK-47, Colt M4, AWP (1 tiro mata sem colete; com colete + capacete precisa de 2)
 Granadas: HE (explode, dano em área), flash (cega quem olha), smoke (bloqueia a visão dos bots).
 
 ## Loot
-Caixas verdes (amarelo no minimapa) dão ao passar por cima: colete, capacete, kit médico, munição,
+Baús verdes (amarelo no minimapa): chegue perto, toque ABRIR (F no PC), veja o item e toque PEGAR. Itens: colete, capacete, kit médico, munição,
 arma (AK/M4/AWP) ou granada. Reabrem em 30 s. Os bots também pegam.
 
 ## Clima
@@ -38,4 +38,4 @@ Dia, chuva (chão molhado, poças) e noite com chuva (postes acesos).
 
 ## Ainda falta (próximas etapas)
 Battle Royale (avião/paraquedas), modo bomba, áreas subterrâneas, casas de 3 andares,
-sprites 2D dos personagens, sons reais (ElevenLabs) e imagens (Higgsfield/Magnific).
+modelos 3D melhores dos personagens, sons reais (ElevenLabs) e imagens (Higgsfield/Magnific).

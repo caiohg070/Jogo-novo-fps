@@ -13,7 +13,7 @@
 ## 2. Câmera e visual
 - Câmera fixa, de cima, levemente inclinada, estilo Brawl Stars — não se move de ângulo.
 - Mapa 3D com profundidade: relevo, morros, montanhas, ruas mais altas e mais baixas.
-- Personagens: usar 2D (sprites com várias direções) para otimizar, mas com aparência de 3D.
+- Personagens: ~~sprites 2D~~ — decidido: não precisa mais de sprites 2D; personagens continuam em 3D.
 - Visual realista tático, seguir EXATAMENTE as referências (Door Kickers 2 / Thunder Tier One):
   tons de terra, poeira e concreto, sombras longas, telhados cortados mostrando o interior das casas,
   variação noturna com chuva e poças.
