@@ -614,7 +614,8 @@ const eye = (s, h = 1.5) => new V3(s.pos.x, s.y + h, s.pos.z);
 const los = (a, b) => { const A = eye(a), B = eye(b); return !smokeBlocks(A, B) && firstHit(A, B) === Infinity; };
 // no alto (terraço/escada) quem atira se inclina por cima da mureta; o alvo no alto só expõe a cabeça quando está atirando
 const lean = (a, b) => (a.y - b.y > 1.5 ? 0.35 : 0);
-const peek = (t, from) => (t.y - from.y > 1.5 ? (now - t.lastShot < 0.7 ? 0.3 : -0.1) : 0);
+const onTerrace = t => t.y > H1 - 0.3 && t.pos.x > HOUSE.x0 && t.pos.x < HOUSE.x1 && t.pos.z > HOUSE.z0 && t.pos.z < HOUSE.z1;
+const peek = (t, from) => (t.y - from.y > 1.5 && onTerrace(t) ? (now - t.lastShot < 0.7 ? 0.3 : -0.1) : 0);
 function aimPoint(t, x, z, from) { return new V3(x ?? t.pos.x, t.y + SHOT_H + (from ? peek(t, from) : 0) + rand(-0.05, 0.1), z ?? t.pos.z); }
 const canShoot = (a, b) => shotBlock(eye(a, SHOT_H + lean(a, b)), aimPoint(b, null, null, a)) === Infinity;
 
@@ -1176,12 +1177,12 @@ function updateBot(b, dt) {
   if (!b.alive) return;
   const blind = b.blindT > 0;
   const sight = b.w.scope ? 45 : 30;
-  ai.scanT -= dt;
+  ai.scanT -= dt; if (ai.ignoreT > 0) ai.ignoreT -= dt;
   if (ai.scanT <= 0) {
     ai.scanT = 0.2; ai.target = null;
     if (!blind) {
       let bd = sight;
-      for (const e of enemiesOf(b)) { const d = Math.hypot(e.pos.x - b.pos.x, e.pos.z - b.pos.z); if (d < bd && los(b, e)) { bd = d; ai.target = e; } }
+      for (const e of enemiesOf(b)) { if (e === ai.ignore && ai.ignoreT > 0) continue; const d = Math.hypot(e.pos.x - b.pos.x, e.pos.z - b.pos.z); if (d < bd && los(b, e)) { bd = d; ai.target = e; } }
     }
   }
   const t = ai.target && ai.target.alive && !blind ? ai.target : null;
@@ -1199,6 +1200,8 @@ function updateBot(b, dt) {
     b.facing = ang;
     ai.clearT -= dt;
     if (ai.clearT <= 0) { ai.clearT = 0.25; ai.clear = canShoot(b, t); }
+    ai.blockedT = ai.clear ? 0 : (ai.blockedT || 0) + dt;
+    if (ai.blockedT > 3) { ai.blockedT = 0; ai.ignore = t; ai.ignoreT = 4; ai.state = 'patrol'; ai.wp = (nearestWP(b.pos) + 1) % WP.length; }
     const sniper = b.w.scope, far = sniper ? 30 : 16, near = sniper ? 12 : 7;
     const fwd = !ai.clear ? 1 : d > far ? 1 : d < near ? -1 : 0;
     ai.strafeT -= dt;
@@ -1283,12 +1286,12 @@ function applyWeather(w) {
     hemi.color = C(0.70, 0.73, 0.78); hemi.groundColor = C(0.30, 0.28, 0.25); hemi.intensity = 1.25;
     sun.color = C(0.85, 0.88, 0.92); sun.intensity = 0.9; renderer.toneMappingExposure = 0.95;
   } else {
-    scene.background = C(0.05, 0.07, 0.10); scene.fog.color.copy(scene.background); scene.fog.near = 18; scene.fog.far = 62;
-    hemi.color = C(0.30, 0.38, 0.55); hemi.groundColor = C(0.06, 0.06, 0.08); hemi.intensity = 0.55;
-    sun.color = C(0.55, 0.65, 0.9); sun.intensity = 0.45; renderer.toneMappingExposure = 1.1;
+    scene.background = C(0.10, 0.13, 0.18); scene.fog.color.copy(scene.background); scene.fog.near = 26; scene.fog.far = 80;
+    hemi.color = C(0.42, 0.50, 0.68); hemi.groundColor = C(0.12, 0.12, 0.14); hemi.intensity = 0.95;
+    sun.color = C(0.62, 0.72, 0.95); sun.intensity = 0.85; renderer.toneMappingExposure = 1.3;
   }
   for (const l of streetLights) l.intensity = night ? 45 : 0;
-  lantern.intensity = night ? 7 : 0;
+  lantern.intensity = night ? 12 : 0; lantern.distance = 18;
   terrainMat.roughness = wet ? 0.55 : 1; terrainMat.color.setScalar(wet ? 0.72 : 1);
   for (const m of allMats) m.roughness = wet ? Math.min(m.userData.rough, 0.5) : m.userData.rough;
   rain.material.opacity = night ? 0.3 : 0.45;
@@ -1629,7 +1632,7 @@ $('#play').addEventListener('click', () => {
   if (isTouch) document.documentElement.requestFullscreen?.().then(() => screen.orientation?.lock?.('landscape')).catch(() => {});
   showCenter(mode === 'tdm' ? 'MATA-MATA' : 'TREINO', mode === 'tdm' ? `primeiro time a ${TDM_GOAL} abates` : 'elimine os 2 bots', 2.5);
 });
-window.__game = { get player() { return player; }, get bots() { return bots; }, throwNade, giveLoot, applyWeather, get now() { return now; } };
+window.__los = los; window.__cs = canShoot; window.__game = { get player() { return player; }, get bots() { return bots; }, throwNade, giveLoot, applyWeather, get now() { return now; } };
 frame();
 </script>
 </body>
