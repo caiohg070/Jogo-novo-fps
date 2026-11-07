@@ -127,7 +127,7 @@ function updateScore() {
     $('#score').innerHTML = `$${player.money} · RODADA ${bombS.round} · <span class="ta">AZUL <b>${bombS.score.A}</b></span> × <span class="tb"><b>${bombS.score.B}</b> VERM.</span> · ${t}`; return;
   }
   // só o placar dos times + meta (sem segunda contagem pessoal; seus abates estão no TAB/fim de partida)
-  if (mode === 'ctf') { $('#score').innerHTML = `<span class="ta">AZUL <b>${ctfS.score.A}</b></span> × <span class="tb"><b>${ctfS.score.B}</b> VERM.</span> &nbsp;·&nbsp; até ${CTF_GOAL}`; return; }
+  if (mode === 'ctf') { $('#score').innerHTML = `<span class="ta">AZUL <b>${ctfS.score.A}</b></span> × <span class="tb"><b>${ctfS.score.B}</b> VERM.</span> &nbsp;·&nbsp; até ${CTF_GOAL} · ${Math.floor(ctfS.t / 60)}:${String(Math.floor(ctfS.t % 60)).padStart(2, '0')}`; return; }
   $('#score').innerHTML = mode === 'tdm'
     ? `<span class="ta">AZUL <b>${teamScore.A}</b></span> × <span class="tb"><b>${teamScore.B}</b> VERMELHO</span> &nbsp;·&nbsp; até ${TDM_GOAL}`
     : `ABATES <b>${kills}</b> &nbsp;·&nbsp; MORTES <b>${deaths}</b>`;

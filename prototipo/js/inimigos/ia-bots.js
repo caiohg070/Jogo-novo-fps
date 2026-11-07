@@ -76,7 +76,7 @@ function updateBot(b, dt) {
     }
     if (b.hp < 35 && b.nades.smoke > 0 && Math.random() < dt) throwNade(b, 'smoke', b.pos.x + dx * 3, b.pos.z + dz * 3);
     const cf = mode === 'ctf' && ctfCarried(b);
-    if (cf) { const h = FLAGS[b.team].base; [mx, mz] = navSteer(b, h.x, h.z); speed = 3.8; }
+    if (cf) { const h = ctfRoute(b); [mx, mz] = navSteer(b, h.x, h.z); speed = 3.8; }
   } else if (ai.state === 'search' && !mustDefuse(b)) {
     ai.searchT -= dt;
     const dx = ai.last.x - b.pos.x, dz = ai.last.z - b.pos.z, l = Math.hypot(dx, dz);
