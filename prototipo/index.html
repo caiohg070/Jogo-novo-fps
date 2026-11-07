@@ -97,8 +97,8 @@ body.is-touch.medic #healBtn{display:block}
   display:none;align-items:center;justify-content:center;pointer-events:auto;opacity:.8}
 body.is-touch #reloadBtn{display:flex}
 /* controles 70% transparentes; ficam um pouco mais visíveis enquanto usados */
-#joy,#aimBtn,.rbtn,#reloadBtn{opacity:.2!important}
-#joy:not(.idle),#aimBtn.on,#nadeBtn.on{opacity:.42!important}
+#joy,#aimBtn,.rbtn,#reloadBtn{opacity:var(--ctl-op,.2)!important;scale:var(--ctl-s,1)}
+#joy:not(.idle),#aimBtn.on,#nadeBtn.on{opacity:var(--ctl-op2,.42)!important}
 #actBtn{position:fixed;right:calc(var(--ctl-x) + 20px);top:calc(var(--ctl-y) + 40px);z-index:8;padding:9px 16px;border-radius:20px;
   background:rgba(232,163,58,.85);color:#1d1a16;font-weight:800;font-size:13px;letter-spacing:.04em;cursor:pointer;display:none;pointer-events:auto;white-space:nowrap}
 body:not(.is-touch) #actBtn{right:50%;transform:translateX(50%);top:auto;bottom:70px}
@@ -122,6 +122,18 @@ body:not(.is-touch) #actBtn{right:50%;transform:translateX(50%);top:auto;bottom:
 .board button{all:unset;cursor:pointer;flex:1;text-align:center;padding:11px 0;border-radius:6px;font-weight:800;letter-spacing:.05em;background:var(--accent);color:#1d1a16}
 .board button.sec{background:transparent;border:1px solid var(--hud-line);color:var(--fg)}
 .board button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cfg{display:flex;flex-direction:column;gap:12px;font-size:13px}
+.cfg label{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.cfg b{color:var(--accent);font-variant-numeric:tabular-nums}
+.cfg input{grid-column:span 2;width:100%;accent-color:var(--accent);touch-action:auto}
+.cfgBtn{all:unset;cursor:pointer;display:block;width:100%;margin-top:6px;padding:9px 0;border-radius:6px;border:1px solid var(--hud-line);text-align:center;font-weight:700;font-size:13px;color:var(--fg)}
+.xpbar{height:6px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;margin:4px auto 0;max-width:260px}
+.xpbar i{display:block;height:100%;background:var(--accent)}
+#boardXP{text-align:center;margin:10px 0 0;font-size:13px}
+#boardXP .up{color:var(--accent);font-weight:800;font-size:15px}
+#tut{top:calc(max(10px,env(safe-area-inset-top)) + 44px);left:50%;transform:translateX(-50%);padding:8px 14px;font-size:14px;font-weight:700;text-align:center;display:none;max-width:min(560px,calc(100% - 300px));border-color:var(--accent)}
+#tut small{display:block;color:var(--accent);font-size:10px;letter-spacing:.1em;margin-bottom:2px}
+@media (orientation:portrait){#tut{max-width:calc(100% - 24px);top:calc(max(10px,env(safe-area-inset-top)) + 150px)}}
 .buygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .buygrid button{all:unset;cursor:pointer;padding:8px 6px;border:1px solid var(--hud-line);border-radius:6px;text-align:center;font-size:12px;font-weight:700;color:var(--fg)}
 .buygrid button small{display:block;color:var(--accent);font-size:11px;margin-top:2px}
@@ -194,13 +206,23 @@ body.is-touch #droneBtn.show{display:block}
 <div id="fsBtn" title="Tela cheia">⛶</div>
 <div id="pauseBtn" title="Pausa (Esc)">II</div>
 <div class="board" id="pause"><div class="card panel"><h2>PAUSA</h2>
-  <div class="row"><button id="resume">CONTINUAR</button><button class="sec" id="quit">SAIR PARA O MENU</button></div></div></div>
+  <div class="row"><button id="resume">CONTINUAR</button><button class="sec" id="quit">SAIR PARA O MENU</button></div>
+  <button class="cfgBtn" id="cfgOpen2">⚙ CONFIGURAÇÕES</button></div></div>
 <div id="buyBtn">COMPRAR (B)</div>
 <div class="board" id="buy"><div class="card panel"><h2>COMPRAR · <span id="money">$0</span></h2><div class="buygrid" id="buyGrid"></div>
   <div class="row"><button id="buyClose">FECHAR</button></div></div></div>
-<div class="board" id="board"><div class="card panel"><h2 id="boardTitle">FIM DE PARTIDA</h2><table id="boardTable"></table>
+<div class="board" id="board"><div class="card panel"><h2 id="boardTitle">FIM DE PARTIDA</h2><table id="boardTable"></table><div id="boardXP"></div>
   <div class="row"><button id="again">JOGAR DE NOVO</button><button class="sec" id="toMenu">MENU</button></div></div></div>
 <div id="actBtn"></div>
+<div class="board" id="cfgBoard"><div class="card panel"><h2>CONFIGURAÇÕES</h2>
+  <div class="cfg">
+    <label>Volume geral <b id="cv-vol"></b><input type="range" id="c-vol" min="0" max="100" step="5"></label>
+    <label>Tamanho dos botões <b id="cv-size"></b><input type="range" id="c-size" min="70" max="140" step="5"></label>
+    <label>Visibilidade dos botões <b id="cv-op"></b><input type="range" id="c-op" min="10" max="80" step="5"></label>
+    <label>Altura dos controles <b id="cv-h"></b><input type="range" id="c-h" min="50" max="80" step="2"></label>
+  </div>
+  <div class="row"><button class="sec" id="cfgReset">PADRÃO</button><button id="cfgClose">OK</button></div></div></div>
+<div id="tut" class="hud panel"><small id="tutStep"></small><span id="tutTxt"></span></div>
 <div id="objArrow"><i>▲</i><span></span></div>
 
 <div id="start">
@@ -213,6 +235,7 @@ body.is-touch #droneBtn.show{display:block}
       <button class="opt" data-v="br">BATTLE ROYALE<small>8 jogadores, avião e paraquedas</small></button>
       <button class="opt" data-v="bomb">BOMBA<small>3 vs 3, plante no A ou B</small></button>
       <button class="opt" data-v="ctf">BANDEIRA<small>3 vs 3, capture 3 vezes</small></button>
+      <button class="opt" data-v="tutorial">TUTORIAL<small>aprenda os controles passo a passo</small></button>
     </div>
     <h3>CLASSE</h3>
     <div class="opts" data-group="cls">
@@ -252,6 +275,7 @@ body.is-touch #droneBtn.show{display:block}
       <button class="opt" data-v="mochila">MOCHILA</button>
     </div>
     <button id="play">JOGAR</button>
+    <button class="cfgBtn" id="cfgOpen">⚙ CONFIGURAÇÕES (volume e botões)</button>
     <p id="career"></p>
     <p class="help"><b>Celular:</b> joystick anda; segure e arraste o botão vermelho para mirar (já atira); toque rápido mira sozinho. Botão de granada: segure, arraste e solte. Toque na lista à direita para trocar arma (o 4 troca a granada). Caixas verdes no mapa têm loot. O botão laranja serve para abrir baú/porta, entrar em veículo, usar metralhadora fixa e tirolesa.<br>
     <b>PC:</b> WASD, mouse mira, clique atira, 1/2/3 armas, 4 troca granada, G joga, E cura (médico), F usar/entrar, V drone, R recarrega.</p>
@@ -461,7 +485,27 @@ function wall(x0, x1, z0, z1, y0, y1, o = {}) {
   box(x0, x1, z0, z1, y0, y1, o.color ?? WALL, { fade: true, upper: o.upper });
   box(x0 - 0.01, x1 + 0.01, z0 - 0.01, z1 + 0.01, y1, y1 + 0.05, CAP, { collide: false, solid: false, cast: false, upper: o.upper });
 }
-function windowWall(x0, x1, z0, z1, y0, y1) { wall(x0, x1, z0, z1, y0, y0 + 1.0); wall(x0, x1, z0, z1, y0 + 2.1, y1); }
+const glasses = [], glassMat = new THREE.MeshStandardMaterial({ color: 0xbfe3f0, roughness: 0.05, metalness: 0.3, transparent: true, opacity: 0.35, depthWrite: false });
+function windowWall(x0, x1, z0, z1, y0, y1) {
+  wall(x0, x1, z0, z1, y0, y0 + 1.0); wall(x0, x1, z0, z1, y0 + 2.1, y1);
+  // vidro da janela: só enfeite (não bloqueia visão); quebra com tiro ou explosão
+  const thinX = x1 - x0 < z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+  const g = new THREE.Mesh(boxGeo, glassMat);
+  g.scale.set(thinX ? 0.04 : x1 - x0, 1.1, thinX ? z1 - z0 : 0.04); g.position.set(cx, y0 + 1.55, cz);
+  scene.add(g); glasses.push(g);
+}
+function breakGlass(g) {
+  if (!g.visible) return; g.visible = false;
+  const P = g.position;
+  for (let i = 0; i < 14; i++) spawnPart(new V3(P.x + rand(-0.5, 0.5) * g.scale.x, P.y + rand(-0.5, 0.5), P.z + rand(-0.5, 0.5) * g.scale.z), 0xd8f2ff, rand(0.06, 0.14), rand(0.5, 0.9), new V3(rand(-2, 2), rand(0, 2), rand(-2, 2)), true, 0, 9);
+  if (actx && player) { const v = vol(player.pos.distanceTo(P)); noise(0.35, 0.35 * v, 'highpass', 4200); for (let k = 0; k < 4; k++) setTimeout(() => actx && tone(rand(2500, 5200), rand(1800, 3000), 0.06, 0.05 * v, 'triangle'), 40 + k * rand(30, 70)); }
+}
+const glassRay = new THREE.Raycaster();
+function glassAlong(a, b) {
+  const d = new V3().subVectors(b, a), L = d.length(); if (L < 0.05) return; glassRay.set(a, d.divideScalar(L)); glassRay.far = L;
+  for (const h of glassRay.intersectObjects(glasses, false)) breakGlass(h.object);
+}
+function resetGlass() { for (const g of glasses) g.visible = true; }
 
 // ---------- casa de 2 andares ----------
 {
@@ -897,7 +941,7 @@ function engineStart() {
   if (!actx || engine) return;
   const o = actx.createOscillator(), o2 = actx.createOscillator(), f = actx.createBiquadFilter(), g = actx.createGain();
   o.type = 'sawtooth'; o2.type = 'square'; o.frequency.value = 45; o2.frequency.value = 22.5; f.type = 'lowpass'; f.frequency.value = 500; g.gain.value = 0.05;
-  o.connect(f); o2.connect(f); f.connect(g).connect(actx.destination); o.start(); o2.start(); engine = { o, o2, f, g };
+  o.connect(f); o2.connect(f); f.connect(g).connect(masterOut); o.start(); o2.start(); engine = { o, o2, f, g };
 }
 function engineStop() { if (!engine) return; try { engine.o.stop(); engine.o2.stop(); } catch {} engine = null; }
 function driveVehicle(V, ix, iz, dt) {
@@ -1101,10 +1145,11 @@ function groundShot(o, dx, dz, range, shooter) {
   }
   hitProp = null; return { dist: Infinity, end: a };
 }
+let lastHit = null;
 function firstHit(a, b) {
   _d.subVectors(b, a); const dist = _d.length(); if (dist < 1e-4) return Infinity; _d.divideScalar(dist);
   ray.set(a, _d); ray.far = dist;
-  const h = ray.intersectObjects(solids, false);
+  const h = ray.intersectObjects(solids, false); lastHit = h[0] || null;
   hitProp = h.length && h[0].object.userData.hp ? h[0].object : null;
   return Math.min(h.length ? h[0].distance : Infinity, terrainBlocks(a, b));
 }
@@ -1194,7 +1239,15 @@ function muzzleFlashLight(p) { const m = muzzleLights[mlIdx++ % 2]; m.l.position
 let shakeT = 0;
 
 // ---------- som provisório (sintetizado; ElevenLabs entra depois) ----------
-let actx = null, noiseBuf = null, rainGain = null;
+// configurações do jogador (volume e controles de toque), salvas no aparelho
+const cfg = { vol: 80, size: 100, op: 20, h: 64 };
+try { Object.assign(cfg, JSON.parse(localStorage.getItem('tatico.cfg')) || {}); } catch {}
+function applyCfg() {
+  const R = document.documentElement.style;
+  R.setProperty('--ctl-s', cfg.size / 100); R.setProperty('--ctl-op', cfg.op / 100); R.setProperty('--ctl-op2', Math.min(1, cfg.op / 100 + 0.22)); R.setProperty('--ctl-y', cfg.h + '%');
+  if (masterOut) masterOut.gain.value = cfg.vol / 100;
+}
+let actx = null, noiseBuf = null, rainGain = null, masterOut = null;
 const SFX = {};
 // toca um som real; longe = mais baixo e abafado; pequena variação de tom para não cansar
 function sfx(name, v, opts = {}) {
@@ -1205,7 +1258,7 @@ function sfx(name, v, opts = {}) {
   let node = src;
   if (opts.muffle) { const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = opts.muffle; node.connect(f); node = f; }
   if (opts.pan && actx.createStereoPanner) { const pn = actx.createStereoPanner(); pn.pan.value = opts.pan; node.connect(pn); node = pn; }
-  node.connect(g).connect(actx.destination);
+  node.connect(g).connect(masterOut);
   src.start(0, 0, opts.dur); return true;
 }
 // som posicional: fonte à direita do jogador toca mais no fone/alto-falante direito
@@ -1216,9 +1269,10 @@ function initAudio() {
   if (actx) return;
   try {
     actx = new (window.AudioContext || window.webkitAudioContext)();
+    masterOut = actx.createGain(); masterOut.gain.value = cfg.vol / 100; masterOut.connect(actx.destination);
     noiseBuf = actx.createBuffer(1, actx.sampleRate * 1, actx.sampleRate);
     const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    rainGain = actx.createGain(); rainGain.gain.value = 0; rainGain.connect(actx.destination);
+    rainGain = actx.createGain(); rainGain.gain.value = 0; rainGain.connect(masterOut);
     // sons reais (ElevenLabs), decodificados uma vez
     for (const [k, url] of Object.entries(window.SONS || {})) {
       const bin = atob(url.split(',')[1]), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
@@ -1233,13 +1287,13 @@ function noise(dur, vol, type, freq, when = 0) {
   const t = actx.currentTime + when, src = actx.createBufferSource(); src.buffer = noiseBuf;
   const f = actx.createBiquadFilter(); f.type = type; f.frequency.value = freq;
   const g = actx.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-  src.connect(f).connect(g).connect(actx.destination); src.start(t); src.stop(t + dur + 0.02);
+  src.connect(f).connect(g).connect(masterOut); src.start(t); src.stop(t + dur + 0.02);
 }
 function tone(f0, f1, dur, vol, type = 'sine') {
   const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
   o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-  o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + 0.02);
+  o.connect(g).connect(masterOut); o.start(t); o.stop(t + dur + 0.02);
 }
 const vol = d => clamp(1 - d / 50, 0, 1);
 const pings = [];
@@ -1255,6 +1309,23 @@ function bang(d, deafen, pos) {
 }
 function boom(d, pos) { if (!actx) return; const v = clamp(1 - d / 70, 0.1, 1); if (sfx('explosao', v, { muffle: lerp(1500, 20000, v), pan: panOf(pos) * 0.6 })) return; noise(1.0, 1.0 * v, 'lowpass', 900); tone(70, 25, 0.8, 0.9 * v); }
 // sons sintetizados que faltavam (sem gastar créditos): bala no concreto/ricochete, pino da granada, alicate do desarme
+// pequena destruição: marca de tiro (buraco escuro) + lascas da cor da parede; some quando a parede some
+const chips = [], chipGeo = new THREE.BoxGeometry(1, 1, 1);
+function clearChips() { for (const c of chips) c.parent?.remove(c); chips.length = 0; }
+function wallChip(hit) {
+  if (!hit || !hit.face) return;
+  const m = hit.object; if (m.userData.veh || !m.parent || m.geometry !== boxGeo) return;
+  const n = hit.face.normal, col = m.material.color;
+  for (let i = 0; i < 4; i++) spawnPart(hit.point.clone().addScaledVector(n.clone().transformDirection(m.matrixWorld), 0.05), col.getHex(), rand(0.06, 0.13), rand(0.4, 0.8), new V3(rand(-1.2, 1.2), rand(0.6, 2), rand(-1.2, 1.2)), false, 0, 9);
+  const mat = new THREE.MeshBasicMaterial({ color: 0x2a221b, transparent: true, opacity: 0.8, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+  const c = new THREE.Mesh(chipGeo, mat), sz = rand(0.09, 0.15), sc = m.scale;
+  const local = m.worldToLocal(hit.point.clone()); local.addScaledVector(n, 0.004 / Math.max(Math.abs(n.x) * sc.x, Math.abs(n.y) * sc.y, Math.abs(n.z) * sc.z));
+  c.position.copy(local);
+  c.scale.set((Math.abs(n.x) > 0.5 ? 0.01 : sz) / sc.x, (Math.abs(n.y) > 0.5 ? 0.01 : sz) / sc.y, (Math.abs(n.z) > 0.5 ? 0.01 : sz) / sc.z);
+  c.onBeforeRender = () => { mat.opacity = 0.8 * (m.material.transparent ? m.material.opacity : 1); };
+  m.add(c); chips.push(c);
+  if (chips.length > 220) { const o = chips.shift(); o.parent?.remove(o); }
+}
 function bulletHit(p) {
   impact(p);
   if (!actx || !player) return;
@@ -1486,7 +1557,7 @@ class Soldier {
       if (!this.isBot && this.reserve <= 0 && now - (this.dryAt ?? -9) > 0.5) { this.dryAt = now; if (!sfx('seco', 0.16, { dur: 0.25 })) blip(180, 0.04, 0.025); }
       return false;
     }
-    this.fireCd = w.rate; this.lastShot = now;
+    this.fireCd = w.rate; this.lastShot = now; if (tut && this === player) tut.shots++;
     if (this.turret) { const T = this.turret; T.heat += 0.05; if (T.heat >= 1) { T.cool = 4; if (this === player) toast('Metralhadora superaqueceu!'); } }
     else this.mag--;
     const range = w.range * (att.mira ? 1.25 : 1);
@@ -1519,15 +1590,16 @@ class Soldier {
       origin.y = this.y + SHOT_H + lean(this, best);
       const P = aimPoint(best, undefined, undefined, this);   // centro do alvo (a borda podia ficar dentro da mureta)
       const block = shotBlock(origin, P), dist = origin.distanceTo(P);
-      const hp1 = hitProp;
-      if (block < dist - 0.2) { end = origin.clone().add(P.sub(origin).normalize().multiplyScalar(block)); bulletHit(end); if (hp1) hurtProp(hp1, randInt(w.dmg[0], w.dmg[1]), this); }
+      const hp1 = hitProp, lh = lastHit;
+      if (block < dist - 0.2) { end = origin.clone().add(P.sub(origin).normalize().multiplyScalar(block)); bulletHit(end); if (hp1) hurtProp(hp1, randInt(w.dmg[0], w.dmg[1]), this); else wallChip(lh); }
       else { end = P; damage(best, randInt(w.dmg[0], w.dmg[1]) * (this.isBot ? diff.dmg : 1), this, w.pen); hitProp = null; blood(P); }
     } else {
       const g = groundShot(origin, dx, dz, range, this);
-      end = g.end; if (g.dist < Infinity) { bulletHit(end); if (hitProp) hurtProp(hitProp, randInt(w.dmg[0], w.dmg[1]), this); }
+      const lh = lastHit; end = g.end; if (g.dist < Infinity) { bulletHit(end); if (hitProp) hurtProp(hitProp, randInt(w.dmg[0], w.dmg[1]), this); else wallChip(lh); }
     }
     if (Math.hypot(end.x - origin.x, end.z - origin.z) < Math.hypot(muzzle.x - origin.x, muzzle.z - origin.z) + 0.05) muzzle = origin;   // colado na parede: traçante não sai de trás dela
     tracer(muzzle, end, w.scope ? 0xfff2c8 : 0xffd894, w.scope ? 0.18 : w.pellets ? 0.05 : 0.07);
+    glassAlong(origin, end);
   }
   stab(ang, enemies) {
     const w = this.w; this.fireCd = w.rate; this.swingT = 0.22;
@@ -1612,6 +1684,7 @@ function updateDowned(dt) {
   }
 }
 function damage(t, dmg, from, pen = 0.5) {
+  if (tut && tut.step < TUT.length - 1 && t.isBot) return;   // no tutorial os bots só valem no último passo
   if (!t.alive || t.team === from.team) return;
   let toArmor = 0;
   if (t.armor > 0) { const red = (1 - pen) * 0.5; toArmor = dmg * red; t.armor = Math.max(0, Math.round(t.armor - toArmor * 1.2)); }
@@ -1639,11 +1712,17 @@ function hitDir(from) {
 // histórico salvo no aparelho
 const CAREER_KEY = 'tatico.carreira';
 const career = (() => { try { return JSON.parse(localStorage.getItem(CAREER_KEY)) || {}; } catch { return {}; } })();
-for (const k of ['partidas', 'abates', 'mortes', 'vitorias']) career[k] = career[k] || 0;
+for (const k of ['partidas', 'abates', 'mortes', 'vitorias', 'xp']) career[k] = career[k] || 0;
 function saveCareer() { try { localStorage.setItem(CAREER_KEY, JSON.stringify(career)); } catch {} }
+// XP e níveis: abate 100, captura 300, plantar 150, vitória 500, partida jogada 50
+const xpNeed = l => 300 + 200 * (l - 1);                       // XP para ir do nível l para o l+1
+function levelInfo(xp) { let l = 1; while (xp >= xpNeed(l)) { xp -= xpNeed(l); l++; } return { lvl: l, cur: xp, need: xpNeed(l) }; }
+let matchXP = 0;
+const addXP = (n, why) => { if (!started) return; matchXP += n; if (why) toast(`+${n} XP · ${why}`); };
 function renderCareer() {
   const c = career, kd = (c.abates / Math.max(1, c.mortes)).toFixed(2);
-  $('#career').innerHTML = c.partidas || c.abates ? `<b>Seu histórico:</b> ${c.partidas} partidas · ${c.vitorias} vitórias · ${c.abates} abates · ${c.mortes} mortes · K/D ${kd}` + (c.melhorBR ? ` · melhor no BR: ${c.melhorBR}º` : '') : '';
+  const L = levelInfo(c.xp || 0);
+  $('#career').innerHTML = `<b>NÍVEL ${L.lvl}</b> · ${L.cur}/${L.need} XP<div class="xpbar"><i style="width:${(L.cur / L.need) * 100}%"></i></div>` + (c.partidas || c.abates ? `<b>Seu histórico:</b> ${c.partidas} partidas · ${c.vitorias} vitórias · ${c.abates} abates · ${c.mortes} mortes · K/D ${kd}` + (c.melhorBR ? ` · melhor no BR: ${c.melhorBR}º` : '') : '');
 }
 let killInfo = '';
 function die(t, by) {
@@ -1663,7 +1742,7 @@ function die(t, by) {
   feed(by, t);
   if (mode === 'tdm' && by !== t) teamScore[by.team] += 1;
   if (t === player) { deaths++; if (RESPAWN_MODES.has(mode)) showCenter('VOCÊ MORREU', (killInfo ? killInfo + ' · ' : '') + 'renascendo em 3…'); else showCenter('VOCÊ MORREU', killInfo || (mode === 'br' ? '' : 'aguarde a próxima rodada'), 3); }
-  if (by === player && t !== player) { kills++; player.refill(); blip(880, 0.12, 0.1); }
+  if (by === player && t !== player) { addXP(100); kills++; player.refill(); blip(880, 0.12, 0.1); }
   updateScore();
   if (mode === 'bomb') bombCheckWipe();
   if (mode === 'br' && !roundOver) {
@@ -1829,6 +1908,7 @@ function flashBang(P) {
   bang(player.pos.distanceTo(src), deafen, src);
 }
 function explode(P, owner, R = HE_R, dmg = 100, name = 'HE') {
+  for (const g of glasses) if (g.visible && g.position.distanceTo(P) < R + 1) breakGlass(g);
   const src = P.clone(); src.y += 0.4;
   boomLight.position.copy(src); boomLight.color.set(0xffa040); boomLight.intensity = 120;
   for (let i = 0; i < 14; i++) spawnPart(src, i < 6 ? 0xffa040 : 0x4a3f35, rand(0.6, 1.2), rand(0.4, 1.1), new V3(rand(-4, 4), rand(1, 5), rand(-4, 4)), i < 6, 1.5);
@@ -2654,7 +2734,7 @@ zoneMesh.visible = false; scene.add(zoneMesh);
 let planeSnd = null;
 function startBR() {
   planeSnd?.stop(); planeSnd = null;
-  if (actx && SFX.aviao) { planeSnd = actx.createBufferSource(); planeSnd.buffer = SFX.aviao; planeSnd.loop = true; const g = actx.createGain(); g.gain.value = 0.35; planeSnd.connect(g).connect(actx.destination); planeSnd.start(); }
+  if (actx && SFX.aviao) { planeSnd = actx.createBufferSource(); planeSnd.buffer = SFX.aviao; planeSnd.loop = true; const g = actx.createGain(); g.gain.value = 0.35; planeSnd.connect(g).connect(masterOut); planeSnd.start(); }
   const a = rand(0, Math.PI * 2), d = new V3(Math.cos(a), 0, Math.sin(a));
   plane.dir.copy(d); plane.pos.set(-d.x * 70, PLANE_Y, -d.z * 70 + rand(-15, 15)); plane.len = 140; plane.t = 0; plane.active = true;
   plane.mesh.visible = true; plane.mesh.rotation.y = Math.atan2(d.x, d.z);
@@ -2886,7 +2966,7 @@ function updateBomb(dt) {
     const pb = S.plantBy;
     if (!pb.alive || pb.downed || pb.moving || !siteOf(pb)) S.plantBy = null;
     else if ((S.plantT += dt) >= 3) {
-      pb.money += 300; S.planted = true; S.pos = new V3(pb.pos.x, pb.y, pb.pos.z); S.carrier = null; S.plantBy = null; S.timer = 35;
+      if (pb === player) addXP(150, 'bomba plantada'); pb.money += 300; S.planted = true; S.pos = new V3(pb.pos.x, pb.y, pb.pos.z); S.carrier = null; S.plantBy = null; S.timer = 35;
       showCenter('BOMBA PLANTADA', 'defenda até explodir', 2.5);
       for (const b of bots) if (b.team === 'B' && b.alive) { b.ai.state = 'patrol'; }
     }
@@ -2954,7 +3034,7 @@ function updateCTF(dt) {
     const F = ctfCarried(s); if (!F) continue;
     const home = FLAGS[s.team];
     if (home.atBase && Math.hypot(s.pos.x - home.base.x, s.pos.z - home.base.z) < 2) {
-      ctfReturn(F, null); ctfS.score[s.team]++;
+      ctfReturn(F, null); ctfS.score[s.team]++; if (s === player) addXP(300, 'captura');
       showCenter(s.team === player.team ? 'CAPTURA DO SEU TIME!' : 'O INIMIGO CAPTUROU', `${s.name} · AZUL ${ctfS.score.A} × ${ctfS.score.B} VERM.`, 2.5);
       if (actx) { tone(520, 1040, 0.35, 0.1); }
       if (ctfS.score[s.team] >= CTF_GOAL && !roundOver) { roundOver = 3; matchEnd = (s.team === 'A' ? 'VITÓRIA · ' : 'DERROTA · ') + `${ctfS.score.A} × ${ctfS.score.B}`; }
@@ -2977,6 +3057,7 @@ function ctfObjective(b) {
 
 // ================= partida =================
 function setupMatch(cls) {
+  matchXP = 0;
   for (const s of soldiers) { scene.remove(s.m.root); s.tag.remove(); s.edge.remove(); }
   clearWorld();
   player = new Soldier('Você', false, 'A', cls, { skin: choice.skin, acc: choice.acc });
@@ -3005,6 +3086,7 @@ function setupMatch(cls) {
 }
 // limpa granadas, fogo, minas, airdrops, veículos e metralhadoras entre partidas/rodadas
 function clearWorld() {
+  resetGlass(); clearChips();
   for (const n of nades) scene.remove(n.m); nades.length = 0;
   for (const f of fires) scene.remove(f.light); fires.length = 0;
   for (const M of mines) scene.remove(M.m); mines.length = 0;
@@ -3026,7 +3108,12 @@ const clock = new THREE.Clock();
 let mmT = 0, mmT2 = 0, matchEnd = '';
 function showBoard(title) {
   started = false; matchEnd = ''; document.body.classList.remove('playing');
-  if (/^VITÓRIA/.test(title)) { career.vitorias++; saveCareer(); }
+  if (/^VITÓRIA/.test(title)) { career.vitorias++; matchXP += 500; }
+  matchXP += 50;
+  const before = levelInfo(career.xp).lvl; career.xp += matchXP; saveCareer();
+  const L = levelInfo(career.xp);
+  $('#boardXP').innerHTML = (L.lvl > before ? `<div class="up">SUBIU PARA O NÍVEL ${L.lvl}!</div>` : '') + `+${matchXP} XP nesta partida · NÍVEL ${L.lvl} (${L.cur}/${L.need})<div class="xpbar"><i style="width:${(L.cur / L.need) * 100}%"></i></div>`;
+  matchXP = 0;
   $('#boardTitle').textContent = title;
   const rows = [...soldiers].sort((a, b) => b.stats.k - a.stats.k || b.stats.dmg - a.stats.dmg);
   const cls = s => s === player ? 'me' : '';
@@ -3035,8 +3122,8 @@ function showBoard(title) {
     rows.map(s => `<tr class="${cls(s)}"><td class="${tcl(s)}">${s.name}</td><td>${s.C.name}</td><td>${s.stats.k}</td><td>${s.stats.d}</td><td>${Math.round(s.stats.dmg)}</td></tr>`).join('');
   $('#board').style.display = 'flex';
 }
-$('#again').addEventListener('click', () => { $('#board').style.display = 'none'; career.partidas++; saveCareer(); setupMatch(choice.cls); started = true; document.body.classList.add('playing'); });
-$('#toMenu').addEventListener('click', () => { $('#board').style.display = 'none'; renderCareer(); $('#start').style.display = 'flex'; });
+$('#again').addEventListener('click', () => { if (tut) { $('#board').style.display = 'none'; $('#play').click(); return; } $('#board').style.display = 'none'; career.partidas++; saveCareer(); setupMatch(choice.cls); started = true; document.body.classList.add('playing'); });
+$('#toMenu').addEventListener('click', () => { tut = null; $('#board').style.display = 'none'; renderCareer(); $('#start').style.display = 'flex'; });
 let paused = false;
 function setPause(on) {
   if (!started && on) return;
@@ -3047,14 +3134,15 @@ function setPause(on) {
 }
 $('#pauseBtn').addEventListener('pointerdown', e => { e.stopPropagation(); setPause(true); });
 $('#resume').addEventListener('click', () => setPause(false));
-$('#quit').addEventListener('click', () => { setPause(false); started = false; document.body.classList.remove('playing'); planeSnd?.stop(); planeSnd = null; hideCenter(); renderCareer(); $('#start').style.display = 'flex'; });
+$('#quit').addEventListener('click', () => { tut = null; $('#tut').style.display = 'none'; setPause(false); started = false; document.body.classList.remove('playing'); planeSnd?.stop(); planeSnd = null; hideCenter(); renderCareer(); $('#start').style.display = 'flex'; });
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
   if (document.hidden) { requestAnimationFrame(frame); return; }
   if (started && !paused) {
     now += dt;
     updatePlayer(dt);
-    if (!roundOver) for (const b of bots) updateBot(b, dt);
+    if (!roundOver && !(tut && tut.step < TUT.length - 1)) for (const b of bots) updateBot(b, dt);
+    if (tut) updateTut();
     updateVehicles(dt); updateTurrets(dt);
     separate();
     for (const s of soldiers) {
@@ -3107,17 +3195,60 @@ for (const grp of document.querySelectorAll('.opts')) {
     if (grp.dataset.group === 'skin' || grp.dataset.group === 'acc') try { localStorage.setItem('tatico.visual', JSON.stringify({ skin: choice.skin, acc: choice.acc })); } catch {}
   });
 }
+for (const k of ['vol', 'size', 'op', 'h']) {
+  const inp = $('#c-' + k), show = () => { $('#cv-' + k).textContent = cfg[k] + '%'; };
+  inp.value = cfg[k]; show();
+  inp.addEventListener('input', () => { cfg[k] = +inp.value; show(); applyCfg(); try { localStorage.setItem('tatico.cfg', JSON.stringify(cfg)); } catch {} if (k === 'vol' && actx) blip(700, 0.05, 0.12); });
+}
+applyCfg();
+const openCfg = () => { initAudio(); applyCfg(); $('#cfgBoard').style.display = 'flex'; document.body.classList.add('cfg-open'); };
+$('#cfgOpen').addEventListener('click', openCfg); $('#cfgOpen2').addEventListener('click', openCfg);
+$('#cfgClose').addEventListener('click', () => { $('#cfgBoard').style.display = 'none'; document.body.classList.remove('cfg-open'); });
+$('#cfgReset').addEventListener('click', () => { Object.assign(cfg, { vol: 80, size: 100, op: 20, h: 64 }); for (const k in cfg) { $('#c-' + k).value = cfg[k]; $('#cv-' + k).textContent = cfg[k] + '%'; } applyCfg(); try { localStorage.removeItem('tatico.cfg'); } catch {} });
+// enquanto ajusta, mostra os controles de toque por cima para ver o resultado
 mode = 'treino'; setupMatch('tr'); updateCamera(1); updateWalls(); updateHud(); renderCareer();
 $('#start').addEventListener('pointerdown', () => initAudio(), { once: true });
+// tutorial: passos simples no modo treino (bots parados até o último passo)
+const T2 = (touch, pc) => isTouch ? touch : pc;
+const TUT = [
+  { t: () => T2('Ande: arraste o joystick do lado esquerdo', 'Ande com W A S D'), ok: () => tut.moved > 3 },
+  { t: () => T2('Mire e atire: segure e arraste o botão vermelho (direita)', 'Mire com o mouse e clique para atirar'), ok: () => tut.shots >= 3 },
+  { t: () => T2('Recarregue: toque em RECAR.', 'Recarregue com R'), ok: () => player.reloadT > 0 },
+  { t: () => T2('Troque de arma: toque na lista de armas à direita', 'Troque de arma com 1, 2 ou 3'), ok: () => player.weapon !== tut.w0 },
+  { t: () => T2('Jogue uma granada: segure o botão da granada, arraste e solte', 'Jogue uma granada com G (o 4 troca o tipo)'), ok: () => tut.nadeCount() < tut.n0 },
+  { t: () => 'Agora elimine os 2 bots! (eles vão reagir)', ok: () => tut.kills >= 2 },
+];
+let tut = null;
+function updateTut() {
+  if (tut.done) return;
+  if (tut.last) tut.moved += Math.hypot(player.pos.x - tut.last.x, player.pos.z - tut.last.z);
+  tut.last = player.pos.clone(); tut.kills = kills;
+  const S = TUT[tut.step];
+  $('#tutStep').textContent = `TUTORIAL · PASSO ${tut.step + 1} DE ${TUT.length}`; $('#tutTxt').textContent = S.t();
+  if (S.ok()) {
+    if (actx) tone(660, 990, 0.15, 0.08);
+    if (++tut.step >= TUT.length) {
+      tut.done = true; $('#tut').style.display = 'none'; career.tutorial = true; matchXP += 200;
+      showCenter('TUTORIAL CONCLUÍDO!', 'agora escolha um modo no menu', 3); roundOver = 3; matchEnd = 'TUTORIAL CONCLUÍDO';
+    } else if (tut.step === TUT.length - 1) for (const b of bots) b.revealT = 99;
+  }
+}
 $('#play').addEventListener('click', () => {
   initAudio();
-  mode = choice.mode; diff = DIFF[choice.diff]; setupMatch(choice.cls); applyWeather(choice.weather);
+  const tutorial = choice.mode === 'tutorial';
+  mode = tutorial ? 'treino' : choice.mode; diff = DIFF[choice.diff]; setupMatch(choice.cls); applyWeather(choice.weather);
   $('#start').style.display = 'none'; started = true; document.body.classList.add('playing');
   career.partidas++; saveCareer();
   if (isTouch) document.documentElement.requestFullscreen?.().then(() => screen.orientation?.lock?.('landscape')).catch(() => {});
   const intro = { treino: ['TREINO', 'elimine os 2 bots'], tdm: ['MATA-MATA', `primeiro time a ${TDM_GOAL} abates`],
     bomb: ['BOMBA', `você leva a bomba: plante no A (barracão) ou B (oeste) · ${BOMB_GOAL} rodadas vencem`], br: ['BATTLE ROYALE', 'toque SALTAR quando quiser · a zona azul fecha'],
     ctf: ['CAPTURE A BANDEIRA', `pegue a bandeira vermelha (norte) e leve até a sua base (sul) · ${CTF_GOAL} capturas vencem`] }[mode];
+  tut = null; $('#tut').style.display = 'none';
+  if (tutorial) {
+    const nc = () => Object.values(player.nades).reduce((a, b) => a + b, 0);
+    tut = { step: 0, moved: 0, shots: 0, kills: 0, last: null, w0: player.weapon, n0: nc(), nadeCount: nc };
+    $('#tut').style.display = 'block'; hideCenter(); return;
+  }
   showCenter(intro[0], intro[1], 3.5);
 });
 window.__nav = { navPath, navBlocked, navIdx, navLineClear, NAV_N }; window.__los = los; window.__die = die; window.__ts = () => teamScore; window.__bomb = bombS; window.__zone = zone; window.__jump = jumpOut; window.__cs = canShoot; window.__sfx = SFX; window.__game = { get player() { return player; }, get bots() { return bots; }, throwNade, giveLoot, applyWeather, get now() { return now; }, vehicles, doors, turrets, zips, bushes, FLAGS, ctfS, loots, fires, mines, enterVeh, exitVeh, useTurret, useDrone, dropCrate, damage, playerAction: () => playerAction(), setDoor, groundAt, terrainHeight, shotBlock, firstHit, terrainBlocks, aimPoint, get hitProp() { return hitProp; }, solids, get mode() { return mode; } };

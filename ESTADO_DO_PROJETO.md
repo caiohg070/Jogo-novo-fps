@@ -198,7 +198,17 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 
 **✅ 6º chat (3ª rodada)** — Placar (`updateScore`): tirado "sua: na base · inimiga: na base" do Bandeira e o "abates/mortes" pessoal do Mata-mata (parecia 2ª contagem); agora mostra `até N`. Conferido nos 5 modos.
 
-**➡️ PRÓXIMO CHAT:** nenhum pedido pendente do usuário. Fim do 6º chat: tudo salvo, site e artifact atualizados.
+**✅ 6º chat (4ª rodada) — ideias opcionais aprovadas**
+- **XP/níveis:** `career.xp`, `levelInfo()`, `addXP()`; abate 100, captura 300, plantar 150, vitória 500, partida 50, tutorial 200.
+  Nível l→l+1 custa `300 + 200·(l−1)`. Mostrado no menu (barra) e no fim da partida (`#boardXP`, "SUBIU PARA O NÍVEL N!"). Sem desbloqueios ainda.
+- **Configurações** (`cfg`, salvo em `localStorage 'tatico.cfg'`): volume geral (nó `masterOut`), tamanho, visibilidade e altura dos
+  botões de toque (CSS `--ctl-s`, `--ctl-op`, `--ctl-y`). Botão ⚙ no menu e na pausa.
+- **Tutorial:** opção TUTORIAL nos modos (roda no treino): 6 passos (`TUT`, `updateTut()`), bots parados e imortais até o último passo.
+- **Vidro que quebra:** `windowWall()` cria vidro (`glasses`), quebra com tiro (`glassAlong`) ou explosão; volta a cada partida (`resetGlass`).
+  Não bloqueia visão nem tiro.
+- **Pequena destruição nas paredes:** cada tiro deixa marca escura + lascas da cor da parede (`wallChip`, até 220 marcas; somem em `clearChips`).
+
+**➡️ PRÓXIMO CHAT:** nenhum pedido pendente do usuário.
 
 **Pendências pequenas no protótipo**
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
