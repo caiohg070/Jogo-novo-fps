@@ -78,13 +78,13 @@ function thud(m) { if (actx) { const v = vol(player.pos.distanceTo(m.position));
 function groundShot(o, dx, dz, range, shooter) {
   const onGround = Math.abs(shooter.y - terrainHeight(shooter.pos.x, shooter.pos.z)) < 0.35, base = o.y - shooter.y;
   const yAt = (x, z) => onGround ? Math.max(terrainHeight(x, z) + base, o.y - 4) : Math.max(o.y, terrainHeight(x, z) + base);
-  let a = o.clone(), d = 0; const STEP = 1.5;
+  let a = o.clone(), d = 0; const STEP = 1.5, pts = [];   // pts: caminho do tiro (sobe/desce com o morro)
   while (d < range) {
     const n = Math.min(range, d + STEP), x = o.x + dx * n, z = o.z + dz * n, b = new V3(x, yAt(x, z), z);
-    const h = firstHit(a, b); if (h < Infinity) { const seg = a.distanceTo(b); return { dist: d + (n - d) * h / seg, end: a.clone().lerp(b, h / seg) }; }
-    a = b; d = n;
+    const h = firstHit(a, b); if (h < Infinity) { const seg = a.distanceTo(b); return { dist: d + (n - d) * h / seg, end: a.clone().lerp(b, h / seg), pts }; }
+    if (Math.abs(b.y - a.y) > 0.02 || !pts.length) pts.push(b); a = b; d = n;
   }
-  hitProp = null; return { dist: Infinity, end: a };
+  hitProp = null; pts.pop(); return { dist: Infinity, end: a, pts };
 }
 let lastHit = null;
 function firstHit(a, b) {

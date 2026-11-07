@@ -32,14 +32,16 @@ function updateParts(dt) {
 }
 const tracers = [];
 for (let i = 0; i < 40; i++) {
-  const g = new THREE.BufferGeometry().setFromPoints([new V3(), new V3()]);
+  const g = new THREE.BufferGeometry().setFromPoints(Array.from({ length: 32 }, () => new V3())); g.setDrawRange(0, 2);
   const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xffd894, transparent: true, opacity: 0.9, depthWrite: false }));
   l.visible = false; l.frustumCulled = false; scene.add(l); tracers.push({ l, life: 0 });
 }
 let trIdx = 0;
-function tracer(a, b, color = 0xffd894, life = 0.07) {
+// traçante: reta (a→b) ou seguindo uma lista de pontos (tiro que acompanha o morro)
+function tracer(a, b, color = 0xffd894, life = 0.07, path) {
   const t = tracers[trIdx++ % tracers.length], p = t.l.geometry.attributes.position;
-  p.setXYZ(0, a.x, a.y, a.z); p.setXYZ(1, b.x, b.y, b.z); p.needsUpdate = true;
+  const P = path && path.length ? [a, ...path, b].slice(0, 32) : [a, b];
+  P.forEach((q, i) => p.setXYZ(i, q.x, q.y, q.z)); t.l.geometry.setDrawRange(0, P.length); p.needsUpdate = true;
   t.l.material.color.set(color); t.l.visible = true; t.life = life;
 }
 function impact(p) { for (let i = 0; i < 3; i++) spawnPart(p, 0xb9a88a, 0.25, rand(0.35, 0.6), new V3(rand(-1, 1), rand(0.5, 1.6), rand(-1, 1)), false, 0.5); }
@@ -124,8 +126,9 @@ function boom(d, pos) { if (!actx) return; const v = clamp(1 - d / 70, 0.1, 1); 
 // pequena destruição: marca de tiro (buraco escuro) + lascas da cor da parede; some quando a parede some
 const chips = [], chipGeo = new THREE.BoxGeometry(1, 1, 1);
 const debris = [], CHIP_LIFE = 8;   // marcas e lascas duram ~8 s e somem aos poucos
-function clearChips() { for (const c of chips) c.parent?.remove(c); chips.length = 0; for (const d of debris) scene.remove(d.m); debris.length = 0; }
+function clearChips() { for (const k of marks) scene.remove(k.m); marks.length = 0; for (const c of chips) c.parent?.remove(c); chips.length = 0; for (const d of debris) scene.remove(d.m); debris.length = 0; }
 function updateChips(dt) {
+  updateMarks();
   for (let i = chips.length - 1; i >= 0; i--) if (now - chips[i].userData.t > CHIP_LIFE) { chips[i].parent?.remove(chips[i]); chips.splice(i, 1); }
   for (let i = debris.length - 1; i >= 0; i--) {
     const d = debris[i], age = now - d.t, m = d.m;
@@ -149,16 +152,26 @@ function wallChip(hit) {
     debris.push({ m: dm, t: now, rest: false, spin: rand(-8, 8), v: wn.clone().multiplyScalar(rand(1, 2.5)).add(new V3(rand(-0.8, 0.8), rand(0.5, 2), rand(-0.8, 0.8))) });
   }
   if (debris.length > 300) scene.remove(debris.shift().m);
-  const mat = new THREE.MeshBasicMaterial({ color: 0x2a221b, transparent: true, opacity: 0.8, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
-  const c = new THREE.Mesh(chipGeo, mat), sz = rand(0.09, 0.15), sc = m.scale;
+  const mat = new THREE.MeshBasicMaterial({ color: 0x1a1410, transparent: true, opacity: 0.9, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+  const c = new THREE.Mesh(chipGeo, mat), sz = rand(0.16, 0.26), sc = m.scale;
   const local = m.worldToLocal(hit.point.clone()); local.addScaledVector(n, 0.004 / Math.max(Math.abs(n.x) * sc.x, Math.abs(n.y) * sc.y, Math.abs(n.z) * sc.z));
   c.position.copy(local);
   c.scale.set((Math.abs(n.x) > 0.5 ? 0.01 : sz) / sc.x, (Math.abs(n.y) > 0.5 ? 0.01 : sz) / sc.y, (Math.abs(n.z) > 0.5 ? 0.01 : sz) / sc.z);
   c.userData.t = now;
-  c.onBeforeRender = () => { mat.opacity = 0.8 * clamp((CHIP_LIFE - (now - c.userData.t)) / 1.5, 0, 1) * (m.material.transparent ? m.material.opacity : 1); };
+  c.onBeforeRender = () => { mat.opacity = 0.9 * clamp((CHIP_LIFE - (now - c.userData.t)) / 1.5, 0, 1) * (m.material.transparent ? m.material.opacity : 1); };
   m.add(c); chips.push(c);
   if (chips.length > 220) { const o = chips.shift(); o.parent?.remove(o); }
 }
+// marca no chão/terreno (tiro, faca, queimado de bomba): disco escuro deitado que some aos poucos
+const markGeo = new THREE.CircleGeometry(1, 14); markGeo.rotateX(-Math.PI / 2);
+const marks = [];
+function groundMark(P, r, color = 0x15110d, op = 0.85, life = CHIP_LIFE, sx = 1) {
+  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 });
+  const m = new THREE.Mesh(markGeo, mat); m.scale.set(r * sx, 1, r); m.rotation.y = rand(0, Math.PI);
+  m.position.set(P.x, groundAt(P.x, P.z, P.y + 0.3) + 0.03, P.z); m.renderOrder = 2; scene.add(m);
+  marks.push({ m, t: now, life, op }); if (marks.length > 160) scene.remove(marks.shift().m);
+}
+function updateMarks() { for (let i = marks.length - 1; i >= 0; i--) { const k = marks[i], age = now - k.t; if (age > k.life) { scene.remove(k.m); marks.splice(i, 1); } else k.m.material.opacity = k.op * clamp((k.life - age) / 2, 0, 1); } }
 function bulletHit(p) {
   impact(p);
   if (!actx || !player) return;

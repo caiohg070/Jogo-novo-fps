@@ -126,6 +126,7 @@ function explode(P, owner, R = HE_R, dmg = 100, name = 'HE') {
   for (let i = 0; i < 14; i++) spawnPart(src, i < 6 ? 0xffa040 : 0x4a3f35, rand(0.6, 1.2), rand(0.4, 1.1), new V3(rand(-4, 4), rand(1, 5), rand(-4, 4)), i < 6, 1.5);
   if (player.pos.distanceTo(src) < 20) shakeT = 0.35;
   boom(player.pos.distanceTo(src), src);
+  groundMark(P, R * 0.45, 0x0d0a08, 0.85, 20);   // queimado no chão
   for (const m of solids.slice()) if (m.userData.hp && !m.userData.veh && m.getWorldPosition(_d).distanceTo(src) < R * 0.8) hurtProp(m, 200, owner);
   for (const V of vehicles) if (!V.dead && V.pos.distanceTo(new V3(src.x, V.y, src.z)) < R * 0.8 && Math.abs(V.y - src.y) < 3) vehDamage(V, dmg * 1.6 * (1 - V.pos.distanceTo(new V3(src.x, V.y, src.z)) / R), owner);
   for (const s of soldiers) {

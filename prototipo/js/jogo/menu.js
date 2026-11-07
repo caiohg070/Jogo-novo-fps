@@ -59,6 +59,8 @@ function updateTut() {
   if (tut.last) tut.moved += Math.hypot(player.pos.x - tut.last.x, player.pos.z - tut.last.z);
   tut.last = player.pos.clone(); tut.kills = kills;
   if (player.veh) { const V = player.veh.pos; if (tut.vlast) tut.drove += Math.hypot(V.x - tut.vlast.x, V.z - tut.vlast.z); tut.vlast = V.clone(); } else tut.vlast = null;
+  // acabou a bala: lembra da faca e do baú
+  if (player.w.kind === 'gun' && player.mag <= 0 && player.reserve <= 0 && !player.reloadT && !(tut.noAmmoT > now)) { tut.noAmmoT = now + 6; toast(T2('Sem balas! Use a FACA (lista de armas) ou abra um baú para achar munição', 'Sem balas! Aperte 3 para a FACA ou abra um baú para achar munição')); }
   const S = TUT[tut.step];
   if (tut.shown !== tut.step) {                                     // entrou num passo novo
     tut.shown = tut.step; tut.acts.clear(); tut.tgt = S.pick ? S.pick() : null;
@@ -89,6 +91,7 @@ $('#play').addEventListener('click', () => {
   if (tutorial) {
     const nc = () => Object.values(player.nades).reduce((a, b) => a + b, 0);
     tut = { step: 0, moved: 0, shots: 0, kills: 0, drove: 0, last: null, vlast: null, shown: -1, acts: new Set(), tgt: null, w0: player.weapon, n0: nc(), nadeCount: nc };
+    for (const k in player.ammo) player.ammo[k].res = WEAPONS[k].mag * 8;   // tutorial: bastante pente
     $('#tut').style.display = 'block'; hideCenter(); return;
   }
   showCenter(intro[0], intro[1], 3.5);

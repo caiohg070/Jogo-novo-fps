@@ -246,7 +246,7 @@ class Soldier {
       const perp2 = ox * ox + oz * oz - proj * proj; if (perp2 > HIT_R * HIT_R) continue;
       best = t; bestT = Math.max(0.1, proj - Math.sqrt(HIT_R * HIT_R - perp2));
     }
-    let end;
+    let end, path = null;
     if (best) {
       origin.y = this.y + SHOT_H + lean(this, best);
       const P = aimPoint(best, undefined, undefined, this);   // centro do alvo (a borda podia ficar dentro da mureta)
@@ -256,10 +256,11 @@ class Soldier {
       else { end = P; damage(best, randInt(w.dmg[0], w.dmg[1]) * (this.isBot ? diff.dmg : 1), this, w.pen); hitProp = null; blood(P); }
     } else {
       const g = groundShot(origin, dx, dz, range, this);
-      const lh = lastHit; end = g.end; if (g.dist < Infinity) { bulletHit(end); if (hitProp) hurtProp(hitProp, randInt(w.dmg[0], w.dmg[1]), this); else wallChip(lh); }
+      const lh = lastHit; end = g.end; path = g.pts.slice(1);
+      if (g.dist < Infinity) { bulletHit(end); if (hitProp) hurtProp(hitProp, randInt(w.dmg[0], w.dmg[1]), this); else if (lh) wallChip(lh); else groundMark(end, rand(0.12, 0.18)); }
     }
     if (Math.hypot(end.x - origin.x, end.z - origin.z) < Math.hypot(muzzle.x - origin.x, muzzle.z - origin.z) + 0.05) muzzle = origin;   // colado na parede: traçante não sai de trás dela
-    tracer(muzzle, end, w.scope ? 0xfff2c8 : 0xffd894, w.scope ? 0.18 : w.pellets ? 0.05 : 0.07);
+    tracer(muzzle, end, w.scope ? 0xfff2c8 : 0xffd894, w.scope ? 0.18 : w.pellets ? 0.05 : 0.07, path);
     glassAlong(origin, end);
   }
   stab(ang, enemies) {
@@ -270,9 +271,13 @@ class Soldier {
       const d = Math.hypot(t.pos.x - this.pos.x, t.pos.z - this.pos.z);
       if (d > w.range + 0.4 || Math.abs(angDiff(ang, Math.atan2(t.pos.x - this.pos.x, t.pos.z - this.pos.z))) > 0.9) continue;
       if (!los(this, t)) continue;
-      damage(t, randInt(w.dmg[0], w.dmg[1]), this, w.pen); blood(eye(t, 1.2));
-      break;
+      damage(t, randInt(w.dmg[0], w.dmg[1]), this, w.pen); blood(eye(t, 1.2)); groundMark(t.pos.clone().setY(t.y), rand(0.25, 0.35), 0x5a0a07, 0.8, 12);
+      return true;
     }
+    // golpe no vazio: risco na parede/caixa à frente ou no chão
+    const o = eye(this, 1.1), f = o.clone().add(new V3(Math.sin(ang) * w.range, 0, Math.cos(ang) * w.range));
+    if (firstHit(o, f) < Infinity && lastHit) { if (hitProp) hurtProp(hitProp, 25, this); else wallChip(lastHit); }
+    else groundMark(new V3(this.pos.x + Math.sin(ang) * 1.2, this.y, this.pos.z + Math.cos(ang) * 1.2), 0.32, 0x1a1410, 0.75, CHIP_LIFE, 0.18);
     return true;
   }
   useKit() {
