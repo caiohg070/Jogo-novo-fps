@@ -284,7 +284,7 @@ const WEAPONS = {
   knife:  { name: 'Faca', kind: 'melee', slot: 'knife', rate: 0.55, dmg: [50, 60], range: 1.8, speed: 6.2, pen: 0.5 },
   // novas: escopeta (vários chumbos, forte de perto), SMG (rápida, corre mais), metralhadora (pente de 100, lenta)
   shotgun: { name: 'Escopeta', kind: 'gun', slot: 'primary', mag: 6, reserve: 30, rate: 0.85, dmg: [9, 13], pellets: 8, spread: 0.085, range: 13, reload: 2.8, speed: 5.0, pen: 0.3, snd: [1500, 80, 0.55] },
-  smg:    { name: 'SMG', kind: 'gun', slot: 'primary', mag: 30, reserve: 120, rate: 0.065, dmg: [14, 19], spread: 0.036, range: 22, reload: 1.9, speed: 5.7, pen: 0.35, snd: [5200, 240, 0.22] },
+  smg:    { name: 'SMG', kind: 'gun', slot: 'primary', mag: 30, reserve: 120, rate: 0.065, dmg: [14, 19], spread: 0.026, range: 26, reload: 1.9, speed: 5.7, pen: 0.35, snd: [5200, 240, 0.22] },
   lmg:    { name: 'Metralhadora', kind: 'gun', slot: 'primary', mag: 100, reserve: 200, rate: 0.09, dmg: [24, 30], spread: 0.042, range: 32, reload: 4.6, speed: 4.2, pen: 0.55, snd: [2600, 120, 0.4] },
   turret: { name: 'Metralhadora fixa', kind: 'gun', slot: 'turret', mag: 999, reserve: 0, rate: 0.075, dmg: [26, 32], spread: 0.022, range: 40, reload: 1, speed: 0, pen: 0.6, snd: [2200, 110, 0.45] },
 };
@@ -704,14 +704,16 @@ const bunkerRoof = [];
 }
 
 // ---------- telhado do barracão + escada de mão na parede leste (lado de fora) ----------
-const barnRoof = [];
+const barnRoof = []; let ladderZ = null;
 {
   const { x0, x1, z0, z1 } = BARN, R = BARN_Y + 3.4, top = R + 0.12;
   barnRoof.push(box(x0, x1, z0, z1, R, top, 0x6f726b, { collide: false, rough: 0.55, metal: 0.35 }));
   for (let i = 1; i < 10; i++) barnRoof.push(box(x0 + i * 2 - 0.05, x0 + i * 2 + 0.05, z0, z1, top, top + 0.04, 0x5c5f58, { collide: false, solid: false, cast: false }));
   surfaces.push({ x0, x1, z0, z1, h: () => top });
   const LX0 = x1, LX1 = x1 + 1.7, LZ0 = -34.6, LZ1 = -33.8;
-  surfaces.push({ x0: LX0, x1: LX1, z0: LZ0, z1: LZ1, h: x => BARN_Y + clamp((LX1 - x) / (LX1 - LX0), 0, 1) * (top - BARN_Y) });
+  // escada de mão: não é rampa — sobe/desce pelo botão de ação (SUBIR/DESCER ESCADA)
+  const LZ = (LZ0 + LZ1) / 2, la = { x: LX1 + 0.2, z: LZ, y: BARN_Y }, lb = { x: x1 - 0.9, z: LZ, y: top };
+  ladderZ = { a: la, b: lb, ladder: true, time: 1.3, cable: t => t < 0.75 ? new V3(x1 + 0.4, lerp(BARN_Y, top, t / 0.75) + 1.95, LZ) : new V3(lerp(x1 + 0.4, lb.x, (t - 0.75) / 0.25), top + 1.95, LZ) };
   const rm = stdMat(0x5a4632);
   for (const z of [LZ0 + 0.05, LZ1 - 0.05]) {
     const L = Math.hypot(LX1 - LX0, top - BARN_Y), m = new THREE.Mesh(boxGeo, rm);
@@ -725,7 +727,7 @@ const doors = [];
 function door(x0, x1, z0, z1, y0, y1, open = false, swing = 1) {
   const alongX = x1 - x0 > z1 - z0, w = alongX ? x1 - x0 : z1 - z0, th = alongX ? z1 - z0 : x1 - x0;
   const pivot = new THREE.Group(); pivot.position.set(alongX ? x0 : (x0 + x1) / 2, 0, alongX ? (z0 + z1) / 2 : z0); scene.add(pivot);
-  const mat = stdMat(0x6e4e30); mat.transparent = true;
+  const mat = stdMat(0x6e4e30);
   const m = new THREE.Mesh(boxGeo, mat); m.castShadow = true; m.receiveShadow = true;
   m.scale.set(alongX ? w : th, y1 - y0, alongX ? th : w); m.position.set(alongX ? w / 2 : 0, (y0 + y1) / 2, alongX ? 0 : w / 2); pivot.add(m);
   const knob = new THREE.Mesh(boxGeo, stdMat(0xc9b36a, { metal: 0.6, rough: 0.4 })); knob.scale.set(alongX ? 0.06 : th + 0.1, 0.06, alongX ? th + 0.1 : 0.06);
@@ -733,7 +735,7 @@ function door(x0, x1, z0, z1, y0, y1, open = false, swing = 1) {
   const col = { x0, x1, z0, z1, y0, y1, door: true };
   const d = { pivot, m, col, open: false, ang: 0, swing, cx: (x0 + x1) / 2, cz: (z0 + z1) / 2, y0, broken: false, x0, x1, z0, z1 };
   m.userData.hp = 240; m.userData.col = col; m.userData.door = d; m.userData.chip = 0x6e4e30;
-  solids.push(m); fadeables.push(m); colliders.push(col); doors.push(d);
+  solids.push(m); colliders.push(col); doors.push(d);   // porta não fica transparente
   if (open) { setDoor(d, true, true); d.ang = d.swing * 1.6; pivot.rotation.y = d.ang; }
   return d;
 }
@@ -773,11 +775,13 @@ const zips = [];
   colliders.push({ x0: b.x - 0.12, x1: b.x + 0.12, z0: b.z - 0.12, z1: b.z + 0.12, y0: b.y, y1: b.y + HANG });
   zips.push({ a, b, cable, HANG });
 }
+zips.push(ladderZ);
 function updateZip(s, dt) {
   const Z = s.zip, dir = Z.a === Z.Z.a ? 1 : -1;
-  Z.t = Math.min(1, Z.t + (11 * dt) / Z.len);
+  Z.t = Math.min(1, Z.t + (Z.Z.ladder ? dt / Z.Z.time : (11 * dt) / Z.len));
   const tt = dir > 0 ? Z.t : 1 - Z.t, c = Z.Z.cable(tt);
   s.pos.set(c.x, 0, c.z); s.y = c.y - 1.95; s.facing = Math.atan2(Z.b.x - Z.a.x, Z.b.z - Z.a.z);
+  if (Z.t >= 1 && Z.Z.ladder) { s.zip = null; s.pos.set(Z.b.x, 0, Z.b.z); s.y = Z.b.y; s.vy = 0; return; }
   if (Z.t >= 1) { s.zip = null; s.y = Math.max(groundAt(s.pos.x, s.pos.z, s.y + 1), s.y); s.vy = 0; s.pos.x += Math.sin(s.facing) * 0.9; s.pos.z += Math.cos(s.facing) * 0.9; }
 }
 
@@ -1077,6 +1081,18 @@ function hurtProp(m, dmg, by) {
   }
   navRefresh(c);
   buildMinimap();
+}
+// tiro/mira sem alvo acompanha o relevo: sobe nos morros e desce nas partes baixas (em trechos de 1,5 m)
+function groundShot(o, dx, dz, range, shooter) {
+  const onGround = Math.abs(shooter.y - terrainHeight(shooter.pos.x, shooter.pos.z)) < 0.35, base = o.y - shooter.y;
+  const yAt = (x, z) => onGround ? Math.max(terrainHeight(x, z) + base, o.y - 4) : Math.max(o.y, terrainHeight(x, z) + base);
+  let a = o.clone(), d = 0; const STEP = 1.5;
+  while (d < range) {
+    const n = Math.min(range, d + STEP), x = o.x + dx * n, z = o.z + dz * n, b = new V3(x, yAt(x, z), z);
+    const h = firstHit(a, b); if (h < Infinity) { const seg = a.distanceTo(b); return { dist: d + (n - d) * h / seg, end: a.clone().lerp(b, h / seg) }; }
+    a = b; d = n;
+  }
+  hitProp = null; return { dist: Infinity, end: a };
 }
 function firstHit(a, b) {
   _d.subVectors(b, a); const dist = _d.length(); if (dist < 1e-4) return Infinity; _d.divideScalar(dist);
@@ -1493,11 +1509,10 @@ class Soldier {
       if (block < dist - 0.2) { end = origin.clone().add(P.sub(origin).normalize().multiplyScalar(block)); bulletHit(end); if (hp1) hurtProp(hp1, randInt(w.dmg[0], w.dmg[1]), this); }
       else { end = P; damage(best, randInt(w.dmg[0], w.dmg[1]) * (this.isBot ? diff.dmg : 1), this, w.pen); hitProp = null; blood(P); }
     } else {
-      const far = new V3(origin.x + dx * range, origin.y, origin.z + dz * range);
-      const block = firstHit(origin, far);
-      if (block < Infinity) { end = origin.clone().add(new V3(dx, 0, dz).multiplyScalar(block)); bulletHit(end); if (hitProp) hurtProp(hitProp, randInt(w.dmg[0], w.dmg[1]), this); }
-      else end = far;
+      const g = groundShot(origin, dx, dz, range, this);
+      end = g.end; if (g.dist < Infinity) { bulletHit(end); if (hitProp) hurtProp(hitProp, randInt(w.dmg[0], w.dmg[1]), this); }
     }
+    if (Math.hypot(end.x - origin.x, end.z - origin.z) < Math.hypot(muzzle.x - origin.x, muzzle.z - origin.z) + 0.05) muzzle = origin;   // colado na parede: traçante não sai de trás dela
     tracer(muzzle, end, w.scope ? 0xfff2c8 : 0xffd894, w.scope ? 0.18 : w.pellets ? 0.05 : 0.07);
   }
   stab(ang, enemies) {
@@ -1929,7 +1944,7 @@ function playerAction() {
   const V = vehicles.find(V => !V.dead && !V.driver && Math.hypot(V.pos.x - p.pos.x, V.pos.z - p.pos.z) < V.def.r + 1.3 && Math.abs(V.y - p.y) < 1.2);
   if (V) return { t: 'ENTRAR NO ' + V.def.name.toUpperCase(), f: () => enterVeh(p, V) };
   for (const Z of zips) for (const [a, b] of [[Z.a, Z.b], [Z.b, Z.a]])
-    if (Math.hypot(a.x - p.pos.x, a.z - p.pos.z) < 1.7 && Math.abs(a.y - p.y) < 1) return { t: 'DESCER NA TIROLESA', f: () => { p.zip = { a, b, t: 0, len: Math.hypot(b.x - a.x, b.z - a.z), Z }; p.reloadT = 0; if (actx) noise(0.4, 0.15, 'highpass', 2500); } };
+    if (Math.hypot(a.x - p.pos.x, a.z - p.pos.z) < 1.7 && Math.abs(a.y - p.y) < 1) return { t: Z.ladder ? (a === Z.a ? 'SUBIR ESCADA' : 'DESCER ESCADA') : 'DESCER NA TIROLESA', f: () => { p.zip = { a, b, t: 0, len: Math.hypot(b.x - a.x, b.z - a.z), Z }; p.reloadT = 0; if (actx) Z.ladder ? noise(0.25, 0.08, 'lowpass', 900) : noise(0.4, 0.15, 'highpass', 2500); } };
   let D = null, dd = 1.7;
   for (const d of doors) { if (d.broken || Math.abs(d.y0 - p.y) > 1.2) continue; const k = Math.hypot(d.cx - p.pos.x, d.cz - p.pos.z); if (k < dd) { dd = k; D = d; } }
   if (D) return { t: D.open ? 'FECHAR PORTA' : 'ABRIR PORTA', f: () => setDoor(D, !D.open) };
@@ -2421,8 +2436,8 @@ function updatePlayer(dt) {
   if (firing) p.tryFire(p.facing);
   aimLine.visible = showAim;
   if (showAim) {
-    const range = p.w.range, o = eye(p, SHOT_H), far = new V3(o.x + Math.sin(p.facing) * range, o.y, o.z + Math.cos(p.facing) * range);
-    let h = Math.min(range, firstHit(o, far));
+    const range = p.w.range * (p.attOn.mira ? 1.25 : 1), o = eye(p, SHOT_H);
+    let h = Math.min(range, groundShot(o, Math.sin(p.facing), Math.cos(p.facing), range, p).dist); hitProp = null;
     const fx = Math.sin(p.facing), fz = Math.cos(p.facing);
     for (const t of enemiesOf(p)) {                                // para no primeiro inimigo na linha
       const ox = t.pos.x - p.pos.x, oz = t.pos.z - p.pos.z, pr = ox * fx + oz * fz;
@@ -3054,7 +3069,7 @@ $('#play').addEventListener('click', () => {
     ctf: ['CAPTURE A BANDEIRA', `pegue a bandeira vermelha (norte) e leve até a sua base (sul) · ${CTF_GOAL} capturas vencem`] }[mode];
   showCenter(intro[0], intro[1], 3.5);
 });
-window.__nav = { navPath, navBlocked, navIdx, navLineClear, NAV_N }; window.__los = los; window.__die = die; window.__ts = () => teamScore; window.__bomb = bombS; window.__zone = zone; window.__jump = jumpOut; window.__cs = canShoot; window.__sfx = SFX; window.__game = { get player() { return player; }, get bots() { return bots; }, throwNade, giveLoot, applyWeather, get now() { return now; }, vehicles, doors, turrets, zips, bushes, FLAGS, ctfS, loots, fires, mines, enterVeh, exitVeh, useTurret, useDrone, dropCrate, damage, playerAction: () => playerAction(), setDoor, get mode() { return mode; } };
+window.__nav = { navPath, navBlocked, navIdx, navLineClear, NAV_N }; window.__los = los; window.__die = die; window.__ts = () => teamScore; window.__bomb = bombS; window.__zone = zone; window.__jump = jumpOut; window.__cs = canShoot; window.__sfx = SFX; window.__game = { get player() { return player; }, get bots() { return bots; }, throwNade, giveLoot, applyWeather, get now() { return now; }, vehicles, doors, turrets, zips, bushes, FLAGS, ctfS, loots, fires, mines, enterVeh, exitVeh, useTurret, useDrone, dropCrate, damage, playerAction: () => playerAction(), setDoor, groundAt, terrainHeight, shotBlock, firstHit, terrainBlocks, aimPoint, get hitProp() { return hitProp; }, solids, get mode() { return mode; } };
 frame();
 </script>
 </body>
