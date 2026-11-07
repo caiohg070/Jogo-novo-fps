@@ -1,10 +1,11 @@
 # Estado do projeto — Jogo tático top-down
 
 > **Para continuar em um novo chat:** cole este arquivo (ou peça para o Claude ler `ESTADO_DO_PROJETO.md`
-> e `novojogo.md` do repositório `caiohg070/jogo-novo-fps`, branch `claude/save-game-files-repo-rdk6pf`).
+> e `novojogo.md` do repositório `caiohg070/jogo-novo-fps`, branch **`claude/game-continuation-improvements-crkbqw`** — é a mais nova;
+> a `claude/save-game-files-repo-rdk6pf` ficou com a versão anterior).
 > **Regra do projeto:** sempre perguntar antes de iniciar algo grande ou gastar créditos (ElevenLabs/Higgsfield/Magnific).
 
-Última atualização: 07/11/2026.
+Última atualização: 07/11/2026 (2º chat).
 
 ---
 
@@ -21,7 +22,7 @@
 | Página raiz para GitHub Pages (redireciona p/ `prototipo/`) | `index.html` + `.nojekyll` |
 | Jogo publicado (para testar no celular) | https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC |
 | Sons no ElevenLabs | flow "Jogo tático - efeitos sonoros" (id `HB0RnWHvUUjmllWHYXRE`) |
-| Branch de trabalho | `claude/save-game-files-repo-rdk6pf` (é a única branch; não existe `main`) |
+| Branch de trabalho | **`claude/game-continuation-improvements-crkbqw`** (mais nova). A `claude/save-game-files-repo-rdk6pf` tem a versão anterior. Não existe `main` |
 
 **Como abrir localmente:** abrir `prototipo/index.html` no Chrome (precisa de internet para baixar o Three.js da CDN).
 
@@ -124,6 +125,24 @@ Os testes foram feitos com Playwright (Chromium headless) simulando tiros/posiç
 bot colado na parede tomando tiro, arma atravessando parede, escada (obstáculo, atravessar por trás, fresta no vão),
 bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora da câmera, chuva tocando com tela bloqueada.
 
+**2º chat (07/11/2026) — branch `claude/game-continuation-improvements-crkbqw`**
+- **Navegação dos bots com A\*** (seção `navegação dos bots`, antes da IA): grade de 0,5 m (`navBlocked`, `navHgt`),
+  colisores inflados 0,4 m, `navPath()` (A\* 8 direções, sem cortar quina, caminho suavizado), `navSteer(b, x, z)` usado em
+  busca, objetivo da bomba, roam do BR e patrulha. Anda reto quando a linha está livre; dentro da casa, no terraço/escada e
+  no bunker usa a rota feita à mão. Caixote quebrado chama `navRefresh()`. Teto do bunker conta como chão; vão da rampa bloqueado.
+  Testado: portas da casa e do barracão funcionam, ~3 ms por caminho.
+- **BR:** bot sem arma/colete/capacete vai até o baú mais perto (≤30 m, dentro da zona). Testado: um bot pegou AWP, colete e capacete.
+- **Indicador de dano:** arco vermelho em volta do jogador apontando para quem atirou (`hitDir`).
+- **Câmera do abate:** ao morrer, a câmera vai até quem te matou por ~2 s (com silhueta) e mostra nome, arma e vida dele (`killInfo`, `killCamTarget`).
+- **Som posicional (estéreo):** `sfx(..., {pan})` + `panOf(pos)` em tiros, passos, recarga, faca, flash, HE, smoke.
+- **Sons sintetizados** (sem créditos): bala no concreto/ricochete (`bulletHit`), pino da granada (`pinPull`), alicate do desarme (`snip`), caixote quebrando.
+- **Pausa:** botão II (canto esquerdo) ou Esc/P → CONTINUAR / SAIR PARA O MENU.
+- **Histórico salvo no aparelho** (localStorage `tatico.carreira`): partidas, vitórias, abates, mortes, K/D, melhor colocação no BR — aparece na tela inicial.
+- Gancho de teste novo: `window.__nav`.
+- ⚠️ **Não verificado:** em teste artificial (jogador e outros bots desligados à força), 2 bots ficaram em estado "engage" parados
+  sem inimigo vivo por 70 s+. Pode ser só o teste ou bug real da IA (alvo morto/desligado não limpa o estado). Investigar primeiro.
+- O artifact (link da seção 1) **ainda não foi republicado** com essas mudanças; README do protótipo também não foi atualizado.
+
 ---
 
 ## 4. O que falta / próximos passos
@@ -132,7 +151,9 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
 - [ ] Som da chuva tem só 2 s (repete); gerar um mais longo se incomodar.
 - [ ] Usuário ainda não ativou o GitHub Pages (ver seção 1).
-- [ ] Bots não usam navegação de verdade (andam em linha reta entre pontos; destravam com "detour"). Em mapas novos podem enroscar.
+- [x] ~~Bots sem navegação de verdade~~ → A\* feito no 2º chat.
+- [ ] Investigar bots presos em "engage" sem inimigo (ver aviso acima).
+- [ ] Republicar o artifact e atualizar `prototipo/README.md` com as novidades do 2º chat.
 - [ ] Mapa maior vale para todos os modos (nos modos 3×3 o anel externo fica pouco usado).
 
 **Do documento `novojogo.md` ainda não feito**
@@ -141,6 +162,14 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 - [ ] Imagens geradas (Higgsfield/Magnific, sprite sheets) — não necessárias agora (sem sprites 2D).
 - [ ] Multiplayer online (o documento pede começar sem).
 - [ ] Empacotar para Play Store (Capacitor) **ou** migrar para **Unity** (plano principal do usuário).
+
+**Ideias sugeridas (ainda não feitas, perguntar antes)**
+- Progressão: XP/níveis, desbloquear skins/acessórios, desafios diários.
+- Ping/marcação para aliados e ordens rápidas aos bots aliados ("me siga", "segure o A").
+- Replay curto do abate, estatísticas por arma, mapa de calor das mortes.
+- Mais mapas/variações (porto, vila com sobrados de 3 andares na Unity), portas que abrem/fecham, vidro que quebra.
+- Configurações: volume, tamanho/posição dos botões, sensibilidade da mira, qualidade gráfica (sombras) para celular fraco.
+- Tutorial interativo curto na primeira vez.
 
 **Plano combinado**
 1. Usuário aprova a jogabilidade no protótipo.
@@ -152,6 +181,6 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 ## 5. Como pedir mudanças no próximo chat (sugestão)
 
 > "Leia `ESTADO_DO_PROJETO.md` e `novojogo.md` do repositório caiohg070/jogo-novo-fps (branch
-> claude/save-game-files-repo-rdk6pf). Continue o protótipo em `prototipo/index.html`.
+> claude/game-continuation-improvements-crkbqw). Continue o protótipo em `prototipo/index.html`.
 > Depois de cada mudança: testar, fazer commit/push na mesma branch e republicar o artifact
 > https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC."
