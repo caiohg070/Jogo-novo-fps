@@ -9,7 +9,7 @@ Na tela inicial escolha **modo**, **classe** e **clima**.
 ## Modos
 - **Treino:** você contra 2 bots.
 - **Mata-mata (3 vs 3):** você + 2 aliados (CT e médico) contra 3 inimigos; primeiro time a 20 abates vence.
-- **Battle Royale:** 8 jogadores (todos contra todos). Todos começam no avião; toque SALTAR quando quiser e
+- **Battle Royale:** 8 jogadores (todos contra todos), mapa 116 x 116 m com anel externo (ruínas, contêineres, carros, 12 baús extras). Todos começam no avião; toque SALTAR quando quiser e
   guie o paraquedas com o joystick. Começa só com pistola e faca — armas e colete nos baús. A zona azul fecha;
   fora dela você perde vida. Último vivo vence.
 - **Bomba:** 3 vs 3 por rodadas (sem renascer). Você leva a bomba: plante no **A** (barracão) ou **B** (oeste)
