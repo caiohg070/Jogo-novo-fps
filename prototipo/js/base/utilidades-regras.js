@@ -24,14 +24,14 @@ const WEAPONS = {
   pistol: { name: 'Pistola', kind: 'gun', slot: 'secondary', mag: 20, reserve: 120, rate: 0.3, dmg: [16, 22], spread: 0.03, range: 24, reload: 2.0, speed: 5.5, pen: 0.3, snd: [5000, 220, 0.22] },
   knife:  { name: 'Faca', kind: 'melee', slot: 'knife', rate: 0.55, dmg: [50, 60], range: 1.8, speed: 6.2, pen: 0.5 },
   // novas: escopeta (vários chumbos, forte de perto), SMG (rápida, corre mais), metralhadora (pente de 100, lenta)
-  shotgun: { name: 'Escopeta', kind: 'gun', slot: 'primary', mag: 6, reserve: 30, rate: 0.85, dmg: [9, 13], pellets: 8, spread: 0.085, range: 13, reload: 2.8, speed: 5.0, pen: 0.3, snd: [1500, 80, 0.55] },
+  shotgun: { name: 'Escopeta', kind: 'gun', slot: 'primary', mag: 6, reserve: 30, rate: 0.85, dmg: [14, 19], pellets: 8, spread: 0.08, range: 15, reload: 2.8, speed: 5.0, pen: 0.3, snd: [1500, 80, 0.55] },
   smg:    { name: 'SMG', kind: 'gun', slot: 'primary', mag: 30, reserve: 120, rate: 0.065, dmg: [14, 19], spread: 0.026, range: 26, reload: 1.9, speed: 5.7, pen: 0.35, snd: [5200, 240, 0.22] },
   lmg:    { name: 'Metralhadora', kind: 'gun', slot: 'primary', mag: 100, reserve: 200, rate: 0.09, dmg: [24, 30], spread: 0.042, range: 32, reload: 4.6, speed: 4.2, pen: 0.55, snd: [2600, 120, 0.4] },
   turret: { name: 'Metralhadora fixa', kind: 'gun', slot: 'turret', mag: 999, reserve: 0, rate: 0.075, dmg: [26, 32], spread: 0.022, range: 40, reload: 1, speed: 0, pen: 0.6, snd: [2200, 110, 0.45] },
 };
 const NADES = { flash: { name: 'Flash', s: 'F', fuse: 1.5 }, he: { name: 'HE', s: 'HE', fuse: 1.6 }, smoke: { name: 'Smoke', s: 'S', fuse: 1.2 },
   molotov: { name: 'Molotov', s: 'Mo', fuse: 2.5, impact: true }, impact: { name: 'Impacto', s: 'I', fuse: 3, impact: true }, mine: { name: 'Mina', s: 'Mi', fuse: 1.0 } };
-const NADE_ORDER = ['he', 'flash', 'smoke', 'molotov', 'impact', 'mine'];
+const NADE_ORDER = ['he', 'flash', 'smoke', 'molotov', 'mine'];
 const CLASSES = {
   tr:     { name: 'Terrorista', primary: 'ak', secondary: 'deagle', nades: { he: 1, flash: 1, smoke: 0, molotov: 1 }, armor: 0, helmet: false,
             pal: { pants: 0x7a6a50, shirt: 0x8c7a5a, vest: 0x4a4234, pack: 0x3d372c, helmet: 0x5a4d3a } },

@@ -93,7 +93,7 @@ function updateHud() {
     else if (w.kind === 'melee') { $('#ammo').textContent = '∞'; $('#resWrap').style.display = 'none'; $('#ammo').classList.remove('low'); }
     else { $('#ammo').textContent = rl ? '…' : p.mag; $('#res').textContent = p.reserve; $('#resWrap').style.display = ''; $('#ammo').classList.toggle('low', p.mag <= Math.ceil(w.mag / 4)); }
     for (const el of document.querySelectorAll('.slot')) el.classList.toggle('on', el.dataset.slot === WEAPONS[p.weapon].slot);
-    $('#n-primary').textContent = p.inv.primary ? WEAPONS[p.inv.primary].name : '— vazio —'; $('#s-primary').textContent = A ? `${A.mag}/${A.res}` : 'ache em baú';
+    $('#n-primary').textContent = p.inv.primary ? WEAPONS[p.inv.primary].name : '— vazio —'; $('#s-primary').textContent = A ? `${A.mag}/${A.res}` : (mode === 'bomb' ? 'compre (B)' : 'ache em baú');
     $('#n-secondary').textContent = WEAPONS[p.inv.secondary].name; $('#s-secondary').textContent = `${S.mag}/${S.res}`;
     const nc = p.nades[p.nadeSel] || 0;
     $('#n-nade').textContent = NADES[p.nadeSel].name;
