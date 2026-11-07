@@ -25,7 +25,7 @@
   const N = 12;
   for (let i = 0; i < N; i++) {
     const za = RZ0 - (i * RL) / N, zb = RZ0 - ((i + 1) * RL) / N;
-    box(3.4, 5.7, zb, za, H0, H0 + ((i + 1) * FLOOR_H) / N, i % 2 ? 0xa89c86 : 0xb3a78f, { collide: false, solid: false });
+    box(3.4, 5.7, zb, za, H0, H0 + ((i + 1) * FLOOR_H) / N, i % 2 ? 0xa89c86 : 0xb3a78f, { collide: false });   // sólido: a bala não atravessa a escada por baixo
     const top = rampH(za) - 0.1;
     if (top > H0 + 0.4) colliders.push({ x0: 3.4, x1: 5.7, z0: zb, z1: za, y0: H0, y1: top });
   }

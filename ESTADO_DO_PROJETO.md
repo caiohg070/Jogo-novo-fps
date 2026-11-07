@@ -341,3 +341,7 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - Botão ⛶ pequeno e meio transparente no topo, no centro: só aparece em tela cheia e serve para sair.
 - Celular em pé: aviso discreto "↻ Gire o celular" embaixo (iPhone não deixa travar a rotação).
 - Modo app (manifesto / ícone na tela inicial) ficou para depois.
+
+## Tiro atravessando a escada + botão de tela cheia no menu
+- **Escada:** os degraus eram só visuais (`solid: false`), então a bala passava por baixo da escada e acertava quem estava no térreo, no cômodo norte (sob a laje). Agora os degraus bloqueiam tiro (`js/mapa/casa.js`). Testado: subir/descer a escada e da escada para o terraço continuam funcionando; a única linha livre restante é a da porta no pé da escada (aberta de verdade).
+- **Menu:** botão ⛶ de tela cheia ao lado da caveira/troféu (em jogo continua sutil no topo e só em tela cheia).
