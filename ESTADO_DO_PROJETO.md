@@ -1,11 +1,11 @@
 # Estado do projeto — Jogo tático top-down
 
 > **Para continuar em um novo chat:** cole este arquivo (ou peça para o Claude ler `ESTADO_DO_PROJETO.md`
-> e `novojogo.md` do repositório `caiohg070/jogo-novo-fps`, branch **`claude/game-continuation-improvements-crkbqw`** — é a mais nova;
+> e `novojogo.md` do repositório `caiohg070/jogo-novo-fps`, branch **`claude/game-expansion-ideas-2n8tnt`** — é a mais nova;
 > a `claude/save-game-files-repo-rdk6pf` ficou com a versão anterior).
 > **Regra do projeto:** sempre perguntar antes de iniciar algo grande ou gastar créditos (ElevenLabs/Higgsfield/Magnific).
 
-Última atualização: 07/11/2026 (2º chat).
+Última atualização: 07/11/2026 (3º chat).
 
 ---
 
@@ -143,6 +143,28 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
   sem inimigo vivo por 70 s+. Pode ser só o teste ou bug real da IA (alvo morto/desligado não limpa o estado). Investigar primeiro.
 - O artifact (link da seção 1) **ainda não foi republicado** com essas mudanças; README do protótipo também não foi atualizado.
 
+**3º chat (07/11/2026) — branch `claude/game-expansion-ideas-2n8tnt`**
+- **Armas novas:** Escopeta (8 chumbos, forte de perto), SMG (rápida, corre mais), Metralhadora/LMG (pente de 100).
+- **Acessórios** (baú/loja, valem para a arma principal): **silenciador** (som baixo, não aparece no minimapa, bots ouvem só a 8 m) e **mira** (+25% alcance, −20% dispersão, câmera um pouco mais longe).
+- **Granadas novas:** Molotov (fogo 7 s, bots fogem do fogo), Impacto (explode ao tocar), Mina (arma em 1 s, explode com inimigo ou veículo inimigo perto). Terrorista começa com 1 molotov, CT com 1 mina.
+- **Roupas/camuflagem (só visual, combinado não mexer na visão dos bots):** Padrão, Deserto, Floresta, Urbano, Neve, Ghillie. **Acessórios:** boina, óculos, máscara, mochila. Escolha salva no aparelho (`tatico.visual`). Bots do BR usam roupas aleatórias.
+- **Veículos:** 4 quadriciclos e 2 jipes (`VEH`, classe `Vehicle`). Joystick aponta a direção, atropela inimigo, tiro/explosão estragam, explode com 0 e volta em 45 s. Som de motor sintetizado.
+- **Metralhadora fixa** em 2 sacos de areia (`turretAt`): arco de ±63°, superaquece (barra laranja), quem usa fica com a cabeça exposta.
+- **Mapa:** mato alto/moitas (quem está dentro e não atirou há 1,5 s só é visto a 3,5 m — vale para todos), 3 cabanas com paredes de madeira que quebram, **portas** na casa e no barracão (abrem/fecham, quebram com tiro, bots abrem sozinhos; ficam fora da grade A*), **telhado do barracão + escada de mão** na parede leste, **tirolesa** terraço ⇄ morro oeste.
+- **Botão laranja / F** agora escolhe a ação certa (`playerAction`): saltar, sair/entrar veículo, metralhadora, plantar, levantar aliado, baú, tirolesa, porta.
+- **Battle Royale:** **airdrop** aos 50 s e 130 s (caixa vermelha de paraquedas, LMG/AWP + colete + capacete + acessório + granada). Bots vão buscar.
+- **Drone** (Sniper começa com 1; baú/loja): marca inimigos a 35 m por 6 s; bots também usam e avisam o time.
+- **Caído/reanimar** (Mata-mata, Bomba, Bandeira): com 0 de vida cai, rasteja, sangra 20 s; aliado parado ao lado levanta em 3 s (médico 2× mais rápido, ou na hora com a cura). Time todo caído = morrem.
+- **Modo novo: Capture a Bandeira** 3×3 (bases sul/norte, 3 capturas). Bots têm papel atacar/defender.
+- **Clima novo:** Neblina (visão dos bots ×0,6).
+- **Bug do "engage" parado:** não consegui reproduzir; adicionei proteção (sai do combate se ficar 2 s sem alvo, mesmo cego; alvo no avião não conta).
+- Testado com Playwright em todos os modos, sem erros no console.
+
+**Não feito (combinado com o usuário):**
+- Besta silenciosa — usuário não quer. Barris explosivos — não quer. Camuflagem afetar visão dos bots — não quer.
+- **Modo Zumbi — fazer depois.**
+- Pendente técnico: bots ainda não dirigem veículos; passageiro atirando no jipe; bots não usam metralhadora fixa nem tirolesa.
+
 ---
 
 ## 4. O que falta / próximos passos
@@ -181,6 +203,6 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 ## 5. Como pedir mudanças no próximo chat (sugestão)
 
 > "Leia `ESTADO_DO_PROJETO.md` e `novojogo.md` do repositório caiohg070/jogo-novo-fps (branch
-> claude/game-continuation-improvements-crkbqw). Continue o protótipo em `prototipo/index.html`.
+> claude/game-expansion-ideas-2n8tnt). Continue o protótipo em `prototipo/index.html`.
 > Depois de cada mudança: testar, fazer commit/push na mesma branch e republicar o artifact
 > https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC."
