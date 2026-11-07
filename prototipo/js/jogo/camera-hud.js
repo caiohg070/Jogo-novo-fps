@@ -25,7 +25,6 @@ function updateWalls() {
   const inside = player.pos.x > HOUSE.x0 - 0.2 && player.pos.x < HOUSE.x1 + 0.2 && player.pos.z > HOUSE.z0 - 0.2 && player.pos.z < HOUSE.z1 + 0.2 && player.y < H1 - 0.6;
   // atrás da casa (lado de cima da tela): a laje e as paredes da frente tapavam o jogador e as portas/janelas dos fundos
   const behind = !inside && player.pos.x > HOUSE.x0 - 1.5 && player.pos.x < HOUSE.x1 + 1.5 && player.pos.z < HOUSE.z0 + 0.2 && player.pos.z > HOUSE.z0 - 8 && player.y < H1 - 0.6;
-  for (const m of upper) m.visible = !inside && !behind;
   const inBunker = inBK(player.pos.x, player.pos.z) && player.y < BK_TOP - 1;
   for (const m of bunkerRoof) m.visible = !inBunker;
   const inBarn = inBarnS(player);
@@ -34,6 +33,13 @@ function updateWalls() {
   for (const m of barnRoof) m.visible = !inBarn && !behindBarn;
   for (const m of faded) { m.material.opacity = 1; m.material.depthWrite = true; }
   faded.clear();
+  // dentro/atrás da casa: a laje e as muretas de cima ficam bem transparentes (antes sumiam e quem estava no telhado parecia flutuar)
+  const ghostUp = inside || behind;
+  for (const m of upper) {
+    m.castShadow = !ghostUp;
+    if (ghostUp) { m.material.transparent = true; m.material.opacity = 0.2; m.material.depthWrite = false; }
+    else if (m.material.opacity < 1) { m.material.opacity = 1; m.material.depthWrite = true; }
+  }
   if (behind || behindBarn) for (const m of fadeables) {
     const q = m.position, A = behind ? HOUSE : BARN;
     if (q.x > A.x0 - 0.5 && q.x < A.x1 + 0.5 && q.z > A.z0 + 0.5 && q.z < A.z1 + 0.5) { m.material.opacity = 0.22; m.material.depthWrite = false; faded.add(m); }

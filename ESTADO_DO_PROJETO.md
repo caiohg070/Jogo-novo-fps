@@ -293,3 +293,12 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - **Ruas cortando o morro** (`js/base/terreno-cena.js`, `baseHeight`/`rawHeight`): a rua agora acompanha a altura média do relevo em volta (7 m) em vez de achatar para um plano. Inclinação máxima perto das ruas no BR: até 2,5 (68°) → abaixo de 0,95.
 - **Bunker** (`js/base/terreno-cena.js`): a malha do chão é alinhada às bordas do bunker e os triângulos de dentro são removidos (antes uma rampa afundava por fora das paredes).
 - Teste rápido sem desenhar: Mata-mata 300 s e BR sem erros.
+
+## Correções na casa: tiro varando parede na escada, muretas, laje transparente
+- A transparência das paredes NÃO afeta o tiro (testado: mesmos resultados com paredes normais ou transparentes/escondidas).
+- **Causa 1** (`js/personagens/soldados.js` + `shotLen` em `js/base/fisica-visao.js`): o bloqueio medido pelo caminho "dobrado" (sobe/desce) era comparado com a distância em LINHA RETA; o caminho é mais longo, então uma parede batida perto do alvo parecia "depois do alvo" e o tiro contava. Agora compara com o comprimento do próprio caminho. Lógica do tiro (caminho, linhas retas) igual.
+- **Causa 2** (`lean`/`onStairs` em `fisica-visao.js`): o "debruçar na mureta" (+0,45 m na arma quando 1,5 m acima do alvo) valia na escada e erguia a arma acima da parede. Agora não vale na escada (vale no terraço/telhado como antes).
+- Muretas do terraço: 0,95 m → 0,60 m (`js/mapa/casa.js`).
+- Dentro/atrás da casa a laje e as muretas de cima ficam 20% visíveis em vez de sumir (`js/jogo/camera-hud.js`) — quem está no telhado não parece flutuar.
+- Teste geral (pares perto de casa, barracão, bunker e caixas, totalmente escondidos atrás de parede em todas as alturas): tiros que varavam 25 → 13 de ~2.800. Os que restam são, em maioria, o tiro do terraço para baixo rente à parede (comportamento antigo do terraço) e frestas finas. Escada → fora da casa: não vara mais. No degrau mais alto, quem está embaixo do piso de cima ainda acerta os pés de quem está na escada (os pés ficam mesmo visíveis pela abertura).
+- Tiro no morro (mira na imagem do bot): 97% de acerto, igual a antes. Mata-mata e BR rápidos sem erros.
