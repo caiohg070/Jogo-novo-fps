@@ -137,5 +137,18 @@ const peek = (t, from) => (t.y - from.y > 1.5 && onTerrace(t) && nearEdge(t) ? (
 function aimPoint(t, x, z, from) { const hi = from && t.y - from.y > 1.5 && !onTerrace(t); return new V3(x ?? t.pos.x, t.y + SHOT_H + (t.turret ? 0.45 : 0) + (t.downed ? -0.6 : 0) + (from ? peek(t, from) : 0) + (hi ? rand(0.1, 0.5) : rand(-0.05, 0.1)), z ?? t.pos.z); }
 // linha reta livre até peito/ombro/cabeça (morro, telhado): mesma regra do tiro em shootRay
 const straightOpen = (o, t) => [SHOT_H + 0.1, 1.35, 1.6, 0.7].some(hh => { const Q = new V3(t.pos.x, t.y + hh + (t.downed ? -0.6 : 0), t.pos.z); return firstHit(o, Q) >= o.distanceTo(Q) - 0.15 && !smokeBlocks(o, Q); });
-const canShoot = (a, b) => { const o = eye(a, SHOT_H + lean(a, b)); return shotBlock(o, aimPoint(b, null, null, a)) === Infinity || straightOpen(o, b); };
+// terraço: quem está a até 3 m da casa (do lado de fora, no chão) fica protegido pela mureta — o tiro de cima bate nela
+const houseGap = t => Math.hypot(Math.max(HOUSE.x0 - t.pos.x, 0, t.pos.x - HOUSE.x1), Math.max(HOUSE.z0 - t.pos.z, 0, t.pos.z - HOUSE.z1));
+const roofCut = (a, t) => onTerrace(a) && houseGap(t) > 0 && houseGap(t) < 3 && t.y < H1 - 1;
+// vale nos dois sentidos: quem está embaixo, rente à casa, também não acerta quem está no terraço
+const roofBlocked = (a, t) => roofCut(a, t) || roofCut(t, a);
+// ponto da mureta onde a bala bate (borda da casa na direção do alvo)
+function parapetPoint(o, t) {
+  if (onTerrace(t)) { const q = new V3(t.pos.x, H1 + 0.45, t.pos.z), d = new V3().subVectors(o, q); d.y = 0; d.normalize();   // de baixo: bate na mureta do lado de quem atira
+    for (let k = 0; k < 20; k += 0.05) { const x = q.x + d.x * k, z = q.z + d.z * k; if (x <= HOUSE.x0 || x >= HOUSE.x1 || z <= HOUSE.z0 || z >= HOUSE.z1) return new V3(x, H1 + 0.3, z); } }
+  const dx = t.pos.x - o.x, dz = t.pos.z - o.z, L = Math.hypot(dx, dz); let k = 0;
+  while (k < L && o.x + dx * k / L > HOUSE.x0 && o.x + dx * k / L < HOUSE.x1 && o.z + dz * k / L > HOUSE.z0 && o.z + dz * k / L < HOUSE.z1) k += 0.05;
+  return new V3(o.x + dx * k / L, H1 + 0.45, o.z + dz * k / L);
+}
+const canShoot = (a, b) => { if (roofBlocked(a, b)) return false; const o = eye(a, SHOT_H + lean(a, b)); return shotBlock(o, aimPoint(b, null, null, a)) === Infinity || straightOpen(o, b); };
 

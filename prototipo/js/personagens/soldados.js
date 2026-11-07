@@ -247,7 +247,8 @@ class Soldier {
       best = t; bestT = Math.max(0.1, proj - Math.sqrt(HIT_R * HIT_R - perp2));
     }
     let end, path = null;
-    if (best) {
+    if (best && roofBlocked(this, best)) { end = parapetPoint(origin, best); bulletHit(end); }
+    else if (best) {
       origin.y = this.y + SHOT_H + lean(this, best);
       const P = aimPoint(best, undefined, undefined, this);   // centro do alvo (a borda podia ficar dentro da mureta)
       let block = shotBlock(origin, P), dist = shotLen;   // compara com o caminho percorrido, não com a linha reta

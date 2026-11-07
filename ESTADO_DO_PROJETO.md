@@ -302,3 +302,8 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - Dentro/atrás da casa a laje e as muretas de cima ficam 20% visíveis em vez de sumir (`js/jogo/camera-hud.js`) — quem está no telhado não parece flutuar.
 - Teste geral (pares perto de casa, barracão, bunker e caixas, totalmente escondidos atrás de parede em todas as alturas): tiros que varavam 25 → 13 de ~2.800. Os que restam são, em maioria, o tiro do terraço para baixo rente à parede (comportamento antigo do terraço) e frestas finas. Escada → fora da casa: não vara mais. No degrau mais alto, quem está embaixo do piso de cima ainda acerta os pés de quem está na escada (os pés ficam mesmo visíveis pela abertura).
 - Tiro no morro (mira na imagem do bot): 97% de acerto, igual a antes. Mata-mata e BR rápidos sem erros.
+
+## Terraço: mureta protege quem está a até 3 m da casa
+- `roofBlocked`/`parapetPoint` em `js/base/fisica-visao.js` (usado em `shootRay` de `soldados.js` e em `canShoot`): quem está no terraço não acerta quem está no chão, fora da casa, a menos de 3 m da parede — a bala bate na mureta. Vale nos dois sentidos (quem está embaixo rente à casa também não acerta quem está no terraço). A partir de 3 m, tudo igual a antes.
+- Teste: terraço → alvo a 0,5/1,5/2,9 m: 0 acertos (antes 10/10 a 1,5 e 2,9 m); 3,5 e 6 m: 10/10. Tiro no morro 97% igual. Mata-mata e BR rápidos sem erros.
+- Mureta no barracão: proposta, ainda não feita.
