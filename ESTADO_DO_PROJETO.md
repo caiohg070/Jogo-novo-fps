@@ -190,6 +190,12 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 4. Câmera: removido o deslocamento `z += 1.8`; a câmera mira o meio do corpo (`y += 0.9`). Jogador fica exatamente no centro (testado 844×390 e 390×844).
 5. Som da Colt M4: o `m4.mp3` é ~16 dB mais baixo que os outros; ganho extra `SND_GAIN = { m4: 5 }` em `shotSound`.
 
+**✅ Pedidos do 6º chat (2ª rodada)**
+- Atraso no 1º tiro: `FIRST_SHOT_DELAY = 0.18` s (`updatePlayer`, `fireHoldT`) — só armas de fogo do jogador; a rajada segue normal depois.
+- Pega-bandeira: coluna de luz alta e piscando em cada bandeira (`F.beam`), seta laranja `#objArrow` (`updateObjArrow()`)
+  que aponta para o objetivo com texto e distância (BANDEIRA INIMIGA / LEVE PARA SUA BASE / RECUPERE SUA BANDEIRA / PROTEJA …)
+  e anel pulsando no minimapa em volta da bandeira inimiga.
+
 **Pendências pequenas no protótipo**
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
 - [ ] Som da chuva tem só 2 s (repete); gerar um mais longo se incomodar.
