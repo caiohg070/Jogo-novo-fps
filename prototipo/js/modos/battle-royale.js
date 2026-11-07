@@ -26,7 +26,9 @@ function startBR() {
   planeSnd?.stop(); planeSnd = null;
   startPlaneSnd();
   const a = rand(0, Math.PI * 2), d = new V3(Math.cos(a), 0, Math.sin(a));
-  plane.dir.copy(d); const P = MAP * 1.2; plane.pos.set(-d.x * P, PLANE_Y, -d.z * P + rand(-15, 15)); plane.len = P * 2; plane.t = 0; plane.active = true;
+  // com Base Militar a rota passa sempre perto dela (a uns 0–12 m)
+  const P = MAP * 1.2, M = MIL ? new V3(MIL.cx * 0.85 + rand(-8, 8), 0, MIL.cz * 0.85 + rand(-8, 8)) : new V3(0, 0, rand(-15, 15));
+  plane.dir.copy(d); plane.pos.set(M.x - d.x * P, PLANE_Y, M.z - d.z * P); plane.len = P * 2; plane.t = 0; plane.active = true;
   plane.mesh.visible = true; plane.mesh.rotation.y = Math.atan2(d.x, d.z);
   const flight = plane.len / 13;
   // pontos de salto espalhados ao longo da rota do avião (o paraquedas plana ~25 m para o lado)
@@ -45,9 +47,14 @@ function startBR() {
   for (const [i, s] of soldiers.entries()) {
     s.spawn(0, 0); s.inv.primary = null; s.giveAmmo(s.inv.secondary); s.weapon = s.inv.secondary; s.armor = 0; s.helmet = false; s.nades = {}; s.showGear();
     s.air = 'plane'; s.y = PLANE_Y;
-    if (s.isBot) { s.ai = newAI(); s.jumpAt = now + Math.max(0.5, spots[i].u / 13 - 1.2); s.dropX = spots[i].x; s.dropZ = spots[i].z; }
+    if (s.isBot) { s.ai = newAI(); s.jumpAt = now + Math.max(0.5, spots[i].u / 13 - 1.2); s.dropX = spots[i].x; s.dropZ = spots[i].z;
+      if (MIL && i % 3 === 1) {   // ~1 em cada 3 bots cai na Base Militar
+        const uM = (MIL.cx - plane.pos.x) * d.x + (MIL.cz - plane.pos.z) * d.z;
+        s.dropX = MIL.cx + rand(-10, 10); s.dropZ = MIL.cz + rand(-10, 10); s.jumpAt = now + Math.max(0.5, uM / 13 - 1.5 + rand(-0.8, 0.8));
+      } }
   }
-  for (const l of loots) { l.state = 'closed'; l.loot = rollLoot(); }
+  for (const l of loots) if (!l.float) { l.state = 'closed'; l.loot = rollLoot(l); }
+  spawnFloats();
   zone.x = rand(-MAP * 0.35, MAP * 0.35); zone.z = rand(-MAP * 0.35, MAP * 0.35); zone.r = zone.r0; zone.t = 0; zoneMesh.visible = true;
   camTarget.copy(plane.pos);
 }

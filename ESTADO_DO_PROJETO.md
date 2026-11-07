@@ -5,7 +5,7 @@
 > a `claude/save-game-files-repo-rdk6pf` ficou com a versão anterior).
 > **Regra do projeto:** sempre perguntar antes de iniciar algo grande ou gastar créditos (ElevenLabs/Higgsfield/Magnific).
 
-Última atualização: 07/11/2026 (3º chat).
+Última atualização: 07/11/2026 (4º chat — Base Militar e itens flutuantes).
 
 ---
 
@@ -345,3 +345,12 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 ## Tiro atravessando a escada + botão de tela cheia no menu
 - **Escada:** os degraus eram só visuais (`solid: false`), então a bala passava por baixo da escada e acertava quem estava no térreo, no cômodo norte (sob a laje). Agora os degraus bloqueiam tiro (`js/mapa/casa.js`). Testado: subir/descer a escada e da escada para o terraço continuam funcionando; a única linha livre restante é a da porta no pé da escada (aberta de verdade).
 - **Menu:** botão ⛶ de tela cheia ao lado da caveira/troféu (em jogo continua sutil no topo e só em tela cheia).
+
+## Battle Royale: Base Militar, itens flutuantes, baús fora do minimapa (parte 1 de 2)
+- **Base Militar** (`js/mapa/base-militar.js`; lugar sorteado em `js/base/terreno-cena.js` → `MIL`, chão plano): quadrado de 30 m no anel de fora (63–70 m do centro), muro de 2,3 m com 2 portões, **torre de vigia** (5 m, escada de mão + **tirolesa** que desce por cima do muro para o lado do centro do mapa), 2 barracas, 2 contêineres, **caminhão quebrado** (só enfeite), sacos de areia, barris e caixas. **6 baús + 10 itens soltos** com tabela melhor (mais AWP/metralhadora/AK/M4, colete e capacete). Escrito **BASE** no minimapa. Os objetos sorteados do anel não caem dentro dela (`inMil` em `objetos.js`).
+- **Queda:** a rota do avião passa sempre a até ~12 m da base; ~1 em cada 3 bots pula nela (`battle-royale.js`).
+- **Itens flutuantes** (`js/itens/loot-flutuante.js`): 35 itens soltos pelo mapa (colete, capacete, arma, kit médico, munição), girando com anel brilhante; botão PEGAR; bots pegam igual aos baús; não voltam. Sorteados a cada partida em `startBR` (`spawnFloats`). O nome aparece quando o jogador está a menos de 9 m.
+- **Minimapa:** baús não aparecem mais (airdrop continua).
+- Só no Battle Royale; os outros modos não mudaram (testado no Mata-mata).
+- Testado a toda velocidade: 3 mapas, bots caem na base, ninguém preso no muro, pegar item, subir na torre e descer pela tirolesa, sem erros.
+- **Próximo (parte 2, combinado com o usuário):** sortear também casa, barracão e bunker no BR, com distância mínima (~40 m) entre eles e a base. Exige trocar coordenadas fixas por "posição do prédio + distância" em vários arquivos, inclusive `js/base/fisica-visao.js` (só os números, a regra do tiro fica igual) — **pedir autorização antes**.

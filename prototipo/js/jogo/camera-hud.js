@@ -151,8 +151,6 @@ function buildMinimap() {
   const w2m = v => ((v + MAP) / (MAP * 2)) * S;
   g.fillStyle = 'rgba(30,26,22,.85)';
   for (const c of colliders) if (c.y1 - c.y0 > 0.5) g.fillRect(w2m(c.x0), w2m(c.z0), Math.max(2, w2m(c.x1) - w2m(c.x0)), Math.max(2, w2m(c.z1) - w2m(c.z0)));
-  g.fillStyle = '#c9d65a';
-  for (const l of loots) g.fillRect(w2m(l.x) - 3, w2m(l.z) - 3, 6, 6);
 }
 buildMinimap();
 function drawMinimap() {
@@ -171,6 +169,9 @@ function drawMinimap() {
     mctx.strokeStyle = pg.kind === 'shot' ? `rgba(255,80,60,${a})` : `rgba(255,220,120,${a * 0.8})`; mctx.lineWidth = pg.kind === 'shot' ? 3 : 2;
     mctx.beginPath(); mctx.arc(w2m(pg.x), w2m(pg.z), pg.kind === 'shot' ? 10 + (1.4 - pg.t) * 10 : 5, 0, Math.PI * 2); mctx.stroke();
   }
+  if (mode === 'br' && MIL) { const x0 = w2m(MIL.x0), z0 = w2m(MIL.z0), w = w2m(MIL.x1) - x0;   // Base Militar
+    mctx.strokeStyle = 'rgba(255,214,90,.9)'; mctx.lineWidth = 2; mctx.strokeRect(x0, z0, w, w);
+    mctx.font = 'bold 20px system-ui'; mctx.fillStyle = '#ffd65a'; mctx.textAlign = 'center'; mctx.fillText('BASE', x0 + w / 2, z0 + w / 2 + 7); mctx.textAlign = 'start'; }
   if (mode === 'br' && zoneMesh.visible) { mctx.strokeStyle = '#4aa3ff'; mctx.lineWidth = 3; mctx.beginPath(); mctx.arc(w2m(zone.x), w2m(zone.z), (zone.r / (MAP * 2)) * S, 0, Math.PI * 2); mctx.stroke(); }
   if (mode === 'br' && plane.mesh.visible) { mctx.fillStyle = '#fff'; mctx.beginPath(); mctx.arc(w2m(plane.pos.x), w2m(plane.pos.z), 5, 0, Math.PI * 2); mctx.fill(); }
   if (mode === 'bomb') { mctx.font = 'bold 22px system-ui'; mctx.fillStyle = '#e8a33a'; for (const st of SITES) mctx.fillText(st.name, w2m(st.x) - 7, w2m(st.z) + 8);
