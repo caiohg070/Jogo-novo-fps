@@ -38,7 +38,7 @@ function hurtProp(m, dmg, by) {
   m.userData.hp -= dmg;
   if (m.userData.hp > 0) return;
   const c = m.userData.col; const P = m.getWorldPosition(new V3());
-  if (m.userData.door) m.userData.door.broken = true;
+  if (m.userData.door) { const D = m.userData.door; D.broken = true; const oi = colliders.indexOf(D.colOpen); if (oi >= 0) colliders.splice(oi, 1); }
   m.parent.remove(m); solids.splice(solids.indexOf(m), 1); const ci = colliders.indexOf(c); if (ci >= 0) colliders.splice(ci, 1);
   const fi = fadeables.indexOf(m); if (fi >= 0) fadeables.splice(fi, 1);
   for (let i = 0; i < 10; i++) spawnPart(P, m.userData.chip ?? 0x8f6c40, rand(0.2, 0.4), rand(0.5, 1), new V3(rand(-3, 3), rand(1, 4), rand(-3, 3)), false, 0.2, 8);

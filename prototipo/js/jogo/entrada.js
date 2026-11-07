@@ -76,7 +76,7 @@ function endPointer(e) {
   if (e.pointerId === joy.id) { joy.id = null; joy.vx = joy.vy = 0; joyKnob.style.transform = ''; joyEl.style.left = ''; joyEl.style.top = ''; joyEl.classList.add('idle'); }
   if (e.pointerId === aimT.id) { aimT.id = null; aimT.vx = aimT.vy = 0; aimKnob.style.transform = ''; aimEl.classList.remove('on'); }
   if (e.pointerId === nadeT.id) {
-    if (e.type === 'pointerup') { const [tx, tz] = nadeTarget(); throwNade(player, player.nadeSel, tx, tz); }
+    if (e.type === 'pointerup') { const [tx, tz] = nadeTarget(), dragged = Math.hypot(nadeT.vx, nadeT.vy) >= 0.25, n = tut && !tut.done ? tut.nadeCount() : 0; throwNade(player, player.nadeSel, tx, tz); if (dragged && tut && !tut.done && tut.nadeCount() < n) tut.nadeDrag = true; }
     nadeT.id = null; nadeT.vx = nadeT.vy = 0; nadeKnob.style.transform = ''; nadeEl.classList.remove('on');
   }
 }

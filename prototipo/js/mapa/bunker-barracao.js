@@ -53,15 +53,13 @@ const barnRoof = []; let ladderZ = null;
   barnRoof.push(box(x0, x1, z0, z1, R, top, 0x6f726b, { collide: false, rough: 0.55, metal: 0.35 }));
   for (let i = 1; i < 10; i++) barnRoof.push(box(x0 + i * 2 - 0.05, x0 + i * 2 + 0.05, z0, z1, top, top + 0.04, 0x5c5f58, { collide: false, solid: false, cast: false }));
   surfaces.push({ x0, x1, z0, z1, h: () => top });
-  const LX0 = x1, LX1 = x1 + 1.7, LZ0 = -34.6, LZ1 = -33.8;
-  // escada de mão: não é rampa — sobe/desce pelo botão de ação (SUBIR/DESCER ESCADA)
-  const LZ = (LZ0 + LZ1) / 2, la = { x: LX1 + 0.2, z: LZ, y: BARN_Y }, lb = { x: x1 - 0.9, z: LZ, y: top };
-  ladderZ = { a: la, b: lb, ladder: true, time: 1.3, cable: t => t < 0.75 ? new V3(x1 + 0.4, lerp(BARN_Y, top, t / 0.75) + 1.95, LZ) : new V3(lerp(x1 + 0.4, lb.x, (t - 0.75) / 0.25), top + 1.95, LZ) };
+  const LZ0 = -34.6, LZ1 = -33.8, LX = x1 + 0.12;
+  // escada de mão em pé, encostada na parede leste: sobe/desce pelo botão de ação (SUBIR/DESCER ESCADA)
+  const LZ = (LZ0 + LZ1) / 2, la = { x: x1 + 0.75, z: LZ, y: BARN_Y }, lb = { x: x1 - 0.9, z: LZ, y: top };
+  ladderZ = { a: la, b: lb, ladder: true, time: 1.6, cable: t => t < 0.1 ? new V3(lerp(la.x, x1 + 0.42, t / 0.1), BARN_Y + 1.95, LZ)
+    : t < 0.8 ? new V3(x1 + 0.42, lerp(BARN_Y, top, (t - 0.1) / 0.7) + 1.95, LZ) : new V3(lerp(x1 + 0.42, lb.x, (t - 0.8) / 0.2), top + 1.95, LZ) };
   const rm = stdMat(0x5a4632);
-  for (const z of [LZ0 + 0.05, LZ1 - 0.05]) {
-    const L = Math.hypot(LX1 - LX0, top - BARN_Y), m = new THREE.Mesh(boxGeo, rm);
-    m.scale.set(0.08, L, 0.08); m.position.set((LX0 + LX1) / 2, (BARN_Y + top) / 2, z); m.rotation.z = Math.atan2(LX1 - LX0, top - BARN_Y); m.castShadow = true; scene.add(m);
-  }
-  for (let i = 1; i < 10; i++) { const t = i / 10, x = LX1 - t * (LX1 - LX0), yy = BARN_Y + t * (top - BARN_Y); box(x - 0.04, x + 0.04, LZ0, LZ1, yy - 0.03, yy + 0.03, 0x6a5440, { collide: false, solid: false }); }
+  for (const z of [LZ0 + 0.05, LZ1 - 0.05]) { const m = new THREE.Mesh(boxGeo, rm); m.scale.set(0.08, top + 0.5 - BARN_Y, 0.08); m.position.set(LX, (BARN_Y + top + 0.5) / 2, z); m.castShadow = true; scene.add(m); }
+  for (let i = 1; i <= 11; i++) { const yy = BARN_Y + i * 0.3; box(LX - 0.04, LX + 0.04, LZ0, LZ1, yy - 0.03, yy + 0.03, 0x6a5440, { collide: false, solid: false }); }
 }
 
