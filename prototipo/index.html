@@ -1221,7 +1221,7 @@ function updateBot(b, dt) {
     }
   }
   const t = ai.target && ai.target.alive && !blind ? ai.target : null;
-  if (t) { ai.last.copy(t.pos); ai.seenT += dt; ai.state = 'engage'; }
+  if (t) { ai.last.copy(t.pos); ai.seenT += dt; ai.state = 'engage'; ai.lastEnemyT = now; }
   else { ai.seenT = 0; if (ai.state === 'engage' && !blind) { ai.state = 'search'; ai.searchT = 7; } }
   if (b.C.heal && b.hp < 60 && b.healCd <= 0) b.heal();
   if (t && b.inv.primary === 'awp') b.switchTo(Math.hypot(t.pos.x - b.pos.x, t.pos.z - b.pos.z) < 7 ? b.inv.secondary : 'awp');
@@ -1263,15 +1263,13 @@ function updateBot(b, dt) {
   } else if (objectiveFor(b) && !(ai.detourT > 0)) {
     const g = objectiveFor(b), dx = g.x - b.pos.x, dz = g.z - b.pos.z, l = Math.hypot(dx, dz);
     if (l > (g.stop ?? 0.6)) { mx = dx / l; mz = dz / l; speed = 3.8; b.facing = Math.atan2(mx, mz); }
-    else if (g.act) g.act(b);
+    else if (g.act) g.act(b, dt);
   } else {
     if (ai.detourT > 0) ai.detourT -= dt;
     // aliado acompanha o jogador; inimigo patrulha
     const dp = Math.hypot(player.pos.x - b.pos.x, player.pos.z - b.pos.z);
-    if (b.team === player.team && player.alive && !player.air && dp > 6) {
+    if (false) {
       const dx = player.pos.x - b.pos.x, dz = player.pos.z - b.pos.z; mx = dx / dp; mz = dz / dp; speed = dp > 12 ? 4.6 : 3.4; b.facing = Math.atan2(mx, mz);
-    } else if (b.team === player.team && player.alive) {
-      b.facing += dt * 0.6;
     } else if (ai.wait > 0) ai.wait -= dt;
     else {
       const w = WP[ai.wp], dx = w[0] - b.pos.x, dz = w[1] - b.pos.z, l = Math.hypot(dx, dz);
@@ -1743,7 +1741,7 @@ function bombExplode() {
   bombMesh.visible = false;
   endBombRound('A', 'a bomba explodiu');
 }
-const mustDefuse = b => mode === 'bomb' && b.team === 'B' && bombS.planted && !roundOver;
+const mustDefuse = b => mode === 'bomb' && b.team === 'B' && bombS.planted && !roundOver && bombS.timer < 9;
 function objectiveFor(b) {
   if (mode !== 'bomb' || roundOver) return null;
   if (b.team === 'A') {
@@ -1752,9 +1750,28 @@ function objectiveFor(b) {
       return { x: st.x, z: st.z, stop: 1.2, act: bb => { if (!bombS.plantBy && siteOf(bb)) { bombS.plantBy = bb; bombS.plantT = 0; } } };
     }
     if (!bombS.carrier && bombS.pos && !bombS.planted) return { x: bombS.pos.x, z: bombS.pos.z, stop: 0.3 };
+    // bomba plantada: o time que plantou se posiciona em volta e fica de tocaia
+    if (bombS.planted) {
+      if (!b.ai.guard) { const a = rand(0, 6.28); b.ai.guard = { x: bombS.pos.x + Math.cos(a) * rand(5, 8), z: bombS.pos.z + Math.sin(a) * rand(5, 8) }; }
+      return { x: b.ai.guard.x, z: b.ai.guard.z, stop: 0.8, act: (bb, dt) => { bb.facing = Math.atan2(bombS.pos.x - bb.pos.x, bombS.pos.z - bb.pos.z) + Math.sin(now * 0.8) * 0.9; } };
+    }
     return null;
   }
-  if (bombS.planted) return { x: bombS.pos.x, z: bombS.pos.z, stop: 1.0, act: () => {} };
+  if (bombS.planted) {
+    // CT: não corre direto; viu inimigo há pouco → luta primeiro; senão limpa 1–2 pontos em volta antes de desarmar
+    const ai = b.ai;
+    if (bombS.timer > 9 && now - (ai.lastEnemyT ?? -99) < 4) return null;
+    if (!ai.clearPts) {
+      const a0 = Math.atan2(b.pos.z - bombS.pos.z, b.pos.x - bombS.pos.x);
+      ai.clearPts = [0, 1].map(i => ({ x: bombS.pos.x + Math.cos(a0 + i * 1.4 - 0.7) * 7, z: bombS.pos.z + Math.sin(a0 + i * 1.4 - 0.7) * 7 })).slice(0, bombS.timer > 18 ? 2 : 1);
+      ai.clearIdx = 0; ai.holdT = 0;
+    }
+    if (ai.clearIdx < ai.clearPts.length && bombS.timer > 9) {
+      const c = ai.clearPts[ai.clearIdx];
+      return { x: c.x, z: c.z, stop: 1.2, act: (bb, dt) => { bb.facing += dt * 2.5; if ((ai.holdT += dt) > 1.6) { ai.clearIdx++; ai.holdT = 0; } } };
+    }
+    return { x: bombS.pos.x, z: bombS.pos.z, stop: 1.0, act: () => {} };
+  }
   return null;
 }
 function updateBomb(dt) {
