@@ -23,7 +23,7 @@
 | Jogo publicado (para testar no celular) | https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC |
 | **Jogo no GitHub Pages (link principal do usuário)** | https://caiohg070.github.io/Jogo-novo-fps/ (servido da branch `claude/save-game-files-repo-rdk6pf`) |
 | Sons no ElevenLabs | flow "Jogo tático - efeitos sonoros" (id `HB0RnWHvUUjmllWHYXRE`) |
-| Branch de trabalho | **`claude/game-fixes-republish-8n23ze`** (mais nova, 4º chat; baseada na `claude/game-expansion-ideas-2n8tnt`). Não existe `main` |
+| Branch de trabalho | **`claude/game-fixes-republish-8n23ze`** (mais nova, atualizada no 6º chat; `claude/game-fixes-republish-kvd4j8` e `claude/save-game-files-repo-rdk6pf` têm o mesmo conteúdo). Não existe `main` |
 
 **Como abrir localmente:** abrir `prototipo/index.html` no Chrome (precisa de internet para baixar o Three.js da CDN).
 
@@ -197,6 +197,8 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
   e anel pulsando no minimapa em volta da bandeira inimiga.
 
 **✅ 6º chat (3ª rodada)** — Placar (`updateScore`): tirado "sua: na base · inimiga: na base" do Bandeira e o "abates/mortes" pessoal do Mata-mata (parecia 2ª contagem); agora mostra `até N`. Conferido nos 5 modos.
+
+**➡️ PRÓXIMO CHAT:** nenhum pedido pendente do usuário. Fim do 6º chat: tudo salvo, site e artifact atualizados.
 
 **Pendências pequenas no protótipo**
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
