@@ -98,7 +98,7 @@ body.is-touch #reloadBtn{display:flex}
 /* controles 70% transparentes; ficam um pouco mais visíveis enquanto usados */
 #joy,#aimBtn,.rbtn,#reloadBtn{opacity:.2!important}
 #joy:not(.idle),#aimBtn.on,#nadeBtn.on{opacity:.42!important}
-#actBtn{position:fixed;right:calc(var(--ctl-x) - 30px);top:calc(var(--ctl-y) + 74px);z-index:8;padding:9px 16px;border-radius:20px;
+#actBtn{position:fixed;right:calc(var(--ctl-x) + 20px);top:calc(var(--ctl-y) + 40px);z-index:8;padding:9px 16px;border-radius:20px;
   background:rgba(232,163,58,.85);color:#1d1a16;font-weight:800;font-size:13px;letter-spacing:.04em;cursor:pointer;display:none;pointer-events:auto;white-space:nowrap}
 body:not(.is-touch) #actBtn{right:50%;transform:translateX(50%);top:auto;bottom:70px}
 .edge{position:absolute;left:0;top:0;color:#ff5a4a;font-size:22px;text-shadow:0 0 4px #000;pointer-events:none}
@@ -2493,7 +2493,7 @@ function updateHud() {
     else if (w.kind === 'melee') { $('#ammo').textContent = '∞'; $('#resWrap').style.display = 'none'; $('#ammo').classList.remove('low'); }
     else { $('#ammo').textContent = rl ? '…' : p.mag; $('#res').textContent = p.reserve; $('#resWrap').style.display = ''; $('#ammo').classList.toggle('low', p.mag <= Math.ceil(w.mag / 4)); }
     for (const el of document.querySelectorAll('.slot')) el.classList.toggle('on', el.dataset.slot === WEAPONS[p.weapon].slot);
-    $('#n-primary').textContent = p.inv.primary ? WEAPONS[p.inv.primary].name : '— vazio —'; $('#s-primary').textContent = A ? `${A.mag}/${A.res}` : 'pegue em baús';
+    $('#n-primary').textContent = p.inv.primary ? WEAPONS[p.inv.primary].name : '— vazio —'; $('#s-primary').textContent = A ? `${A.mag}/${A.res}` : 'ache em baú';
     $('#n-secondary').textContent = WEAPONS[p.inv.secondary].name; $('#s-secondary').textContent = `${S.mag}/${S.res}`;
     const nc = p.nades[p.nadeSel] || 0;
     $('#n-nade').textContent = NADES[p.nadeSel].name;

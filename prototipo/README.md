@@ -53,8 +53,7 @@ Dia, chuva (chão molhado, poças) e noite com chuva (postes acesos).
 - **PC:** WASD, mouse mira, clique atira, 1/2/3 armas, 4 troca granada, G joga, E cura, R recarrega, roda troca arma.
 
 ## Ainda falta (próximas etapas)
-casas de 3 andares,
-modelos 3D melhores dos personagens, sons reais (ElevenLabs) e imagens (Higgsfield/Magnific).
+casas de 3 andares e visual realista (planejado para a Unity), bots dirigindo veículos/usando metralhadora fixa e tirolesa, modo Zumbi.
 
 ## Sons
 Efeitos gerados no ElevenLabs, em `sons/` (mp3) e embutidos em `sons/sons.js`: tiros de AK-47, Colt M4, AWP,
@@ -64,9 +63,13 @@ Tiros distantes ficam mais baixos e abafados. Os mesmos mp3 servem para a versã
 
 ## Jogar pelo navegador (GitHub Pages)
 1. No GitHub: **Settings → Pages**.
-2. Em *Build and deployment*: Source = **Deploy from a branch**; Branch = `claude/save-game-files-repo-rdk6pf`, pasta **/ (root)** → **Save**.
+2. Em *Build and deployment*: Source = **Deploy from a branch**; Branch = `claude/game-fixes-republish-8n23ze`, pasta **/ (root)** → **Save**.
 3. Em 1–2 minutos o jogo fica em `https://caiohg070.github.io/jogo-novo-fps/` (o `index.html` da raiz leva para `prototipo/`).
 Obs.: Pages grátis só em repositório público.
+
+## Novidades (2º chat)
+- Bots com navegação A* (contornam paredes e entram pelas portas).
+- Indicador de dano (arco vermelho), câmera do abate, som estéreo, pausa (II / Esc), histórico de partidas na tela inicial.
 
 ## Novidades (3º chat)
 - Armas: Escopeta, SMG, Metralhadora; acessórios silenciador e mira (baús/loja).

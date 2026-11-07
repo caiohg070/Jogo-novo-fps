@@ -1,7 +1,7 @@
 # Estado do projeto — Jogo tático top-down
 
 > **Para continuar em um novo chat:** cole este arquivo (ou peça para o Claude ler `ESTADO_DO_PROJETO.md`
-> e `novojogo.md` do repositório `caiohg070/jogo-novo-fps`, branch **`claude/game-expansion-ideas-2n8tnt`** — é a mais nova;
+> e `novojogo.md` do repositório `caiohg070/jogo-novo-fps`, branch **`claude/game-fixes-republish-8n23ze`** — é a mais nova;
 > a `claude/save-game-files-repo-rdk6pf` ficou com a versão anterior).
 > **Regra do projeto:** sempre perguntar antes de iniciar algo grande ou gastar créditos (ElevenLabs/Higgsfield/Magnific).
 
@@ -15,14 +15,14 @@
 |---|---|
 | Documento de ideias original | `novojogo.md` |
 | Imagens de referência (ref01–ref08) | `referencias/` |
-| **Jogo (protótipo no navegador)** | `prototipo/index.html` (arquivo único, ~2150 linhas) |
+| **Jogo (protótipo no navegador)** | `prototipo/index.html` (arquivo único, ~3060 linhas) |
 | Sons (mp3 do ElevenLabs) | `prototipo/sons/*.mp3` |
 | Sons embutidos (base64) usados pelo jogo | `prototipo/sons/sons.js` (gerado a partir dos mp3) |
 | Manual do protótipo (controles, modos) | `prototipo/README.md` |
 | Página raiz para GitHub Pages (redireciona p/ `prototipo/`) | `index.html` + `.nojekyll` |
 | Jogo publicado (para testar no celular) | https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC |
 | Sons no ElevenLabs | flow "Jogo tático - efeitos sonoros" (id `HB0RnWHvUUjmllWHYXRE`) |
-| Branch de trabalho | **`claude/game-continuation-improvements-crkbqw`** (mais nova). A `claude/save-game-files-repo-rdk6pf` tem a versão anterior. Não existe `main` |
+| Branch de trabalho | **`claude/game-fixes-republish-8n23ze`** (mais nova, 4º chat; baseada na `claude/game-expansion-ideas-2n8tnt`). Não existe `main` |
 
 **Como abrir localmente:** abrir `prototipo/index.html` no Chrome (precisa de internet para baixar o Three.js da CDN).
 
@@ -160,6 +160,12 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 - **Bug do "engage" parado:** não consegui reproduzir; adicionei proteção (sai do combate se ficar 2 s sem alvo, mesmo cego; alvo no avião não conta).
 - Testado com Playwright em todos os modos, sem erros no console.
 
+**4º chat (07/11/2026) — branch `claude/game-fixes-republish-8n23ze`**
+- Teste longo automático (Playwright, tempo acelerado 20×) em todos os modos e climas: sem erros; patrulha/combate dos bots ok.
+- Celular: botão laranja de ação (ex.: SALTAR DO AVIÃO) subiu/foi para a esquerda — antes cobria a caixa de munição.
+- Lista de armas: texto "pegue em baús" vazava da caixa → "ache em baú".
+- Artifact republicado com tudo do 2º, 3º e 4º chats; README e este arquivo corrigidos.
+
 **Não feito (combinado com o usuário):**
 - Besta silenciosa — usuário não quer. Barris explosivos — não quer. Camuflagem afetar visão dos bots — não quer.
 - **Modo Zumbi — fazer depois.**
@@ -175,7 +181,7 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 - [ ] Usuário ainda não ativou o GitHub Pages (ver seção 1).
 - [x] ~~Bots sem navegação de verdade~~ → A\* feito no 2º chat.
 - [ ] Investigar bots presos em "engage" sem inimigo (ver aviso acima).
-- [ ] Republicar o artifact e atualizar `prototipo/README.md` com as novidades do 2º chat.
+- [x] Artifact republicado e README atualizado (4º chat).
 - [ ] Mapa maior vale para todos os modos (nos modos 3×3 o anel externo fica pouco usado).
 
 **Do documento `novojogo.md` ainda não feito**
@@ -203,6 +209,6 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 ## 5. Como pedir mudanças no próximo chat (sugestão)
 
 > "Leia `ESTADO_DO_PROJETO.md` e `novojogo.md` do repositório caiohg070/jogo-novo-fps (branch
-> claude/game-expansion-ideas-2n8tnt). Continue o protótipo em `prototipo/index.html`.
+> claude/game-fixes-republish-8n23ze). Continue o protótipo em `prototipo/index.html`.
 > Depois de cada mudança: testar, fazer commit/push na mesma branch e republicar o artifact
 > https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC."
