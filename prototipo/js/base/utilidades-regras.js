@@ -54,6 +54,6 @@ const SKINS = {
 const TEAM_MODES = new Set(['tdm', 'bomb', 'ctf']), RESPAWN_MODES = new Set(['treino', 'tdm', 'ctf']);
 const TEAM_COLOR = { A: 0x2f7fd0, B: 0xc0392b };
 const HEAL_CD = 18;
-const DIFF = { facil: { react: 1.7, err: 1.9, dmg: 0.55 }, medio: { react: 1, err: 1, dmg: 0.75 }, dificil: { react: 0.6, err: 0.55, dmg: 0.95 } };
+const DIFF = { facil: { react: 1.7, err: 1.9, dmg: 0.55 }, medio: { react: 1, err: 1.3, dmg: 0.75 }, dificil: { react: 0.6, err: 0.55, dmg: 0.95 } };
 let diff = DIFF.medio;
 

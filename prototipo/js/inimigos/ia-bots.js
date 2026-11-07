@@ -117,12 +117,15 @@ function updateBot(b, dt) {
   ai.stuckT += dt;
   if (ai.stuckT > 1) {
     if (b.moving && ai.stuckPos.distanceTo(b.pos) < 0.35) {
-      if (blind) ai.blindDir += Math.PI;
+      ai.path = null; ai.stuckN = (ai.stuckN || 0) + 1;
+      // preso 2 vezes seguidas: desiste do ponto e vai para o seguinte ao próximo (antes voltava sempre para o mesmo)
+      if (ai.stuckN >= 2 && !blind && ai.state !== 'engage') { ai.stuckN = 0; ai.state = 'patrol'; ai.roam = null; ai.detourT = 3; ai.wp = (nearestWP(b.pos) + 2) % WP.length; }
+      else if (blind) ai.blindDir += Math.PI;
       else if (mode === 'br' && ai.state === 'patrol') ai.roam = null;
       else if (ai.state === 'patrol') { ai.wp = (ai.wp + 1) % WP.length; if (objectiveFor(b)) { ai.detourT = 2.5; ai.wp = nearestWP(b.pos); } }
       else if (ai.state === 'search') { ai.state = 'patrol'; ai.wp = nearestWP(b.pos); }
       else ai.strafe = -ai.strafe || 1;
-    }
+    } else ai.stuckN = 0;
     ai.stuckT = 0; ai.stuckPos.copy(b.pos);
   }
 }

@@ -9,7 +9,7 @@ const navIdx = (x, z) => { const i = Math.floor((x + MAP) / NAV_C), j = Math.flo
 const navX = k => -MAP + ((k % NAV_N) + 0.5) * NAV_C, navZ = k => -MAP + (((k / NAV_N) | 0) + 0.5) * NAV_C;
 const inHouseRect = (x, z, m = 0) => x > HOUSE.x0 - m && x < HOUSE.x1 + m && z > HOUSE.z0 - m && z < HOUSE.z1 + m;
 const navBase = k => { const x = navX(k), z = navZ(k); return Math.max(Math.abs(x), Math.abs(z)) > MAP - 2.2 || (x > 26.5 && x < BK.x1 + 0.6 && z > -0.7 && z < BK.z1 + 0.4) ? 1 : 0; }; // borda e vão da rampa do bunker
-const navHits = (c, k) => { if (c.door) return false; const x = navX(k), z = navZ(k), h = navHgt[k];
+const navHits = (c, k) => { if (c.door && !c.leaf) return false; /* porta fechada o bot abre; folha aberta é parede */ const x = navX(k), z = navZ(k), h = navHgt[k];
   return x > c.x0 - NAV_INF && x < c.x1 + NAV_INF && z > c.z0 - NAV_INF && z < c.z1 + NAV_INF && c.y1 > h + 0.35 && c.y0 < h + 1.7; };
 function navCellsOf(c, f) {
   const i0 = Math.max(0, Math.floor((c.x0 - NAV_INF + MAP) / NAV_C)), i1 = Math.min(NAV_N - 1, Math.floor((c.x1 + NAV_INF + MAP) / NAV_C));
@@ -90,7 +90,7 @@ function navSteer(b, gx, gz) {
   const ai = b.ai, dx = gx - b.pos.x, dz = gz - b.pos.z, l = Math.hypot(dx, dz);
   if (l < 0.01) return [0, 0];
   const k0 = navIdx(b.pos.x, b.pos.z), nh = k0 >= 0 ? navHgt[k0] : b.y;
-  if (Math.abs(b.y - nh) > 1.2 || (inHouseRect(b.pos.x, b.pos.z, 0.6) && inHouseRect(gx, gz, 0.6)) || navLineClear(b.pos.x, b.pos.z, gx, gz)) { ai.path = null; return [dx / l, dz / l]; }
+  if (Math.abs(b.y - nh) > 1.2 || navLineClear(b.pos.x, b.pos.z, gx, gz)) { ai.path = null; return [dx / l, dz / l]; }
   if (!ai.path || ai.pathT <= 0 || Math.hypot(ai.pathGoal[0] - gx, ai.pathGoal[1] - gz) > 1.5) {
     ai.path = navPath(b.pos.x, b.pos.z, gx, gz) || [[gx, gz]]; ai.pathI = 0; ai.pathT = 1.5; ai.pathGoal = [gx, gz];
   }
