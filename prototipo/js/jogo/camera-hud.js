@@ -22,7 +22,8 @@ const inBarnS = s => s.pos.x > BARN.x0 - 0.2 && s.pos.x < BARN.x1 + 0.2 && s.pos
 const insideHouse = s => s.pos.x > HOUSE.x0 && s.pos.x < HOUSE.x1 && s.pos.z > HOUSE.z0 && s.pos.z < HOUSE.z1 && s.y < H1 - 0.6;
 const inSmoke = s => smokes.some(k => k.age > 0.8 && eye(s, 1.2).distanceTo(k.pos) < k.r * 0.85);
 function updateWalls() {
-  const inside = player.pos.x > HOUSE.x0 - 0.2 && player.pos.x < HOUSE.x1 + 0.2 && player.pos.z > HOUSE.z0 - 0.2 && player.pos.z < HOUSE.z1 + 0.2 && player.y < H1 - 0.6;
+  // na escada conta como dentro até pisar no terraço (antes a laje voltava a ficar sólida no fim da subida)
+  const inside = player.pos.x > HOUSE.x0 - 0.2 && player.pos.x < HOUSE.x1 + 0.2 && player.pos.z > HOUSE.z0 - 0.2 && player.pos.z < HOUSE.z1 + 0.2 && (player.y < H1 - 0.6 || onStairs(player));
   // atrás da casa (lado de cima da tela): a laje e as paredes da frente tapavam o jogador e as portas/janelas dos fundos
   const behind = !inside && player.pos.x > HOUSE.x0 - 1.5 && player.pos.x < HOUSE.x1 + 1.5 && player.pos.z < HOUSE.z0 + 0.2 && player.pos.z > HOUSE.z0 - 8 && player.y < H1 - 0.6;
   const inBunker = inBK(player.pos.x, player.pos.z) && player.y < BK_TOP - 1;
@@ -33,11 +34,11 @@ function updateWalls() {
   for (const m of barnRoof) m.visible = !inBarn && !behindBarn;
   for (const m of faded) { m.material.opacity = 1; m.material.depthWrite = true; }
   faded.clear();
-  // dentro/atrás da casa: a laje e as muretas de cima ficam bem transparentes (antes sumiam e quem estava no telhado parecia flutuar)
+  // dentro/atrás da casa: a laje e as muretas de cima ficam meio transparentes (45%) (antes sumiam e quem estava no telhado parecia flutuar)
   const ghostUp = inside || behind;
   for (const m of upper) {
     m.castShadow = !ghostUp;
-    if (ghostUp) { m.material.transparent = true; m.material.opacity = 0.2; m.material.depthWrite = false; }
+    if (ghostUp) { m.material.transparent = true; m.material.opacity = 0.45; m.material.depthWrite = false; }
     else if (m.material.opacity < 1) { m.material.opacity = 1; m.material.depthWrite = true; }
   }
   if (behind || behindBarn) for (const m of fadeables) {

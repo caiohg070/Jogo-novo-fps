@@ -307,3 +307,8 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - `roofBlocked`/`parapetPoint` em `js/base/fisica-visao.js` (usado em `shootRay` de `soldados.js` e em `canShoot`): quem está no terraço não acerta quem está no chão, fora da casa, a menos de 3 m da parede — a bala bate na mureta. Vale nos dois sentidos (quem está embaixo rente à casa também não acerta quem está no terraço). A partir de 3 m, tudo igual a antes.
 - Teste: terraço → alvo a 0,5/1,5/2,9 m: 0 acertos (antes 10/10 a 1,5 e 2,9 m); 3,5 e 6 m: 10/10. Tiro no morro 97% igual. Mata-mata e BR rápidos sem erros.
 - Mureta no barracão: proposta, ainda não feita.
+
+## Escada: tiro de fora pela parede leste e teto dentro da casa
+- **Teto** (`js/jogo/camera-hud.js`): a laje e as muretas de cima ficam 45% visíveis (antes 20%, parecia que não tinha teto) quando se está dentro/atrás da casa, **inclusive na escada até pisar no terraço** (antes a laje voltava a ficar sólida nos últimos 20% da subida).
+- **Tiro na escada** (`stairCut`/`inStairwell` em `js/base/fisica-visao.js`, dentro de `roofBlocked`): quem está na escada (inclusive o último degrau) e quem está no chão fora da casa não se acertam — a bala bate na parede leste (`parapetPoint`). Causa: o último trecho do tiro "dobrado" corria na altura do peito de quem estava no alto da escada e passava por cima da parede/mureta. Quem está dentro da casa continua acertando quem está na escada.
+- Teste (atiradores em volta da casa sem linha reta até o alvo, alvo em 11 pontos da escada, 3 tiros cada): acertos 82 → 0. De dentro da casa: continua acertando. Partida rápida sem desenhar a tela: sem erros.
