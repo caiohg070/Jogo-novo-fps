@@ -274,6 +274,6 @@ Teste jogou todos os modos sozinho: sem erros de código. Problemas achados vira
 O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 
 - [x] **Etapa 1 – loja e armas (feita):** tirado o item "Mira" (loja, baús, caixa do BR); tirada a granada de Impacto (loja, ordem das granadas, bots, BR — agora só HE); escopeta mais forte (dano 14–19 por chumbo, alcance 15); Bomba: espaço vazio diz "compre (B)" e dinheiro de plantar respeita limite de $16.000.
-- [ ] **Etapa 2 – AWP:** pequeno zoom da câmera na direção da mira com a AWP (`js/jogo/camera-hud.js`).
+- [x] **Etapa 2 – AWP (feita):** com arma de luneta (AWP), vivo e a pé, a câmera desliza 3,5 m para o lado da mira (`scopeOff` em `js/jogo/camera-hud.js`, entra/sai suave); afastamento da luneta caiu de 1,4 para 1,2. Testado: câmera anda 3,5 m na direção mirada, sem erros.
 - [ ] **Etapa 3 – bots:** bots travam parados (principalmente perto de x −3, z −5.7, ao lado da casa; também (4,28), (−14.7,5), (−6.5,−29.8)); se preso, pular para o próximo ponto. Dificuldade MÉDIO errar um pouco mais (`js/inimigos/ia-bots.js`, `navegacao.js`, `DIFF` em `utilidades-regras.js`).
 - [ ] **Etapa 4 – modos:** Bandeira: ninguém captura (carregador sempre morre no meio, perto de −6,−5) → desviar da casa central, aliados escoltam, e tempo máximo de partida (`js/modos/bandeira.js`). Battle Royale: saltos mais espalhados e zona fechando mais devagar (`js/modos/battle-royale.js`). Aumentar o mapa do BR: deixar para outro chat.

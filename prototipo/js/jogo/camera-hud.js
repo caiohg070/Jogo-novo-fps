@@ -1,13 +1,18 @@
 'use strict';
 // ================= câmera, paredes, HUD =================
 const camTarget = new V3();
+// AWP (arma com luneta): câmera desliza alguns metros para o lado da mira
+const scopeOff = new V3(), _so = new V3();
 // depois de morrer, a câmera vai até quem te matou por ~2 s (mostra onde ele estava)
 const killCamTarget = () => { const k = player.killer, t = now - (player.diedAt ?? -99); return !player.alive && k && k.alive && t > 0.5 && t < 2.8 ? k : null; };
 function updateCamera(dt) {
   const kc = killCamTarget(), f = kc || player;
   camTarget.lerp(new V3(f.pos.x, f.air ? f.y - 2 : f.y, f.pos.z), Math.min(1, dt * (kc ? 4 : 8)));
-  camZoom = lerp(camZoom, player.air === 'plane' ? 1.5 : player.air ? 1.35 : player.veh ? 1.25 + Math.abs(player.veh.v) / 60 : player.alive && player.w.scope ? 1.4 : player.alive && player.attOn.mira ? 1.15 : player.turret ? 1.2 : 1, Math.min(1, dt * 3));
-  camera.position.copy(camTarget).addScaledVector(CAM_OFF, camScale * camZoom); camera.position.y += 0.9;   // mira no meio do corpo: jogador no centro da tela
+  camZoom = lerp(camZoom, player.air === 'plane' ? 1.5 : player.air ? 1.35 : player.veh ? 1.25 + Math.abs(player.veh.v) / 60 : player.alive && player.w.scope ? 1.2 : player.alive && player.attOn.mira ? 1.15 : player.turret ? 1.2 : 1, Math.min(1, dt * 3));
+  const sc = !kc && player.alive && !player.air && !player.veh && player.w.scope;
+  _so.set(sc ? Math.sin(player.facing) * 3.5 : 0, 0, sc ? Math.cos(player.facing) * 3.5 : 0);
+  scopeOff.lerp(_so, Math.min(1, dt * 4));
+  camera.position.copy(camTarget).add(scopeOff).addScaledVector(CAM_OFF, camScale * camZoom); camera.position.y += 0.9;   // mira no meio do corpo: jogador no centro da tela
   if (shakeT > 0) { shakeT -= dt; camera.position.x += rand(-1, 1) * shakeT * 1.2; camera.position.z += rand(-1, 1) * shakeT * 1.2; }
   sun.position.copy(camTarget).add(SUN_OFF); sun.target.position.copy(camTarget);
   lantern.position.set(player.pos.x, player.y + 3, player.pos.z);
