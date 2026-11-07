@@ -172,6 +172,19 @@ function groundMark(P, r, color = 0x15110d, op = 0.85, life = CHIP_LIFE, sx = 1)
   m.position.set(P.x, groundAt(P.x, P.z, P.y + 0.3) + 0.03, P.z); m.renderOrder = 2; scene.add(m);
   marks.push({ m, t: now, life, op }); if (marks.length > 160) scene.remove(marks.shift().m);
 }
+// marca de explosão: mancha suave (borda esfumada, centro mais escuro) que acompanha o relevo — antes era um disco preto chapado
+const scorchTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+  for (let i = 0; i < 9; i++) { const x = 64 + rand(-18, 18), y = 64 + rand(-18, 18), r = rand(28, 52), gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, 'rgba(18,14,10,0.55)'); gr.addColorStop(0.6, 'rgba(30,24,18,0.25)'); gr.addColorStop(1, 'rgba(40,32,24,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+function scorchMark(P, r, op = 0.9, life = 20) {
+  const N = 8, geo = new THREE.PlaneGeometry(2 * r, 2 * r, N, N); geo.rotateX(-Math.PI / 2); geo.rotateY(rand(0, Math.PI * 2));
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) { const x = P.x + pos.getX(i), z = P.z + pos.getZ(i); pos.setXYZ(i, x, groundAt(x, z, P.y + 0.6) + 0.04, z); }
+  const mat = new THREE.MeshBasicMaterial({ map: scorchTex, transparent: true, opacity: op, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4 });
+  const m = new THREE.Mesh(geo, mat); m.renderOrder = 2; scene.add(m);
+  marks.push({ m, t: now, life, op }); if (marks.length > 160) scene.remove(marks.shift().m);
+}
 function updateMarks() { for (let i = marks.length - 1; i >= 0; i--) { const k = marks[i], age = now - k.t; if (age > k.life) { scene.remove(k.m); marks.splice(i, 1); } else k.m.material.opacity = k.op * clamp((k.life - age) / 2, 0, 1); } }
 function bulletHit(p) {
   impact(p);

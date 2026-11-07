@@ -58,14 +58,23 @@ function pipes(x, z) {
   for (const [ox, oy, oz] of [[0, r, -1.2], [0, r, 0.05], [0, r * 2.7, -0.58]]) cyl(x + ox, y + oy, z + oz, r, 2.6, 0xa29d93, [0, 0, Math.PI / 2], { side: THREE.DoubleSide, solid: true });
   colliders.push({ x0: x - 1.3, x1: x + 1.3, z0: z - 1.85, z1: z + 0.7, y0: y, y1: y + 2.2 });
 }
-const streetLights = [];
-function pole(x, z) {
+const streetLights = [], lampGlows = [];
+function pole(x, z, real = true) {
   const y = terrainHeight(x, z);
   cyl(x, y + 3.5, z, 0.13, 7, 0x6e5640, null, { solid: true });
   box(x - 0.9, x + 0.9, z - 0.06, z + 0.06, y + 6.4, y + 6.55, 0x5e4936, { collide: false, solid: false });
   box(x + 0.6, x + 1.1, z - 0.15, z + 0.15, y + 6.2, y + 6.35, 0x3a3631, { collide: false, solid: false });
   colliders.push({ x0: x - 0.15, x1: x + 0.15, z0: z - 0.15, z1: z + 0.15, y0: y, y1: y + 7 });
-  const l = new THREE.PointLight(0xffc477, 0, 20, 1.6); l.position.set(x + 0.85, y + 6.0, z); scene.add(l); streetLights.push(l);
+  if (real) { const l = new THREE.PointLight(0xffc477, 0, 20, 1.6); l.position.set(x + 0.85, y + 6.0, z); scene.add(l); streetLights.push(l); return; }
+  // poste extra sem PointLight (leve no celular): lâmpada acesa + círculo de luz no chão, só à noite
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffd49a }));
+  bulb.position.set(x + 0.85, y + 6.1, z); bulb.visible = false; scene.add(bulb);
+  const geo = new THREE.CircleGeometry(4.5, 20); geo.rotateX(-Math.PI / 2);
+  const pos = geo.attributes.position, c = document.createElement('canvas'); c.width = c.height = 64;
+  for (let i = 0; i < pos.count; i++) { const gx = x + 0.85 + pos.getX(i), gz = z + pos.getZ(i); pos.setXYZ(i, gx, terrainHeight(gx, gz) + 0.05, gz); }
+  const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,200,130,0.5)'); gr.addColorStop(1, 'rgba(255,200,130,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+  const glow = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  glow.renderOrder = 1; glow.visible = false; scene.add(glow); lampGlows.push(bulb, glow);
 }
 function barrel(x, z, color = 0x7a4a2a) {
   const y = terrainHeight(x, z);
@@ -108,6 +117,9 @@ sandbags(-3, 1, 10, 10.8); sandbags(10, 10.8, -4, -1); sandbags(-24, -21.5, 10, 
 crate(6, 10, 1); crate(7.2, 10, 2); crate(-7.5, -18, 2); crate(-6.3, -18.2, 1); crate(22, -2, 1); crate(-24, 14, 2); crate(12, 18, 1); crate(-30, 26, 1);
 pipes(-22, -16);
 pole(-30, 8.6); pole(-4, 8.6); pole(14, 8.6); pole(30, 8.6);
+// mais postes espalhados (perto da casa, barracão, bunker e morros); pula os que cairiam dentro de algo
+for (const [x, z] of [[-10, -18], [9, -20], [22, -30], [38, -38], [36, 4], [-22, -30], [-40, -4], [-18, 30], [10, 26], [30, 40], [-36, 36], [44, 16]])
+  if (![BARN, BK, HOUSE].some(c => x > c.x0 - 2 && x < c.x1 + 2 && z > c.z0 - 2 && z < c.z1 + 2) && !colliders.some(c => x > c.x0 - 1.4 && x < c.x1 + 1.4 && z > c.z0 - 1.4 && z < c.z1 + 1.4)) pole(x, z, false);
 barrel(-9, -20); barrel(-8.3, -20.4, 0x4a5a3a); barrel(23, 4); barrel(-18, 24, 0x5a3a2a);
 fence(-9.5, -20, -11); fence(-9.5, -9, -4);
 // anel externo do mapa (posições fixas, geradas com semente)
