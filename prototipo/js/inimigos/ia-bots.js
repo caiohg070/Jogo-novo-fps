@@ -5,6 +5,11 @@ const WP = [
   [0, -11], [-4.5, -7.6, 3], [0, -11], [4.6, -13.8], [4.5, -12.2], [4.5, -7.0], [2.5, -7.0], [2.5, -9], [1.7, -13.6],
   [1.7, -17], [8, -18], [16, -18.5], [16, -23.5], [16, -18.5], [20, -17], [26, -12], [24, 0, 1.5], [10, 10], [-8, 12], [-20, 6], [-22, -10, 1.5], [-8, -2],
 ];
+// Battle Royale: volta extra pelo anel novo (pontos livres, em ordem de ângulo)
+if (BR_SEED) for (let i = 0; i < 12; i++) for (let k = 0; k < 20; k++) {
+  const a = (i + 0.5) / 12 * 6.283, r = 52 + srnd() * 26, x = Math.cos(a) * r, z = Math.sin(a) * r;
+  if (!navBlocked[navIdx(x, z)]) { WP.push([x, z, k % 3 ? 0 : 1.5]); break; }
+}
 const newAI = () => ({ state: 'patrol', wp: 0, wait: 0, last: new V3(), seenT: 0, searchT: 0, strafe: 1, strafeT: 0, burst: 0, burstCd: 0,
   stuckT: 0, stuckPos: new V3(), target: null, scanT: 0, clear: false, clearT: 0, blindDir: 0, nadeCd: rand(6, 12) });
 function nearestWP(p) { let bi = 0, bd = Infinity; WP.forEach((w, i) => { const d = Math.hypot(w[0] - p.x, w[1] - p.z); if (d < bd) { bd = d; bi = i; } }); return bi; }
@@ -101,7 +106,11 @@ function updateBot(b, dt) {
           const d = Math.hypot(lo.x - b.pos.x, lo.z - b.pos.z); if (d < ld) { ld = d; L = lo; }
         }
         const a = rand(0, 6.28), r = rand(0, zone.r * 0.7);
-        ai.roam = L ? { x: L.x, z: L.z, loot: L } : { x: clamp(zone.x + Math.cos(a) * r, -MAP + 3, MAP - 3), z: clamp(zone.z + Math.sin(a) * r, -MAP + 3, MAP - 3) };
+        // mapa grande: anda perto de onde está (10–32 m) enquanto a zona é grande, para não juntar todo mundo no meio cedo
+        let rx = zone.x + Math.cos(a) * r, rz = zone.z + Math.sin(a) * r;
+        if (BR_SEED && zone.r > 45) { rx = b.pos.x + Math.cos(a) * rand(10, 32); rz = b.pos.z + Math.sin(a) * rand(10, 32);
+          const zd = Math.hypot(rx - zone.x, rz - zone.z), lim = zone.r * 0.8; if (zd > lim) { rx = zone.x + (rx - zone.x) * lim / zd; rz = zone.z + (rz - zone.z) * lim / zd; } }
+        ai.roam = L ? { x: L.x, z: L.z, loot: L } : { x: clamp(rx, -MAP + 3, MAP - 3), z: clamp(rz, -MAP + 3, MAP - 3) };
       }
       [mx, mz] = navSteer(b, ai.roam.x, ai.roam.z); speed = 3.6; b.facing = Math.atan2(mx, mz);
     } else if (ai.wait > 0) ai.wait -= dt;

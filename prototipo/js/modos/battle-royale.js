@@ -11,7 +11,7 @@ const plane = { mesh: new THREE.Group(), pos: new V3(), dir: new V3(), t: 0, len
   for (const c of plane.mesh.children) c.castShadow = true;
   plane.mesh.visible = false; scene.add(plane.mesh);
 }
-const zone = { x: 0, z: 0, r: 85, r0: 85, r1: 6, t: 0, dur: 300, delay: 45 };
+const zone = { x: 0, z: 0, r: MAP * 1.47, r0: MAP * 1.47, r1: 6, t: 0, dur: BR_SEED ? 360 : 300, delay: BR_SEED ? 55 : 45 };   // mapa grande: zona maior e um pouco mais lenta
 const zoneMesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 40, 64, 1, true), new THREE.MeshBasicMaterial({ color: 0x4aa3ff, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }));
 zoneMesh.visible = false; scene.add(zoneMesh);
 let planeSnd = null;
@@ -19,26 +19,29 @@ function startBR() {
   planeSnd?.stop(); planeSnd = null;
   if (actx && SFX.aviao) { planeSnd = actx.createBufferSource(); planeSnd.buffer = SFX.aviao; planeSnd.loop = true; const g = actx.createGain(); g.gain.value = 0.35; planeSnd.connect(g).connect(masterOut); planeSnd.start(); }
   const a = rand(0, Math.PI * 2), d = new V3(Math.cos(a), 0, Math.sin(a));
-  plane.dir.copy(d); plane.pos.set(-d.x * 70, PLANE_Y, -d.z * 70 + rand(-15, 15)); plane.len = 140; plane.t = 0; plane.active = true;
+  plane.dir.copy(d); const P = MAP * 1.2; plane.pos.set(-d.x * P, PLANE_Y, -d.z * P + rand(-15, 15)); plane.len = P * 2; plane.t = 0; plane.active = true;
   plane.mesh.visible = true; plane.mesh.rotation.y = Math.atan2(d.x, d.z);
   const flight = plane.len / 13;
-  // pontos de salto espalhados pelo mapa, com distância mínima entre eles
-  const spots = [];
-  for (let i = 0; i < soldiers.length; i++) {
-    let best = null, bd = -1;
-    for (let k = 0; k < 25; k++) {
-      const x = rand(-MAP + 12, MAP - 12), z = rand(-MAP + 12, MAP - 12), d = Math.min(99, ...spots.map(p => Math.hypot(p.x - x, p.z - z)));
-      if (d > bd) { bd = d; best = { x, z }; } if (d > 30) break;
+  // pontos de salto espalhados ao longo da rota do avião (o paraquedas plana ~25 m para o lado)
+  const n = soldiers.length, spots = [], perp = new V3(-d.z, 0, d.x);
+  for (let i = 0; i < n; i++) {
+    let x, z, u;
+    for (let k = 0; k < 30; k++) {
+      u = plane.len * (0.12 + 0.76 * (i + rand(0.15, 0.85)) / n);
+      const side = (i % 2 ? 1 : -1) * rand(4, 24);
+      x = plane.pos.x + d.x * u + perp.x * side; z = plane.pos.z + d.z * u + perp.z * side;
+      if (Math.abs(x) < MAP - 8 && Math.abs(z) < MAP - 8) break;
     }
-    spots.push(best);
+    spots.push({ x: clamp(x, -MAP + 8, MAP - 8), z: clamp(z, -MAP + 8, MAP - 8), u });
   }
+  spots.sort(() => Math.random() - 0.5);
   for (const [i, s] of soldiers.entries()) {
     s.spawn(0, 0); s.inv.primary = null; s.giveAmmo(s.inv.secondary); s.weapon = s.inv.secondary; s.armor = 0; s.helmet = false; s.nades = {}; s.showGear();
     s.air = 'plane'; s.y = PLANE_Y;
-    if (s.isBot) { s.ai = newAI(); s.jumpAt = now + (flight - 2) * (0.1 + 0.8 * i / soldiers.length) + rand(0, 1.5); s.dropX = spots[i].x; s.dropZ = spots[i].z; }
+    if (s.isBot) { s.ai = newAI(); s.jumpAt = now + Math.max(0.5, spots[i].u / 13 - 1.2); s.dropX = spots[i].x; s.dropZ = spots[i].z; }
   }
   for (const l of loots) { l.state = 'closed'; l.loot = rollLoot(); }
-  zone.x = rand(-20, 20); zone.z = rand(-20, 20); zone.r = zone.r0; zone.t = 0; zoneMesh.visible = true;
+  zone.x = rand(-MAP * 0.35, MAP * 0.35); zone.z = rand(-MAP * 0.35, MAP * 0.35); zone.r = zone.r0; zone.t = 0; zoneMesh.visible = true;
   camTarget.copy(plane.pos);
 }
 function jumpOut(s) {

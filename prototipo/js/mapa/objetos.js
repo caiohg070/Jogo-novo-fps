@@ -122,13 +122,14 @@ for (const [x, z] of [[-10, -18], [9, -20], [22, -30], [38, -38], [36, 4], [-22,
   if (![BARN, BK, HOUSE].some(c => x > c.x0 - 2 && x < c.x1 + 2 && z > c.z0 - 2 && z < c.z1 + 2) && !colliders.some(c => x > c.x0 - 1.4 && x < c.x1 + 1.4 && z > c.z0 - 1.4 && z < c.z1 + 1.4)) pole(x, z, false);
 barrel(-9, -20); barrel(-8.3, -20.4, 0x4a5a3a); barrel(23, 4); barrel(-18, 24, 0x5a3a2a);
 fence(-9.5, -20, -11); fence(-9.5, -9, -4);
-// anel externo do mapa (posições fixas, geradas com semente)
-const OUTER_LOOT = [];
+// anel externo do mapa (modos normais: posições fixas, semente 7; Battle Royale: sorteado a cada partida e 3× mais coisas)
+const OUTER_LOOT = [], BR_SPOTS = [];
 {
-  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let seed = 7; const rnd = BR_SEED ? srnd : () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const K = BR_SEED ? 3 : 1, R1 = BR_SEED ? MAP - 7 : 54;
   const free = (x, z, m) => !colliders.some(c => x > c.x0 - m && x < c.x1 + m && z > c.z0 - m && z < c.z1 + m);
-  const spot = () => { for (let i = 0; i < 60; i++) { const a = rnd() * 6.283, r = 42 + rnd() * 12, x = Math.cos(a) * r, z = Math.sin(a) * r; if (free(x, z, 4)) return [x, z]; } return null; };
-  const put = (n, f) => { for (let i = 0; i < n; i++) { const p = spot(); if (p) f(p[0], p[1]); } };
+  const spot = () => { for (let i = 0; i < 60; i++) { const a = rnd() * 6.283, r = 42 + rnd() * (R1 - 42), x = Math.cos(a) * r, z = Math.sin(a) * r; if (free(x, z, 4)) return [x, z]; } return null; };
+  const put = (n, f) => { for (let i = 0; i < n * K; i++) { const p = spot(); if (p) f(p[0], p[1]); } };
   put(6, (x, z) => car(x, z, rnd() < 0.5, pick([0x6b4b36, 0x3e4a52, 0x5d3a2a, 0x4a4a3a])));
   put(10, (x, z) => barrier(x, z, rnd() < 0.5));
   put(7, (x, z) => sandbags(x - 1.3, x + 1.3, z - 0.4, z + 0.4));
@@ -141,6 +142,7 @@ const OUTER_LOOT = [];
   put(12, (x, z) => OUTER_LOOT.push([x, z]));
   // cabanas de madeira (paredes quebram com tiro/granada) e moitas de mato alto
   put(3, (x, z) => shack(x, z));
+  if (BR_SEED) { put(4, (x, z) => pole(x, z, false)); put(3, (x, z) => BR_SPOTS.push([x, z])); }
   put(16, (x, z) => { if (roadFactor(x, z) < 0.3) bushes.push({ x, z, r: 1.5 + rnd() * 1.1 }); });
 }
 for (const [x, z, r] of [[-16, 21, 2], [31, -13, 2.2], [-31, -19, 1.8], [7, 35, 2.2], [-36, 13, 2], [21, 33, 1.8], [36, 24, 2], [-8, -40, 2]])

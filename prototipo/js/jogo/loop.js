@@ -18,7 +18,7 @@ function showBoard(title) {
     rows.map(s => `<tr class="${cls(s)}"><td class="${tcl(s)}">${s.name}</td><td>${s.C.name}</td><td>${s.stats.k}</td><td>${s.stats.d}</td><td>${Math.round(s.stats.dmg)}</td></tr>`).join('');
   $('#board').style.display = 'flex';
 }
-$('#again').addEventListener('click', () => { if (tut) { $('#board').style.display = 'none'; $('#play').click(); return; } $('#board').style.display = 'none'; career.partidas++; saveCareer(); setupMatch(choice.cls); started = true; document.body.classList.add('playing'); });
+$('#again').addEventListener('click', () => { if (tut || mode === 'br') { $('#board').style.display = 'none'; $('#play').click(); return; } $('#board').style.display = 'none'; career.partidas++; saveCareer(); setupMatch(choice.cls); started = true; document.body.classList.add('playing'); });
 $('#toMenu').addEventListener('click', () => { tut = null; $('#board').style.display = 'none'; renderCareer(); $('#start').style.display = 'flex'; });
 let paused = false;
 function setPause(on) {

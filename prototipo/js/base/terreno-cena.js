@@ -6,6 +6,12 @@ function roadFactor(x, z) {
   const r2 = 1 - smooth(2.6, 6.5, Math.abs(x + 14));
   return Math.max(r1, r2) * (1 - smooth(MAP - 8, MAP - 2, e));
 }
+// morros sorteados no anel novo do Battle Royale
+const BR_HILLS = [];
+if (BR_SEED) for (let i = 0, n = 9 + Math.floor(srnd() * 5); i < n; i++) {
+  const a = srnd() * 6.283, r = 58 + srnd() * 24;
+  BR_HILLS.push([Math.cos(a) * r, Math.sin(a) * r, 3 + srnd() * 6, 70 + srnd() * 150]);
+}
 function rawHeight(x, z) {
   let h = 1.6 * Math.sin(x * 0.09 + 0.5) * Math.cos(z * 0.075 - 0.3)
         + 0.7 * Math.sin(x * 0.21 + z * 0.17)
@@ -13,6 +19,7 @@ function rawHeight(x, z) {
         + 4.0 * Math.exp(-((x + 27) ** 2 + (z + 6) ** 2) / 80)
         + 6.5 * Math.exp(-((x - 44) ** 2 + (z - 36) ** 2) / 160) + 5.5 * Math.exp(-((x + 44) ** 2 + (z + 32) ** 2) / 140)
         + 4.5 * Math.exp(-((x - 40) ** 2 + (z + 46) ** 2) / 120) + 5.0 * Math.exp(-((x + 42) ** 2 + (z - 44) ** 2) / 130);
+  for (const [hx, hz, hh, hw] of BR_HILLS) h += hh * Math.exp(-((x - hx) ** 2 + (z - hz) ** 2) / hw);
   const e = Math.max(Math.abs(x), Math.abs(z));
   h += smooth(MAP - 4, MAP + 9, e) * 15;
   h = lerp(h, -0.5 + 0.035 * x - 0.03 * z, roadFactor(x, z) * 0.75);
@@ -86,7 +93,7 @@ const lantern = new THREE.PointLight(0xfff2d8, 0, 14, 1.6); scene.add(lantern); 
 
 let terrainMat;
 {
-  const SIZE = (MAP + 26) * 2, SEG = 160;
+  const SIZE = (MAP + 26) * 2, SEG = BR_SEED ? 240 : 160;
   const g = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG);
   g.rotateX(-Math.PI / 2);
   const p = g.attributes.position, col = new Float32Array(p.count * 3), c = new THREE.Color();

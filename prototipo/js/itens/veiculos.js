@@ -138,7 +138,8 @@ function updateVehicles(dt) {
   }
 }
 // pontos de veículos (procura um lugar livre perto do ponto pedido)
-for (const [type, x, z, ang] of [['quad', 36, 4.5, -Math.PI / 2], ['quad', -14, 33, Math.PI], ['quad', -40, 4.5, Math.PI / 2], ['jeep', -14, -40, 0], ['jeep', 44, -6, Math.PI], ['quad', 6, -44, Math.PI / 2]]) {
+for (const [type, x, z, ang] of [['quad', 36, 4.5, -Math.PI / 2], ['quad', -14, 33, Math.PI], ['quad', -40, 4.5, Math.PI / 2], ['jeep', -14, -40, 0], ['jeep', 44, -6, Math.PI], ['quad', 6, -44, Math.PI / 2],
+    ...BR_SPOTS.slice(0, 6).map(([x, z], i) => [i % 3 ? 'quad' : 'jeep', x, z, Math.atan2(-x, -z)])]) {   // Battle Royale: veículos extras no anel sorteado
   const r = VEH[type].r + 0.4;
   let px = x, pz = z;
   for (let k = 0; k < 40; k++) {

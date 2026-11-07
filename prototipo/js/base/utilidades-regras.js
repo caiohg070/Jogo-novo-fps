@@ -11,7 +11,13 @@ const angDiff = (a, b) => { let d = b - a; while (d > Math.PI) d -= Math.PI * 2;
 const V3 = THREE.Vector3;
 
 // ================= regras =================
-const MAP = 58;   // mapa maior (era 40): o centro continua igual, anel externo novo
+// Battle Royale: o menu guarda o pedido e recarrega a página; aqui o mapa é montado maior e sorteado
+let PEND = null;
+try { PEND = JSON.parse(sessionStorage.getItem('tatico.pend')); sessionStorage.removeItem('tatico.pend'); } catch {}
+const BR_SEED = PEND && PEND.mode === 'br' ? clamp(PEND.seed | 0, 1, 2147483646) : 0;
+const MAP = BR_SEED ? 90 : 58;   // 116 m nos modos normais; 180 m no Battle Royale (o centro continua igual)
+let brSeedV = BR_SEED || 1;
+const srnd = () => (brSeedV = (brSeedV * 16807) % 2147483647) / 2147483647;   // sorteio do mapa (mesma semente = mesmo mapa)
 const HOUSE = { x0: -6, x1: 6, z0: -15, z1: -6 };
 const H0 = 0.2, FLOOR_H = 3.0, H1 = H0 + FLOOR_H;
 const MAX_HP = 100, SHOT_H = 1.0, BODY_R = 0.42, HIT_R = 0.36;
