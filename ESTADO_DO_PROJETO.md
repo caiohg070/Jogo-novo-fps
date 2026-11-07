@@ -61,6 +61,7 @@ Precisa estar logado no GitHub no Chrome (repo privado dá 404) e Pages grátis 
 | objetos do mapa | `crate` (quebra com tiro), `sandbags`, `barrier`, `car`, `truck`, `container`, `pipes`, `pole` (poste com luz), `barrel`, `fence`, anel externo gerado com semente |
 | bunker subterrâneo | sala a −3,2 m com rampa e teto que some quando você entra |
 | barracão | 20 × 15 m, 4 portas, caixas dentro (ponto A da bomba) |
+| navegação | grade `navBlk` (célula bloqueada se colisor ocupa a altura do corpo), A* com heap, encurtamento por linha reta, `navDir(bot, x, z)` devolve a direção; recalcula a cada 2 s ou se o alvo mudar |
 | física e visão | `groundAt`, `collide`, `firstHit`, `shotBlock`, `smokeBlocks`, `los`, `lean/peek` (regras do terraço), `aimPoint`, `canShoot` |
 | efeitos | partículas, traçantes, luz de explosão/disparo, tremor de câmera |
 | som | `initAudio`, `sfx`, `shotSound`, `bang`, `boom`, `hiss`, etc. |
@@ -78,7 +79,7 @@ Precisa estar logado no GitHub no Chrome (repo privado dá 404) e Pages grátis 
 | loop | `frame()` |
 | tela inicial | escolhas do menu, botão JOGAR, tela cheia, pausa ao bloquear o celular |
 
-Ganchos de teste no `window`: `__game`, `__los`, `__cs`, `__die`, `__bomb`, `__zone`, `__jump`, `__sfx`, `__ts`.
+Ganchos de teste no `window`: `__game`, `__los`, `__cs`, `__die`, `__bomb`, `__zone`, `__jump`, `__sfx`, `__ts`, `__nav`.
 Os testes foram feitos com Playwright (Chromium headless) simulando tiros/posições.
 
 ---
@@ -132,7 +133,7 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
 - [ ] Som da chuva tem só 2 s (repete); gerar um mais longo se incomodar.
 - [ ] Usuário ainda não ativou o GitHub Pages (ver seção 1).
-- [ ] Bots não usam navegação de verdade (andam em linha reta entre pontos; destravam com "detour"). Em mapas novos podem enroscar.
+- [x] Navegação dos bots: grade de 0,5 m + A* (`navBuild`, `navPath`, `navDir`). Usada na patrulha, busca, objetivo da bomba, roam do BR e para contornar quando não há linha de tiro. Caixote quebrado atualiza a grade (`navMark`). No terraço o bot anda direto (a grade é do térreo).
 - [ ] Mapa maior vale para todos os modos (nos modos 3×3 o anel externo fica pouco usado).
 
 **Do documento `novojogo.md` ainda não feito**
