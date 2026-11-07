@@ -16,7 +16,7 @@ function updateZip(s, dt) {
   const Z = s.zip, dir = Z.a === Z.Z.a ? 1 : -1;
   Z.t = Math.min(1, Z.t + (Z.Z.ladder ? dt / Z.Z.time : (11 * dt) / Z.len));
   const tt = dir > 0 ? Z.t : 1 - Z.t, c = Z.Z.cable(tt);
-  s.pos.set(c.x, 0, c.z); s.y = c.y - 1.95; s.facing = Math.atan2(Z.b.x - Z.a.x, Z.b.z - Z.a.z);
+  s.pos.set(c.x, 0, c.z); s.y = c.y - 1.95; s.facing = Z.Z.ladder ? Math.atan2(Z.Z.b.x - Z.Z.a.x, Z.Z.b.z - Z.Z.a.z) : Math.atan2(Z.b.x - Z.a.x, Z.b.z - Z.a.z); // escada de mão: sempre de frente para os degraus
   if (Z.t >= 1 && Z.Z.ladder) { s.zip = null; s.pos.set(Z.b.x, 0, Z.b.z); s.y = Z.b.y; s.vy = 0; return; }
   if (Z.t >= 1) { s.zip = null; s.y = Math.max(groundAt(s.pos.x, s.pos.z, s.y + 1), s.y); s.vy = 0; s.pos.x += Math.sin(s.facing) * 0.9; s.pos.z += Math.cos(s.facing) * 0.9; }
 }
@@ -38,7 +38,7 @@ turretAt(19.5, 27.5, -Math.PI / 2);   // sacos de areia a leste, virada para o o
 function useTurret(s, T) {
   if (T.user) return;
   T.user = s; s.turret = T; s.prevWeapon = s.weapon; s.weapon = 'turret'; s.reloadT = 0; s.giveAmmo('turret');
-  s.pos.set(T.sx, 0, T.sz); s.facing = T.ang; s.showGear();
+  s.pos.set(T.sx, 0, T.sz); s.facing = T.ang; s.showGear(); sfxAt('metralhadora', s.pos, 0.6);
   if (s === player) toast('Metralhadora: mire dentro do arco · não deixe superaquecer');
 }
 function leaveTurret(s) {

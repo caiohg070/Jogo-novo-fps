@@ -38,7 +38,7 @@ function updateNades(dt) {
         }
       }
       const g = groundAt(n.pos.x, n.pos.z, n.pos.y) + 0.06;
-      if (n.pos.y < g) { n.pos.y = g; n.hit = true; if (n.vel.y < 0) n.vel.y = -n.vel.y * 0.3; n.vel.x *= 0.7; n.vel.z *= 0.7; }
+      if (n.pos.y < g) { if (n.vel.y < -2.5 && !NADES[n.type].impact) sfxAt('quique', n.pos, clamp(-n.vel.y / 10, 0.25, 0.8), { dur: 0.5 }); n.pos.y = g; n.hit = true; if (n.vel.y < 0) n.vel.y = -n.vel.y * 0.3; n.vel.x *= 0.7; n.vel.z *= 0.7; }
     }
     n.m.position.copy(n.pos); n.m.rotation.x += dt * 9;
     n.fuse -= dt; n.age += dt;

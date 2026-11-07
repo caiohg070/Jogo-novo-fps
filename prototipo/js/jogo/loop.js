@@ -10,7 +10,7 @@ function showBoard(title) {
   const L = levelInfo(career.xp);
   $('#boardXP').innerHTML = (L.lvl > before ? `<div class="up">SUBIU PARA O NÍVEL ${L.lvl}!</div>` : '') + `+${matchXP} XP nesta partida · NÍVEL ${L.lvl} (${L.cur}/${L.need})<div class="xpbar"><i style="width:${(L.cur / L.need) * 100}%"></i></div>`;
   matchXP = 0;
-  $('#boardTitle').textContent = title;
+  $('#boardTitle').textContent = title; if (!/^TUTORIAL/.test(title)) endJingle(/^VITÓRIA|^1º/.test(title));
   const rows = [...soldiers].sort((a, b) => b.stats.k - a.stats.k || b.stats.dmg - a.stats.dmg);
   const cls = s => s === player ? 'me' : '';
   const tcl = s => mode === 'br' ? '' : s.team === player.team ? 'ta' : 'tb';
@@ -31,9 +31,16 @@ function setPause(on) {
 $('#pauseBtn').addEventListener('pointerdown', e => { e.stopPropagation(); setPause(true); });
 $('#resume').addEventListener('click', () => setPause(false));
 $('#quit').addEventListener('click', () => { tut = null; $('#tut').style.display = 'none'; setPause(false); started = false; document.body.classList.remove('playing'); planeSnd?.stop(); planeSnd = null; hideCenter(); renderCareer(); $('#start').style.display = 'flex'; });
+// sons contínuos: drone no ar e cabo da tirolesa
+function loopSounds() {
+  const on = started && !paused;
+  loopSet('drone', on && droneT > 0 && player ? 0.5 * vol(player.pos.distanceTo(droneMesh.position) * 1.6) : 0);
+  const z = on && player?.zip && !player.zip.Z.ladder; zipSound(z ? 0.12 : 0, 11);
+}
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
   if (document.hidden) { requestAnimationFrame(frame); return; }
+  updateMusic(); loopSounds();
   if (started && !paused) {
     now += dt;
     updatePlayer(dt);

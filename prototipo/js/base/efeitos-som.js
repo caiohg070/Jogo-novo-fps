@@ -54,7 +54,8 @@ let shakeT = 0;
 
 // ---------- som provisório (sintetizado; ElevenLabs entra depois) ----------
 // configurações do jogador (volume e controles de toque), salvas no aparelho
-const cfg = { vol: 80, size: 100, op: 20, h: 64 };
+const CFG_PADRAO = { vol: 80, mus: 50, size: 100, op: 20, h: 64 };
+const cfg = { ...CFG_PADRAO };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('tatico.cfg')) || {}); } catch {}
 function applyCfg() {
   const R = document.documentElement.style;
@@ -92,6 +93,7 @@ function initAudio() {
       const bin = atob(url.split(',')[1]), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
       actx.decodeAudioData(u8.buffer).then(buf => {
         SFX[k] = buf;
+        if (k === 'musica') updateMusic();
         if (k === 'chuva') { const src = actx.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(rainGain); src.start(); }
       }).catch(() => {});
     }
@@ -110,6 +112,54 @@ function tone(f0, f1, dur, vol, type = 'sine') {
   o.connect(g).connect(masterOut); o.start(t); o.stop(t + dur + 0.02);
 }
 const vol = d => clamp(1 - d / 50, 0, 1);
+// ---------- sons novos (ElevenLabs + sintetizados) ----------
+// som num ponto do mapa: baixa com a distância, abafa longe e vai para o lado certo
+function sfxAt(name, pos, v = 1, opts = {}) {
+  if (!player || !pos) return sfx(name, v, opts);
+  const k = vol(player.pos.distanceTo(pos)); return sfx(name, v * k, { muffle: lerp(1500, 20000, k), pan: panOf(pos), ...opts });
+}
+// sons contínuos (drone, tirolesa): ficam tocando e só mudam de volume/velocidade
+const loops = {};
+function loopSet(name, v, rate = 1) {
+  if (!actx || !SFX[name]) return;
+  let L = loops[name];
+  if (!L) {
+    if (v <= 0.005) return;
+    const src = actx.createBufferSource(); src.buffer = SFX[name]; src.loop = true;
+    const g = actx.createGain(); g.gain.value = 0; src.connect(g).connect(masterOut); src.start(); L = loops[name] = { src, g };
+  }
+  L.g.gain.setTargetAtTime(Math.max(0, v), actx.currentTime, 0.08); L.src.playbackRate.setTargetAtTime(rate, actx.currentTime, 0.1);
+}
+// tirolesa: chiado do cabo, sintetizado (laço de ruído filtrado)
+let zipSnd = null;
+function zipSound(v, speed) {
+  if (!actx) return;
+  if (!zipSnd) {
+    if (v <= 0.005) return;
+    const src = actx.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+    const f = actx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 6; const g = actx.createGain(); g.gain.value = 0;
+    src.connect(f).connect(g).connect(masterOut); src.start(); zipSnd = { f, g };
+  }
+  zipSnd.g.gain.setTargetAtTime(v, actx.currentTime, 0.05); zipSnd.f.frequency.setTargetAtTime(900 + speed * 160, actx.currentTime, 0.1);
+}
+// cápsulas caindo no chão depois do tiro (tilintar curto)
+function shellSound(pos, v = 1) {
+  if (!actx) return; const k = v * (player ? clamp(1 - player.pos.distanceTo(pos) / 12, 0, 1) : 1); if (k < 0.03) return;
+  for (let i = 0; i < 2; i++) setTimeout(() => { if (actx) tone(rand(3200, 4600), rand(2600, 3600), 0.04, 0.025 * k, 'sine'); }, 260 + i * rand(70, 130));
+}
+// música do menu: toca enquanto o menu está aberto e some devagar quando a partida começa
+let music = null;
+function updateMusic() {
+  if (!actx || !SFX.musica) return;
+  const menu = !started && $('#start').style.display !== 'none';
+  const want = menu ? 0.45 * cfg.mus / 100 : 0;
+  if (!music) { if (want <= 0) return; const src = actx.createBufferSource(); src.buffer = SFX.musica; src.loop = true; const g = actx.createGain(); g.gain.value = 0; src.connect(g).connect(masterOut); src.start(); music = { src, g, v: 0 }; }
+  if (Math.abs(music.v - want) > 0.001) { music.v = want; music.g.gain.setTargetAtTime(want, actx.currentTime, menu ? 0.4 : 0.6); }
+}
+// fim de partida: fanfarra ou som triste
+function endJingle(win) { if (!sfx(win ? 'vitoria' : 'derrota', 0.6)) win ? tone(523, 1046, 0.5, 0.1) : tone(330, 165, 0.6, 0.1); }
+// clique nos botões do menu
+function uiClick() { if (!sfx('clique', 0.35)) blip(900, 0.03, 0.06); }
 const pings = [];
 function addPing(x, z, kind) { pings.push({ x, z, kind, t: kind === 'shot' ? 1.4 : 0.7 }); if (pings.length > 40) pings.shift(); }
 function shotSound(w, d, id, pos) { if (!actx) return; const v = vol(d); if (sfx(WSND[id], 0.85 * v * (SND_GAIN[id] || 1), { muffle: lerp(1200, 20000, v * v), dur: id === 'awp' ? 2 : 1.1, pan: panOf(pos) })) return; if (v <= 0.02) return; noise(w.scope ? 0.4 : 0.16, w.snd[2] * v, 'lowpass', lerp(700, w.snd[0], v)); tone(w.snd[1], 40, w.scope ? 0.25 : 0.12, 0.45 * v); }

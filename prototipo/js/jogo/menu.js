@@ -12,7 +12,7 @@ for (const grp of document.querySelectorAll('.opts')) {
     if (grp.dataset.group === 'skin' || grp.dataset.group === 'acc') try { localStorage.setItem('tatico.visual', JSON.stringify({ skin: choice.skin, acc: choice.acc })); } catch {}
   });
 }
-for (const k of ['vol', 'size', 'op', 'h']) {
+for (const k of ['vol', 'mus', 'size', 'op', 'h']) {
   const inp = $('#c-' + k), show = () => { $('#cv-' + k).textContent = cfg[k] + '%'; };
   inp.value = cfg[k]; show();
   inp.addEventListener('input', () => { cfg[k] = +inp.value; show(); applyCfg(); try { localStorage.setItem('tatico.cfg', JSON.stringify(cfg)); } catch {} if (k === 'vol' && actx) blip(700, 0.05, 0.12); });
@@ -21,7 +21,7 @@ applyCfg();
 const openCfg = () => { initAudio(); applyCfg(); $('#cfgBoard').style.display = 'flex'; document.body.classList.add('cfg-open'); };
 $('#cfgOpen').addEventListener('click', openCfg); $('#cfgOpen2').addEventListener('click', openCfg);
 $('#cfgClose').addEventListener('click', () => { $('#cfgBoard').style.display = 'none'; document.body.classList.remove('cfg-open'); });
-$('#cfgReset').addEventListener('click', () => { Object.assign(cfg, { vol: 80, size: 100, op: 20, h: 64 }); for (const k in cfg) { $('#c-' + k).value = cfg[k]; $('#cv-' + k).textContent = cfg[k] + '%'; } applyCfg(); try { localStorage.removeItem('tatico.cfg'); } catch {} });
+$('#cfgReset').addEventListener('click', () => { Object.assign(cfg, CFG_PADRAO); for (const k in cfg) { $('#c-' + k).value = cfg[k]; $('#cv-' + k).textContent = cfg[k] + '%'; } applyCfg(); try { localStorage.removeItem('tatico.cfg'); } catch {} });
 // jogador novo (nunca jogou nem fez/pulou o tutorial): oferece o tutorial antes
 if (!PEND && !career.tutorial && !career.partidas && !career.tutSkip) $('#firstBoard').style.display = 'flex';
 const selMode = v => { choice.mode = v; for (const o of document.querySelectorAll('.opts[data-group="mode"] .opt')) o.classList.toggle('on', o.dataset.v === v); };
@@ -123,5 +123,59 @@ $('#play').addEventListener('click', () => {
   }
   showCenter(intro[0], intro[1], 3.5);
 });
+
+// ================= lobby: janelas de escolha, textos e personagem em 3D =================
+const lbTxt = (g, v) => document.querySelector(`.opts[data-group="${g}"] .opt[data-v="${v}"]`);
+const lbName = (g, v) => lbTxt(g, v)?.firstChild.textContent.trim() || '';
+function lobbyRefresh() {
+  const c = career, L = levelInfo(c.xp || 0);
+  $('#lbLvl').textContent = L.lvl; $('#lbXp').style.width = (L.cur / L.need) * 100 + '%'; $('#lbXpTxt').textContent = `${L.cur}/${L.need} XP`;
+  $('#lbK').textContent = c.abates; $('#lbW').textContent = c.vitorias; $('#lbKD').textContent = (c.abates / Math.max(1, c.mortes)).toFixed(2);
+  $('#lbMode').textContent = lbName('mode', choice.mode); $('#lbModeSub').textContent = lbTxt('mode', choice.mode)?.querySelector('small')?.textContent || '';
+  $('#lbClsName').textContent = lbName('cls', choice.cls); $('#lbClsGear').textContent = lbTxt('cls', choice.cls)?.querySelector('small')?.textContent || '';
+  $('#lbDiff').textContent = lbName('diff', choice.diff); $('#lbWeather').textContent = lbName('weather', choice.weather);
+  heroBuild();
+}
+const lbSheet = $('#lbSheet');
+for (const b of document.querySelectorAll('[data-sheet]')) b.addEventListener('click', () => {
+  for (const p of document.querySelectorAll('.lb-pane')) p.classList.toggle('on', p.dataset.pane === b.dataset.sheet);
+  $('#lbSheetT').textContent = document.querySelector(`.lb-pane[data-pane="${b.dataset.sheet}"]`).dataset.title; lbSheet.classList.add('on');
+});
+const lbClose = () => { lbSheet.classList.remove('on'); lobbyRefresh(); };
+$('#lbSheetOk').addEventListener('click', lbClose);
+lbSheet.addEventListener('click', e => { if (e.target === lbSheet) lbClose(); });
+for (const grp of document.querySelectorAll('#lbSheet .opts')) grp.addEventListener('click', () => setTimeout(lobbyRefresh));
+// clique em qualquer botão de menu/janela (não durante a partida)
+document.addEventListener('click', e => { if (!document.body.classList.contains('playing') || paused) { if (e.target.closest('button, .opt')) { initAudio(); uiClick(); } } }, true);
+// personagem girando no centro do lobby (cena própria, pequena)
+const hero = { r: null, sc: null, cam: null, m: null, key: '' };
+function heroBuild() {
+  const cv = $('#lbHero'); if (!cv) return;
+  if (!hero.r) {
+    try { hero.r = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true }); } catch { return; }
+    hero.r.setPixelRatio(Math.min(devicePixelRatio, 2)); hero.r.toneMapping = THREE.ACESFilmicToneMapping;
+    hero.sc = new THREE.Scene(); hero.cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50); hero.cam.position.set(0, 1.25, 5.2); hero.cam.lookAt(0, 0.95, 0);
+    hero.sc.add(new THREE.HemisphereLight(0xfff1dc, 0x6a4a7a, 2.2));
+    const sun = new THREE.DirectionalLight(0xffe2b0, 2.4); sun.position.set(2, 4, 3); hero.sc.add(sun);
+    const rim = new THREE.DirectionalLight(0x9fd8ff, 1.6); rim.position.set(-3, 2, -2); hero.sc.add(rim);
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(0.75, 32), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.28 })); disc.rotation.x = -Math.PI / 2; disc.position.y = 0.01; hero.sc.add(disc);
+  }
+  const key = choice.cls + choice.skin + choice.acc; if (key === hero.key) return; hero.key = key;
+  if (hero.m) hero.sc.remove(hero.m.root);
+  const C = CLASSES[choice.cls], m = buildSoldier(C.pal, 'A', !!C.heal, { skin: choice.skin, acc: choice.acc });
+  scene.remove(m.root); m.root.traverse(o => { o.castShadow = false; }); hero.sc.add(m.root); hero.m = m;
+  for (const k in m.guns) { m.guns[k].g.visible = k === C.primary; m.guns[k].sil.visible = false; m.guns[k].sc.visible = false; }
+  m.helmet.visible = C.helmet; m.cap.visible = !C.helmet && !m.beret; m.vest.visible = C.armor > 0; if (m.beret) m.beret.visible = !C.helmet;
+  m.chute.visible = false;
+}
+(function heroLoop() {
+  requestAnimationFrame(heroLoop);
+  if (!hero.r || !hero.m || started || $('#start').style.display === 'none') return;
+  const cv = hero.r.domElement, w = cv.clientWidth, h = cv.clientHeight;
+  if (cv.width !== Math.round(w * hero.r.getPixelRatio()) || cv.height !== Math.round(h * hero.r.getPixelRatio())) { hero.r.setSize(w, h, false); hero.cam.aspect = w / h; hero.cam.updateProjectionMatrix(); }
+  const t = performance.now() / 1000; hero.m.root.rotation.y = Math.sin(t * 0.6) * 0.9 + 0.35; hero.m.body.position.y = Math.sin(t * 2) * 0.015;
+  hero.r.render(hero.sc, hero.cam);
+})();
+window.lbReady = true; lobbyRefresh();
 window.__nav = { navPath, navBlocked, navIdx, navLineClear, NAV_N }; window.__los = los; window.__die = die; window.__ts = () => teamScore; window.__bomb = bombS; window.__zone = zone; window.__jump = jumpOut; window.__cs = canShoot; window.__sfx = SFX; window.__game = { get player() { return player; }, get bots() { return bots; }, throwNade, giveLoot, applyWeather, get now() { return now; }, vehicles, doors, turrets, zips, bushes, FLAGS, ctfS, loots, fires, mines, enterVeh, exitVeh, useTurret, useDrone, dropCrate, damage, playerAction: () => playerAction(), setDoor, groundAt, terrainHeight, shotBlock, firstHit, terrainBlocks, aimPoint, get hitProp() { return hitProp; }, solids, get mode() { return mode; }, hurtProp };
 frame();

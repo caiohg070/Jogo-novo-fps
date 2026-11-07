@@ -90,7 +90,7 @@ function playerAction() {
   const V = vehicles.find(V => !V.dead && !V.driver && Math.hypot(V.pos.x - p.pos.x, V.pos.z - p.pos.z) < V.def.r + 1.3 && Math.abs(V.y - p.y) < 1.2);
   if (V) return { t: 'ENTRAR NO ' + V.def.name.toUpperCase(), f: () => enterVeh(p, V) };
   for (const Z of zips) for (const [a, b] of [[Z.a, Z.b], [Z.b, Z.a]])
-    if (Math.hypot(a.x - p.pos.x, a.z - p.pos.z) < 1.7 && Math.abs(a.y - p.y) < 1) return { t: Z.ladder ? (a === Z.a ? 'SUBIR ESCADA' : 'DESCER ESCADA') : 'DESCER NA TIROLESA', f: () => { p.zip = { a, b, t: 0, len: Math.hypot(b.x - a.x, b.z - a.z), Z }; p.reloadT = 0; if (actx) Z.ladder ? noise(0.25, 0.08, 'lowpass', 900) : noise(0.4, 0.15, 'highpass', 2500); } };
+    if (Math.hypot(a.x - p.pos.x, a.z - p.pos.z) < 1.7 && Math.abs(a.y - p.y) < 1) return { t: Z.ladder ? (a === Z.a ? 'SUBIR ESCADA' : 'DESCER ESCADA') : 'DESCER NA TIROLESA', f: () => { p.zip = { a, b, t: 0, len: Math.hypot(b.x - a.x, b.z - a.z), Z }; p.reloadT = 0; if (actx) Z.ladder ? (sfx('escada', 0.7) || noise(0.25, 0.08, 'lowpass', 900)) : noise(0.4, 0.15, 'highpass', 2500); } };
   let D = null, dd = 1.7;
   for (const d of doors) { if (d.broken || Math.abs(d.y0 - p.y) > 1.2) continue; const k = Math.hypot(d.cx - p.pos.x, d.cz - p.pos.z); if (k < dd) { dd = k; D = d; } }
   if (D) return { t: D.open ? 'FECHAR PORTA' : 'ABRIR PORTA', f: () => setDoor(D, !D.open) };
