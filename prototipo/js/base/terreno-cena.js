@@ -40,8 +40,20 @@ function flatten(h, x, z, R, y) {
 const BK = { x0: 25, x1: 33, z0: -6, z1: 1 };       // bunker subterrâneo
 let BK_TOP = 0, BK_FLOOR = 0;
 const inBK = (x, z) => x > BK.x0 && x < BK.x1 && z > BK.z0 && z < BK.z1;
+// Base Militar (só no Battle Royale): quadrado de 30 m num lugar sorteado do anel de fora; o chão fica plano
+let MIL = null, MIL_Y = 0;
+if (BR_SEED) {
+  const a = srnd() * 6.283, r = 63 + srnd() * 7, cx = Math.cos(a) * r, cz = Math.sin(a) * r, H = 15;
+  MIL = { cx, cz, x0: cx - H, x1: cx + H, z0: cz - H, z1: cz + H };
+  MIL_Y = rawHeight(cx, cz);
+}
+const inMil = (x, z, m = 0) => !!MIL && x > MIL.x0 - m && x < MIL.x1 + m && z > MIL.z0 - m && z < MIL.z1 + m;
 function terrainHeight(x, z) {
   if (inBK(x, z)) return BK_FLOOR;
+  if (MIL) { const dx = Math.max(MIL.x0 - x, 0, x - MIL.x1), dz = Math.max(MIL.z0 - z, 0, z - MIL.z1); if (dx < 9 && dz < 9) return lerp(MIL_Y, terrainHeight0(x, z), smooth(0.4, 8, Math.hypot(dx, dz))); }
+  return terrainHeight0(x, z);
+}
+function terrainHeight0(x, z) {
   return flatten(flatten(flatten(rawHeight(x, z), x, z, BK, BK_TOP), x, z, BARN, BARN_Y), x, z, HOUSE, H0);
 }
 BARN_Y = rawHeight(16, -28.5);

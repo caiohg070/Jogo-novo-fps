@@ -20,6 +20,7 @@ A ordem de carregamento fica em `js/arquivos.js` (um arquivo pode usar o que vei
 | **Mapa:** bunker e barracão | `js/mapa/bunker-barracao.js` |
 | **Mapa:** portas | `js/mapa/portas.js` |
 | **Mapa:** tirolesa e metralhadoras fixas | `js/mapa/tirolesa-metralhadoras.js` |
+| **Mapa:** Base Militar (só Battle Royale; lugar sorteado em `terreno-cena.js`) | `js/mapa/base-militar.js` |
 | **Mapa:** clima (chuva, noite, neblina) | `js/mapa/clima.js` |
 | **Personagens:** modelo, roupas, acessórios, animação | `js/personagens/soldados.js` |
 | **Inimigos/bots:** caminho (A*) | `js/inimigos/navegacao.js` |
@@ -28,6 +29,7 @@ A ordem de carregamento fica em `js/arquivos.js` (um arquivo pode usar o que vei
 | Drone | `js/itens/drone.js` |
 | Granadas | `js/itens/granadas.js` |
 | Baús de loot | `js/itens/loot.js` |
+| Itens soltos flutuando (só Battle Royale) | `js/itens/loot-flutuante.js` |
 | Estado do jogo (time, placar, morte, renascer) | `js/jogo/estado.js` |
 | Controles (teclado, toque, joystick) | `js/jogo/entrada.js` |
 | Câmera, paredes transparentes, HUD | `js/jogo/camera-hud.js` |
