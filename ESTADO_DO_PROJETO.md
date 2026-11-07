@@ -287,3 +287,9 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - `js/modos/battle-royale.js`: avião atravessa o mapa todo (`MAP*1.2`); bots saltam espalhados **ao longo da rota do avião** (o paraquedas só plana ~25 m); zona começa com raio `MAP*1.47`, centro sorteado ±35% do mapa, começa a fechar aos 55 s e fecha em 360 s.
 - Teste rápido (sem desenhar, tempo simulado): sementes diferentes geram mapas diferentes; mapa normal continua com 27 baús/6 veículos; BR com 57 baús/12 veículos; 2 partidas de 400 s com bots espalhados pelo mapa até sobrar 1; menu → BR → recarrega → JOGAR → JOGAR DE NOVO (mapa novo) → Mata-mata (mapa normal), sem erros.
 - Não medido: desempenho em celular fraco com o mapa maior.
+
+## Correções: tiro com diferença de altura, morro nas ruas, chão do bunker
+- **Tiro morro/telhado** (`js/jogo/entrada.js`, `aimSnap`): a mira (mouse e joystick) é calculada na altura do jogador; um inimigo mais alto/baixo aparece deslocado na tela, então mirar na imagem dele errava. Agora, se a mira passa sobre a imagem de um inimigo visível com diferença de altura, a direção vai para a posição real dele. Teste (1.108 posições com ≥1,2 m de diferença, clicando no peito do bot na tela): acertos 17% → 97%.
+- **Ruas cortando o morro** (`js/base/terreno-cena.js`, `baseHeight`/`rawHeight`): a rua agora acompanha a altura média do relevo em volta (7 m) em vez de achatar para um plano. Inclinação máxima perto das ruas no BR: até 2,5 (68°) → abaixo de 0,95.
+- **Bunker** (`js/base/terreno-cena.js`): a malha do chão é alinhada às bordas do bunker e os triângulos de dentro são removidos (antes uma rampa afundava por fora das paredes).
+- Teste rápido sem desenhar: Mata-mata 300 s e BR sem erros.
