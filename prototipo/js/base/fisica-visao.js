@@ -82,7 +82,7 @@ function groundShot(o, dx, dz, range, shooter) {
   const base = o.y - shooter.y; let s = -Infinity, gy = shooter.y;
   for (let d = 1.5; d <= Math.min(14, range); d += 1.5) { gy = groundAt(o.x + dx * d, o.z + dz * d, gy + 0.3); s = Math.max(s, (gy + base - o.y) / d); }
   if (s < 0) { const d = Math.min(10, range); s = Math.max(-0.6, (groundAt(o.x + dx * d, o.z + dz * d, shooter.y + 0.3) + base - o.y) / d); }
-  const yAt = (x, z) => o.y + s * Math.hypot(x - o.x, z - o.z);
+  const yAt = (x, z) => o.y + s * Math.hypot(x - o.x, z - o.z); lastSlope = s;
   let a = o.clone(), d = 0, pts = [];   // pts: caminho do tiro (sobe/desce com o morro)
   while (d < range) {
     const n = Math.min(range, d + STEP), x = o.x + dx * n, z = o.z + dz * n, b = new V3(x, yAt(x, z), z);
@@ -91,7 +91,7 @@ function groundShot(o, dx, dz, range, shooter) {
   }
   hitProp = null; pts.pop(); return { dist: Infinity, end: a, pts };
 }
-let lastHit = null;
+let lastHit = null, lastSlope = 0;
 function firstHit(a, b) {
   _d.subVectors(b, a); const dist = _d.length(); if (dist < 1e-4) return Infinity; _d.divideScalar(dist);
   ray.set(a, _d); ray.far = dist;

@@ -172,7 +172,8 @@ function updatePlayer(dt) {
     // laser: sai do cano da arma, na altura dela
     const mz = p.w.kind === 'gun' && p.m.guns[p.weapon] ? p.muzzlePos() : eye(p, SHOT_H);
     const fwd = (mz.x - p.pos.x) * fx + (mz.z - p.pos.z) * fz;
-    aimLine.position.set(mz.x, mz.y, mz.z); aimLine.rotation.y = p.facing; aimLine.scale.z = Math.max(0.2, h - fwd);
+    aimLine.position.set(mz.x, mz.y, mz.z); aimLine.rotation.set(-Math.atan(lastSlope), p.facing, 0, 'YXZ');   // laser inclinado igual à bala (sobe/desce o morro em linha reta)
+    aimLine.scale.z = Math.max(0.2, (h - fwd) * Math.sqrt(1 + lastSlope * lastSlope));
     aimLine.scale.x = 0.25;
     aimLine.material.color.set(p.w.scope ? 0xff2a1f : firing ? 0xff7a50 : 0xff4a3a);
   }
