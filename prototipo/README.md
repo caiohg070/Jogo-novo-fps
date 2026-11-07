@@ -55,3 +55,8 @@ Dia, chuva (chão molhado, poças) e noite com chuva (postes acesos).
 ## Ainda falta (próximas etapas)
 casas de 3 andares,
 modelos 3D melhores dos personagens, sons reais (ElevenLabs) e imagens (Higgsfield/Magnific).
+
+## Sons
+Efeitos gerados no ElevenLabs, em `sons/` (mp3) e embutidos em `sons/sons.js`: tiros de AK-47, Colt M4, AWP,
+Desert Eagle e pistola, faca, recarga, explosão (HE e bomba), flash, smoke, passos, chuva e bipe da bomba.
+Tiros distantes ficam mais baixos e abafados. Os mesmos mp3 servem para a versão Unity.

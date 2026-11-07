@@ -214,6 +214,7 @@ body.is-touch #healBtn.show{display:block}
   </div>
 </div>
 
+<script src="sons/sons.js"></script>
 <script type="importmap">
 { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
 </script>
@@ -753,15 +754,33 @@ let shakeT = 0;
 
 // ---------- som provisório (sintetizado; ElevenLabs entra depois) ----------
 let actx = null, noiseBuf = null, rainGain = null;
+const SFX = {};
+// toca um som real; longe = mais baixo e abafado; pequena variação de tom para não cansar
+function sfx(name, v, opts = {}) {
+  if (!actx || !SFX[name] || v <= 0.01) return false;
+  const src = actx.createBufferSource(); src.buffer = SFX[name];
+  src.playbackRate.value = (opts.rate ?? 1) * (1 + rand(-0.04, 0.04));
+  const g = actx.createGain(); g.gain.value = v;
+  let node = src;
+  if (opts.muffle) { const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = opts.muffle; node.connect(f); node = f; }
+  node.connect(g).connect(actx.destination);
+  src.start(0, 0, opts.dur); return true;
+}
+const WSND = { ak: 'ak', m4: 'm4', awp: 'awp', deagle: 'deagle', pistol: 'pistola' };
 function initAudio() {
   try {
     actx = new (window.AudioContext || window.webkitAudioContext)();
     noiseBuf = actx.createBuffer(1, actx.sampleRate * 1, actx.sampleRate);
     const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    const src = actx.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
-    const f = actx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1400; f.Q.value = 0.4;
-    rainGain = actx.createGain(); rainGain.gain.value = 0;
-    src.connect(f).connect(rainGain).connect(actx.destination); src.start();
+    rainGain = actx.createGain(); rainGain.gain.value = 0; rainGain.connect(actx.destination);
+    // sons reais (ElevenLabs), decodificados uma vez
+    for (const [k, url] of Object.entries(window.SONS || {})) {
+      const bin = atob(url.split(',')[1]), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      actx.decodeAudioData(u8.buffer).then(buf => {
+        SFX[k] = buf;
+        if (k === 'chuva') { const src = actx.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(rainGain); src.start(); }
+      }).catch(() => {});
+    }
   } catch { actx = null; }
 }
 function noise(dur, vol, type, freq) {
@@ -779,17 +798,17 @@ function tone(f0, f1, dur, vol, type = 'sine') {
 const vol = d => clamp(1 - d / 50, 0, 1);
 const pings = [];
 function addPing(x, z, kind) { pings.push({ x, z, kind, t: kind === 'shot' ? 1.4 : 0.7 }); if (pings.length > 40) pings.shift(); }
-function shotSound(w, d) { if (!actx) return; const v = vol(d); if (v <= 0.02) return; noise(w.scope ? 0.4 : 0.16, w.snd[2] * v, 'lowpass', lerp(700, w.snd[0], v)); tone(w.snd[1], 40, w.scope ? 0.25 : 0.12, 0.45 * v); }
+function shotSound(w, d, id) { if (!actx) return; const v = vol(d); if (sfx(WSND[id], 0.85 * v, { muffle: lerp(1200, 20000, v * v), dur: id === 'awp' ? 2 : 1.1 })) return; if (v <= 0.02) return; noise(w.scope ? 0.4 : 0.16, w.snd[2] * v, 'lowpass', lerp(700, w.snd[0], v)); tone(w.snd[1], 40, w.scope ? 0.25 : 0.12, 0.45 * v); }
 function blip(freq, dur = 0.05, v = 0.15) { if (actx) tone(freq, freq, dur, v, 'square'); }
-function whoosh(d) { if (actx) noise(0.12, 0.25 * clamp(1 - d / 20, 0, 1), 'highpass', 2500); }
+function whoosh(d, knife) { if (knife && sfx('faca', 0.7 * clamp(1 - d / 20, 0, 1), { dur: 0.6 })) return; if (actx) noise(0.12, 0.25 * clamp(1 - d / 20, 0, 1), 'highpass', 2500); }
 function bang(d, deafen) {
   if (!actx) return;
   const v = clamp(1 - d / 60, 0.1, 1);
-  noise(0.5, 0.9 * v, 'lowpass', 5000); tone(90, 30, 0.4, 0.8 * v);
+  if (!sfx('flash', v)) { noise(0.5, 0.9 * v, 'lowpass', 5000); tone(90, 30, 0.4, 0.8 * v); }
   if (deafen > 0) tone(3600, 3400, deafen, 0.12, 'sine');
 }
-function boom(d) { if (!actx) return; const v = clamp(1 - d / 70, 0.1, 1); noise(1.0, 1.0 * v, 'lowpass', 900); tone(70, 25, 0.8, 0.9 * v); }
-function hiss(d) { if (actx) noise(1.2, 0.25 * vol(d), 'highpass', 1800); }
+function boom(d) { if (!actx) return; const v = clamp(1 - d / 70, 0.1, 1); if (sfx('explosao', v, { muffle: lerp(1500, 20000, v) })) return; noise(1.0, 1.0 * v, 'lowpass', 900); tone(70, 25, 0.8, 0.9 * v); }
+function hiss(d) { if (sfx('smoke', 0.6 * vol(d))) return; if (actx) noise(1.2, 0.25 * vol(d), 'highpass', 1800); }
 
 // ================= soldados =================
 function buildSoldier(pal, team, medic) {
@@ -886,7 +905,7 @@ class Soldier {
   startReload() {
     if (!this.alive || this.w.kind !== 'gun' || this.reloadT > 0 || this.mag >= this.w.mag || this.reserve <= 0) return;
     this.reloadT = this.w.reload;
-    if (!this.isBot) blip(420, 0.06, 0.08);
+    { const dd = player.pos.distanceTo(this.pos); if (!sfx('recarga', (this.isBot ? 0.35 : 0.6) * clamp(1 - dd / 20, 0, 1), { dur: 1.6 }) && !this.isBot) blip(420, 0.06, 0.08); }
   }
   move(dx, dz, speed, dt) {
     const l = Math.hypot(dx, dz); this.moving = l > 0.05 && this.alive;
@@ -908,6 +927,11 @@ class Soldier {
   update(dt) {
     if (this.isBot && this.alive && this.moving && !this.air && player && this.team !== player.team && (this.stepT = (this.stepT || 0) - dt) <= 0) {
       this.stepT = 0.55; if (this.pos.distanceTo(player.pos) < 16) addPing(this.pos.x, this.pos.z, 'step');
+    }
+    if (this.alive && this.moving && !this.air && player && (this.sndStep = (this.sndStep || 0) - dt) <= 0) {
+      this.sndStep = this.walking ? 0.6 : 0.36;
+      const dd = this === player ? 0 : this.pos.distanceTo(player.pos);
+      if (dd < 16) sfx('passo', (this === player ? (this.walking ? 0.08 : 0.2) : 0.3 * (1 - dd / 16)), { dur: 0.4, rate: rand(0.9, 1.1) });
     }
     if (this.healChan > 0) { this.healChan -= dt; if (this.healChan <= 0) { this.hp = Math.min(MAX_HP, this.hp + 45); if (this === player) toast('+45 vida (kit)'); } }
     if (this.fireCd > 0) this.fireCd -= dt;
@@ -953,7 +977,7 @@ class Soldier {
     const origin = eye(this, SHOT_H), muzzle = this.muzzlePos();
     muzzleFlashLight(muzzle);
     spawnPart(muzzle, 0xffc066, w.scope ? 0.8 : 0.55, 0.05, new V3(), true);
-    shotSound(w, player.pos.distanceTo(this.pos));
+    shotSound(w, player.pos.distanceTo(this.pos), this.weapon);
     if (this !== player && this.team !== player.team && this.pos.distanceTo(player.pos) < 45) addPing(this.pos.x, this.pos.z, 'shot');
     if (this === player && w.scope) shakeT = 0.12;
     for (const b of bots) if (b.alive && b.team !== this.team && b.pos.distanceTo(this.pos) < 32) botHeard(b, this.pos);
@@ -984,7 +1008,7 @@ class Soldier {
   }
   stab(ang, enemies) {
     const w = this.w; this.fireCd = w.rate; this.swingT = 0.22;
-    whoosh(player.pos.distanceTo(this.pos));
+    whoosh(player.pos.distanceTo(this.pos), true);
     for (const t of enemies) {
       if (Math.abs(t.y - this.y) > 1.2) continue;
       const d = Math.hypot(t.pos.x - this.pos.x, t.pos.z - this.pos.z);
@@ -1430,7 +1454,7 @@ function applyWeather(w) {
   terrainMat.roughness = wet ? 0.55 : 1; terrainMat.color.setScalar(wet ? 0.72 : 1);
   for (const m of allMats) m.roughness = wet ? Math.min(m.userData.rough, 0.5) : m.userData.rough;
   rain.material.opacity = night ? 0.2 : 0.28;
-  if (rainGain) rainGain.gain.value = wet ? 0.018 : 0;
+  if (rainGain) rainGain.gain.value = wet ? 0.12 : 0;
 }
 function updateRain(dt) {
   if (!rain.visible) return;
@@ -1937,7 +1961,7 @@ function updateBomb(dt) {
   }
   if (S.planted) {
     S.timer -= dt;
-    if ((S.beep -= dt) <= 0) { S.beep = S.timer > 10 ? 1 : S.timer > 4 ? 0.5 : 0.2; blip(1600, 0.05, 0.07 * vol(player.pos.distanceTo(S.pos) * 0.6)); bombMesh.userData.led.visible = !bombMesh.userData.led.visible; }
+    if ((S.beep -= dt) <= 0) { S.beep = S.timer > 10 ? 1 : S.timer > 4 ? 0.5 : 0.2; { const bv = vol(player.pos.distanceTo(S.pos) * 0.6); if (!sfx('bipe', 0.35 * bv, { dur: 0.25 })) blip(1600, 0.05, 0.07 * bv); } bombMesh.userData.led.visible = !bombMesh.userData.led.visible; }
     // desarme: um CT parado ao lado por 5 s
     const def = soldiers.find(s => s.alive && s.team === 'B' && !s.moving && Math.hypot(s.pos.x - S.pos.x, s.pos.z - S.pos.z) < 1.4);
     if (def) { S.defuseT += dt; def.tagSt.textContent = 'DESARMANDO'; if (S.defuseT >= 5) { bombMesh.visible = false; endBombRound('B', 'bomba desarmada'); return; } }
@@ -2054,7 +2078,7 @@ $('#play').addEventListener('click', () => {
     bomb: ['BOMBA', `você leva a bomba: plante no A (barracão) ou B (oeste) · ${BOMB_GOAL} rodadas vencem`], br: ['BATTLE ROYALE', 'toque SALTAR quando quiser · a zona azul fecha'] }[mode];
   showCenter(intro[0], intro[1], 3.5);
 });
-window.__los = los; window.__die = die; window.__ts = () => teamScore; window.__bomb = bombS; window.__zone = zone; window.__jump = jumpOut; window.__cs = canShoot; window.__game = { get player() { return player; }, get bots() { return bots; }, throwNade, giveLoot, applyWeather, get now() { return now; } };
+window.__los = los; window.__die = die; window.__ts = () => teamScore; window.__bomb = bombS; window.__zone = zone; window.__jump = jumpOut; window.__cs = canShoot; window.__sfx = SFX; window.__game = { get player() { return player; }, get bots() { return bots; }, throwNade, giveLoot, applyWeather, get now() { return now; } };
 frame();
 </script>
 </body>
