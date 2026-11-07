@@ -100,6 +100,8 @@ body.is-touch #reloadBtn{display:flex}
 #actBtn{position:fixed;right:calc(var(--ctl-x) - 30px);top:calc(var(--ctl-y) + 74px);z-index:8;padding:9px 16px;border-radius:20px;
   background:rgba(232,163,58,.85);color:#1d1a16;font-weight:800;font-size:13px;letter-spacing:.04em;cursor:pointer;display:none;pointer-events:auto;white-space:nowrap}
 body:not(.is-touch) #actBtn{right:50%;transform:translateX(50%);top:auto;bottom:70px}
+.edge{position:absolute;left:0;top:0;color:#ff5a4a;font-size:22px;text-shadow:0 0 4px #000;pointer-events:none}
+.edge.ally{display:none!important}
 .lootTag{position:absolute;left:0;top:0;padding:3px 8px;border-radius:5px;background:rgba(18,16,13,.75);color:#ffe28a;font-size:12px;font-weight:800;white-space:nowrap;pointer-events:none}
 
 #start{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
@@ -242,7 +244,7 @@ function rawHeight(x, z) {
   h = lerp(h, -0.5 + 0.035 * x - 0.03 * z, roadFactor(x, z) * 0.75);
   return h;
 }
-const BARN = { x0: 10, x1: 22, z0: -31, z1: -21 };
+const BARN = { x0: 6, x1: 26, z0: -36, z1: -21 };
 let BARN_Y = 0;
 function flatten(h, x, z, R, y) {
   const dx = Math.max(R.x0 - x, 0, x - R.x1), dz = Math.max(R.z0 - z, 0, z - R.z1);
@@ -251,7 +253,7 @@ function flatten(h, x, z, R, y) {
 function terrainHeight(x, z) {
   return flatten(flatten(rawHeight(x, z), x, z, BARN, BARN_Y), x, z, HOUSE, H0);
 }
-BARN_Y = rawHeight(16, -26);
+BARN_Y = rawHeight(16, -28.5);
 function terrainColor(x, z) {
   const n = 0.5 + 0.5 * Math.sin(x * 0.37 + Math.sin(z * 0.23) * 2) * Math.cos(z * 0.31 - x * 0.11);
   const n2 = 0.5 + 0.5 * Math.sin(x * 1.7 + z * 1.3) * Math.sin(z * 1.9 - x * 0.7);
@@ -503,7 +505,7 @@ fence(-9.5, -20, -11); fence(-9.5, -9, -4);
 
 // ---------- barracão de chapa com 4 portas (uma em cada lado) ----------
 {
-  const { x0, x1, z0, z1 } = BARN, T = 0.25, y0 = BARN_Y - 0.3, y1 = BARN_Y + 3.0, D = 0.9, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+  const { x0, x1, z0, z1 } = BARN, T = 0.25, y0 = BARN_Y - 0.3, y1 = BARN_Y + 3.4, D = 1.0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
   const MW = 0x7f8279;
   box(x0, x1, z0, z1, BARN_Y - 0.2, BARN_Y + 0.03, 0x6d6a62, { collide: false, solid: false, cast: false });   // piso de concreto
   wall(x0, cx - D, z0, z0 + T, y0, y1, { color: MW }); wall(cx + D, x1, z0, z0 + T, y0, y1, { color: MW });   // norte
@@ -512,13 +514,12 @@ fence(-9.5, -20, -11); fence(-9.5, -9, -4);
   wall(x1 - T, x1, z0, cz - D, y0, y1, { color: MW }); wall(x1 - T, x1, cz + D, z1, y0, y1, { color: MW });   // leste
   for (const [a, b, c, d] of [[cx - D, cx + D, z0, z0 + T], [cx - D, cx + D, z1 - T, z1], [x0, x0 + T, cz - D, cz + D], [x1 - T, x1, cz - D, cz + D]])
     box(a, b, c, d, BARN_Y + 2.3, y1, MW, { fade: true });                                                   // vergas das portas
-  // cobertura dentro: pilhas de caixas e paletes
+  // dentro: pilhas de caixas, paletes e uma divisória baixa
   const Y = BARN_Y;
-  box(11, 13, -30.5, -29, Y, Y + 1.2, 0x9e7a48); box(11, 12, -30.5, -29.5, Y + 1.2, Y + 2.3, 0x8f6c40);
-  box(19, 21.4, -30.5, -29.2, Y, Y + 1.2, 0x9e7a48);
-  box(11, 12.3, -23, -21.6, Y, Y + 1.2, 0x8f6c40);
-  box(19.8, 21.4, -22.8, -21.6, Y, Y + 1.2, 0x9e7a48); box(20.4, 21.4, -22.8, -21.8, Y + 1.2, Y + 2.3, 0x8f6c40);
-  box(14, 15.2, -27.3, -24.7, Y, Y + 1.15, 0x6b5a44); box(17.4, 18.6, -27.3, -24.7, Y, Y + 1.15, 0x6b5a44);
+  for (const [bx, bz, w, d, h] of [[8, -34.5, 2.2, 1.4, 1.2], [8, -34.5, 1.1, 1.1, 2.3], [22.5, -34.6, 2.6, 1.3, 1.2], [8, -23.2, 1.4, 1.4, 1.2],
+    [23, -23.2, 1.6, 1.3, 1.2], [23.5, -23.2, 1.0, 1.0, 2.3], [12, -31, 1.3, 2.6, 1.15], [20, -31, 1.3, 2.6, 1.15], [12, -26, 1.3, 2.6, 1.15], [20, -26, 1.3, 2.6, 1.15]])
+    box(bx - w / 2, bx + w / 2, bz - d / 2, bz + d / 2, Y, Y + h, h > 2 ? 0x8f6c40 : 0x9e7a48);
+  box(14.2, 17.8, -24.2, -23.8, Y, Y + 1.15, 0x6b5a44);
 }
 
 {
@@ -752,6 +753,9 @@ function buildSoldier(pal, team, medic) {
   return { root, body, legs, guns, helmet, cap, vest, chute };
 }
 
+const ghostGeo = new THREE.CylinderGeometry(0.32, 0.28, 1.7, 10); ghostGeo.translate(0, 0.85, 0);
+const ghostMatE = new THREE.MeshBasicMaterial({ color: 0xff4a3a, transparent: true, opacity: 0.45, depthTest: false, depthWrite: false, fog: false });
+const ghostMatA = new THREE.MeshBasicMaterial({ color: 0x5fb0ff, transparent: true, opacity: 0.4, depthTest: false, depthWrite: false, fog: false });
 class Soldier {
   constructor(name, isBot, team, cls) {
     this.name = name; this.isBot = isBot; this.team = team; this.cls = cls; this.C = CLASSES[cls];
@@ -764,6 +768,8 @@ class Soldier {
     this.lastHurt = -99; this.lastShot = -99; this.respawnT = 0;
     const el = document.createElement('div'); el.className = 'tag ' + (!isBot ? '' : team === 'A' ? 'ally' : 'enemy');
     el.innerHTML = `<div class="st"></div>${name}<div class="b"><i></i></div>`; $('#tags').appendChild(el);
+    this.ghost = new THREE.Mesh(ghostGeo, isBot && team !== 'A' ? ghostMatE : ghostMatA); this.ghost.renderOrder = 9; this.ghost.visible = false; this.m.root.add(this.ghost);
+    const ar = document.createElement('div'); ar.className = 'edge' + (isBot && team !== 'A' ? '' : ' ally'); ar.textContent = '▲'; $('#tags').appendChild(ar); this.edge = ar;
     this.tag = el; this.tagFill = el.querySelector('i'); this.tagSt = el.querySelector('.st'); this.tagStTxt = '';
   }
   get w() { return WEAPONS[this.weapon]; }
@@ -917,7 +923,7 @@ let now = 0, started = false, kills = 0, deaths = 0, mode = 'treino', teamScore 
 const TDM_GOAL = 20;
 let player, bots = [], soldiers = [];
 const enemiesOf = s => soldiers.filter(o => o.alive && !o.air && o.team !== s.team);
-const SPAWNS = { A: [[0, 22], [-24, 20], [27, 4], [-6, 30], [12, 28]], B: [[-19, -22], [24, -18], [-28, -4], [2, -26], [16, -35]] };
+const SPAWNS = { A: [[0, 22], [-24, 20], [27, 4], [-6, 30], [12, 28]], B: [[-19, -22], [24, -18], [-28, -4], [2, -26], [-4, -34]] };
 function farSpawn(s) {
   let best = SPAWNS[s.team][0], bd = -Infinity;
   for (const p of SPAWNS[s.team]) {
@@ -1096,7 +1102,7 @@ function updateSmokes(dt) {
 }
 
 // ---------- baús de loot: chegue perto, ABRIR (F), veja o item e PEGAR (F) ----------
-const LOOT_SPOTS = [[-8, -24], [20, -3], [-20, 16], [3, 28], [-4.8, -11], [-3, -12.2, H1], [28, 20], [-30, -14], [16, -26], [-12, 30], [12, -16]];
+const LOOT_SPOTS = [[-8, -24], [20, -3], [-20, 16], [3, 28], [-4.8, -11], [-3, -12.2, H1], [28, 20], [-30, -14], [16, -33], [-12, 30], [12, -16]];
 const LOOT_TABLE = [['colete', 24], ['capacete', 18], ['medkit', 20], ['municao', 14], ['arma', 14], ['granada', 10]];
 const ITEM_COLOR = { colete: 0x4c5a6a, capacete: 0x3d4a3a, medkit: 0xe8e2d6, municao: 0xb08a3a, arma: 0x222222, granada: 0x4a5a36 };
 const loots = [];
@@ -1205,7 +1211,7 @@ function updateBot(b, dt) {
   if (b.air === 'plane') { if (now >= b.jumpAt) jumpOut(b); return; }
   if (b.air === 'chute') { const dx = b.dropX - b.pos.x, dz = b.dropZ - b.pos.z, l = Math.hypot(dx, dz); if (l > 0.5) b.move(dx / l, dz / l, 7, dt); return; }
   const blind = b.blindT > 0;
-  const sight = b.w.scope ? 45 : 30;
+  const sight = b.w.scope ? 34 : 24;
   ai.scanT -= dt; if (ai.ignoreT > 0) ai.ignoreT -= dt;
   if (ai.scanT <= 0) {
     ai.scanT = 0.2; ai.target = null;
@@ -1511,7 +1517,7 @@ const camTarget = new V3();
 function updateCamera(dt) {
   camTarget.lerp(new V3(player.pos.x, player.air ? Math.min(player.y, 6) : player.y, player.pos.z), Math.min(1, dt * 8));
   camZoom = lerp(camZoom, player.air === 'plane' ? 2.3 : player.air ? 1.7 : player.alive && player.w.scope ? 1.4 : 1, Math.min(1, dt * 3));
-  camera.position.copy(camTarget).addScaledVector(CAM_OFF, camScale * camZoom);
+  camera.position.copy(camTarget).addScaledVector(CAM_OFF, camScale * camZoom); camera.position.z += 1.8 * camScale * camZoom;
   if (shakeT > 0) { shakeT -= dt; camera.position.x += rand(-1, 1) * shakeT * 1.2; camera.position.z += rand(-1, 1) * shakeT * 1.2; }
   sun.position.copy(camTarget).add(SUN_OFF); sun.target.position.copy(camTarget);
   lantern.position.set(player.pos.x, player.y + 3, player.pos.z);
@@ -1524,8 +1530,16 @@ function updateWalls() {
   for (const m of upper) m.visible = !inside;
   for (const m of faded) { m.material.opacity = 1; m.material.depthWrite = true; }
   faded.clear();
-  for (const h of [1.2, 0.3]) {
-    const t = eye(player, h); _d.subVectors(t, camera.position); const dist = _d.length(); _d.divideScalar(dist);
+  const targets = [[player, 1.2], [player, 0.3]];
+  for (const s of soldiers) {
+    if (s === player) continue;
+    s.seen = s.alive && !s.air && !player.air && (s.team === player.team || los(player, s));
+    let occl = false;
+    if (s.seen) { const c = eye(s, 1.0); occl = firstHit(camera.position, c) < camera.position.distanceTo(c) - 0.5; targets.push([s, 1.0]); }
+    s.ghost.visible = s.seen && occl;
+  }
+  for (const [who, h] of targets) {
+    const t = eye(who, h); _d.subVectors(t, camera.position); const dist = _d.length(); _d.divideScalar(dist);
     ray.set(camera.position, _d); ray.far = dist - 0.3;
     for (const hit of ray.intersectObjects(fadeables, false)) { hit.object.material.opacity = 0.22; hit.object.material.depthWrite = false; faded.add(hit.object); }
   }
@@ -1554,6 +1568,14 @@ function updateHud() {
   }
   $('#flashFx').style.opacity = clamp(p.blindT / 1.2, 0, 1);
   for (const s of soldiers) {
+    const [ex, ey, eok] = toScreen(eye(s, 1));
+    const off = s !== p && s.seen && s.team !== p.team && (!eok || ex < 20 || ex > innerWidth - 20 || ey < 20 || ey > innerHeight - 20);
+    s.edge.style.display = off ? '' : 'none';
+    if (off) {
+      const cx = innerWidth / 2, cy = innerHeight / 2; let dx = (eok ? ex : 2 * cx - ex) - cx, dy = (eok ? ey : 2 * cy - ey) - cy;
+      const k = Math.min((cx - 28) / Math.abs(dx || 1e-3), (cy - 28) / Math.abs(dy || 1e-3));
+      s.edge.style.transform = `translate(${cx + dx * k}px,${cy + dy * k}px) translate(-50%,-50%) rotate(${Math.atan2(dx, -dy)}rad)`;
+    }
     const [x, y, ok] = toScreen(new V3(s.pos.x, s.y + 2.15, s.pos.z));
     const enemy = s.team !== p.team;
     const covered = enemy && ((insideHouse(s) && upper[0].visible) || inSmoke(s));
@@ -1669,7 +1691,7 @@ function updateAirPlayer(p, mx, mz, dt) {
 
 // ================= Bomba =================
 const BOMB_GOAL = 5;
-const SITES = [{ name: 'A', x: 16, z: -26, r: 3.2 }, { name: 'B', x: -20, z: 5, r: 3.2 }];
+const SITES = [{ name: 'A', x: 16, z: -28.5, r: 3.2 }, { name: 'B', x: -20, z: 5, r: 3.2 }];
 function letterTex(t) {
   const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
   g.fillStyle = 'rgba(232,163,58,.95)'; g.font = 'bold 110px system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(t, 64, 70);
@@ -1766,7 +1788,7 @@ function updateBomb(dt) {
 
 // ================= partida =================
 function setupMatch(cls) {
-  for (const s of soldiers) { scene.remove(s.m.root); s.tag.remove(); }
+  for (const s of soldiers) { scene.remove(s.m.root); s.tag.remove(); s.edge.remove(); }
   player = new Soldier('Você', false, 'A', cls);
   if (mode === 'br') player.team = 'P';
   bots = mode === 'br' ? [1, 2, 3, 4, 5, 6, 7].map(i => new Soldier('Bot ' + i, true, 'b' + i, pick(['tr', 'ct', 'medic', 'sniper'])))
