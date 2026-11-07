@@ -32,6 +32,7 @@ function applyWeather(w) {
     sun.color = C(0.62, 0.72, 0.95); sun.intensity = 0.85; renderer.toneMappingExposure = 1.3;
   }
   for (const l of streetLights) l.intensity = night ? 45 : 0;
+  for (const m of lampGlows) m.visible = night;
   lantern.intensity = night ? 12 : 0; lantern.distance = 18;
   terrainMat.roughness = wet ? 0.55 : 1; terrainMat.color.setScalar(wet ? 0.72 : 1);
   for (const m of allMats) m.roughness = wet ? Math.min(m.userData.rough, 0.5) : m.userData.rough;
