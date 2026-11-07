@@ -1,6 +1,6 @@
 'use strict';
 // ================= Capture a bandeira =================
-const CTF_GOAL = 3;
+const CTF_GOAL = 3, CTF_TIME = 480;   // 8 min de partida no máximo
 const FLAGS = { A: { team: 'A', base: new V3(2, 0, 31) }, B: { team: 'B', base: new V3(-4, 0, -40) } };
 for (const F of Object.values(FLAGS)) {
   F.base.y = terrainHeight(F.base.x, F.base.z); F.pos = F.base.clone();
@@ -13,11 +13,11 @@ for (const F of Object.values(FLAGS)) {
   F.beam = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 40, 16, 1, true), new THREE.MeshBasicMaterial({ color: TEAM_COLOR[F.team], transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, fog: false }));
   F.beam.position.y = 20; F.g.add(F.beam);
 }
-const ctfS = { score: { A: 0, B: 0 } };
+const ctfS = { score: { A: 0, B: 0 }, t: CTF_TIME };
 const enemyFlag = s => FLAGS[s.team === 'A' ? 'B' : 'A'];
 const ctfCarried = s => Object.values(FLAGS).find(F => F.carrier === s);
 function ctfReset() {
-  ctfS.score = { A: 0, B: 0 };
+  ctfS.score = { A: 0, B: 0 }; ctfS.t = CTF_TIME;
   for (const F of Object.values(FLAGS)) { F.carrier = null; F.atBase = true; F.pos.copy(F.base); F.dropT = 0; }
 }
 function ctfDrop(s) {
@@ -26,7 +26,26 @@ function ctfDrop(s) {
   toast(`Bandeira ${F.team === player.team ? 'AZUL (sua)' : 'VERMELHA'} caiu no chão`);
 }
 function ctfReturn(F, by) { F.carrier = null; F.atBase = true; F.pos.copy(F.base); if (by) toast(`${by.name} devolveu a bandeira ${F.team === 'A' ? 'azul' : 'vermelha'}`); }
+// quem carrega desvia da casa central (x −6..6, z −15..−6): primeiro vai a um corredor lateral, depois à base
+const CTF_LANES = [-24, 24];
+function ctfRoute(s) {
+  const home = FLAGS[s.team].base;
+  if (s.ctfLane === undefined) s.ctfLane = pick(CTF_LANES);
+  const zMid = (HOUSE.z0 + HOUSE.z1) / 2;
+  // ainda do lado de lá da casa e longe do corredor → vai ao corredor
+  const before = Math.sign(s.pos.z - zMid) !== Math.sign(home.z - zMid) || Math.abs(s.pos.z - zMid) < 9;
+  if (before && Math.abs(s.pos.x - s.ctfLane) > 4) return { x: s.ctfLane, z: clamp(s.pos.z, zMid - 12, zMid + 12) };
+  if (before) return { x: s.ctfLane, z: zMid + Math.sign(home.z - zMid) * 14 };
+  return { x: home.x, z: home.z };
+}
+function ctfTimeUp() {
+  const { A, B } = ctfS.score; roundOver = 3;
+  const r = A === B ? 'EMPATE · ' : ((A > B) === (player.team === 'A') ? 'VITÓRIA · ' : 'DERROTA · ');
+  matchEnd = r + `${A} × ${B} (tempo esgotado)`;
+  showCenter('TEMPO ESGOTADO', `AZUL ${A} × ${B} VERM.`, 3);
+}
 function updateCTF(dt) {
+  if ((ctfS.t -= dt) <= 0) { ctfS.t = 0; ctfTimeUp(); return; }
   for (const F of Object.values(FLAGS)) {
     const c = F.carrier;
     if (c && (!c.alive || c.downed)) ctfDrop(c);
@@ -36,7 +55,7 @@ function updateCTF(dt) {
       for (const s of soldiers) {
         if (!s.alive || s.downed || s.air || Math.hypot(s.pos.x - F.pos.x, s.pos.z - F.pos.z) > 1.3 || Math.abs(s.y - F.pos.y) > 1.5) continue;
         if (s.team === F.team) { if (!F.atBase) ctfReturn(F, s); }
-        else if (!ctfCarried(s)) { F.carrier = s; F.atBase = false; toast(s === player ? 'Você pegou a bandeira! Leve até a sua base' : `${s.name} pegou a bandeira ${F.team === 'A' ? 'AZUL' : 'vermelha'}`); if (actx) tone(600, 900, 0.2, 0.08); }
+        else if (!ctfCarried(s)) { F.carrier = s; s.ctfLane = undefined; F.atBase = false; toast(s === player ? 'Você pegou a bandeira! Leve até a sua base' : `${s.name} pegou a bandeira ${F.team === 'A' ? 'AZUL' : 'vermelha'}`); if (actx) tone(600, 900, 0.2, 0.08); }
         break;
       }
     }
@@ -59,14 +78,18 @@ function updateCTF(dt) {
 }
 function ctfObjective(b) {
   const mine = FLAGS[b.team], theirs = enemyFlag(b), ai = b.ai;
-  if (ctfCarried(b)) return { x: mine.base.x, z: mine.base.z, stop: 0.5 };
+  if (ctfCarried(b)) { const r = ctfRoute(b); return { x: r.x, z: r.z, stop: 0.5 }; }
   if (mine.carrier) return { x: mine.carrier.pos.x, z: mine.carrier.pos.z, stop: 2 };           // persegue quem roubou
   if (!mine.atBase) return { x: mine.pos.x, z: mine.pos.z, stop: 0.2 };                          // devolve a bandeira caída
   if (b.role === 'def') {
     if (!ai.guard || Math.random() < 0.002) { const a = rand(0, 6.28); ai.guard = { x: mine.base.x + Math.cos(a) * rand(3, 7), z: mine.base.z + Math.sin(a) * rand(3, 7) }; }
     return { x: ai.guard.x, z: ai.guard.z, stop: 0.8, act: bb => { bb.facing += 0.01; } };
   }
-  if (theirs.carrier) return { x: theirs.carrier.pos.x, z: theirs.carrier.pos.z, stop: 3 };       // escolta o aliado
+  if (theirs.carrier) {                                                                            // escolta: à frente e dos lados, rumo à base
+    const c = theirs.carrier, r = ctfRoute(c), dx = r.x - c.pos.x, dz = r.z - c.pos.z, l = Math.hypot(dx, dz) || 1;
+    const side = (bots.indexOf(b) % 2 ? 1 : -1) * 3;
+    return { x: c.pos.x + dx / l * 4 - dz / l * side, z: c.pos.z + dz / l * 4 + dx / l * side, stop: 1.5 };
+  }
   return { x: theirs.pos.x, z: theirs.pos.z, stop: 0.2 };
 }
 
