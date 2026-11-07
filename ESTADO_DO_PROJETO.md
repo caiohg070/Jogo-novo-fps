@@ -261,3 +261,10 @@ Jogador novo (sem partidas, sem tutorial e sem ter pulado) vê `#firstBoard` "PR
 > claude/game-fixes-republish-8n23ze). Continue o protótipo em `prototipo/index.html`.
 > Depois de cada mudança: testar, fazer commit/push na mesma branch e republicar o artifact
 > https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC."
+
+## Atualização (tiros no relevo, granada, postes)
+- Tiro em morro/telhado/terraço: se o caminho padrão bate, tenta linha reta até peito/ombro/cabeça (`shootRay` em `js/personagens/soldados.js`; bots usam a mesma regra em `canShoot`, `js/base/fisica-visao.js`). Testado: morro 20/20 em 12 ângulos, terraço da casa 0/20 → 20/20; atrás do morro continua bloqueado.
+- Linha da mira inclinada igual à bala; traçante reto; folhas dos arbustos meio transparentes (não conferidos jogando).
+- Granada: marca suave que segue o relevo (`scorchMark` em `js/base/efeitos-som.js`).
+- 8 postes extras (`js/mapa/objetos.js`), luz só à noite via lâmpada + círculo no chão (sem PointLight).
+- Ideia futura: online por código de sala (PeerJS), ainda não feito.
