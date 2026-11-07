@@ -180,6 +180,17 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 
 ## 4. O que falta / próximos passos
 
+**➡️ PRÓXIMO CHAT — pedidos do usuário ainda NÃO feitos (fazer primeiro)**
+1. **Arma sem bala:** quando acaba toda a munição, o som de "seco" toca muito alto e muito rápido (repete a cada quadro enquanto segura o tiro).
+   Onde: `tryFire()` → linha com `sfx('seco', 0.5, ...)`. Ideia: tocar no máximo 1× a cada ~0,4 s e mais baixo.
+2. **Mensagem ao matar alguém** aparece grande no meio da tela e tampa tudo. Procurar o que mostra o abate (feed/`showCenter`/números de dano)
+   e trocar por um aviso pequeno (canto ou topo), sem cobrir o centro.
+3. **Mira tem que sair da arma como um laser:** hoje a linha (`aimLine`, em `updatePlayer`) sai do pé (`p.y + 0.06`).
+   Fazer sair do cano (`muzzlePos()`), na altura da arma, como um feixe fino de laser.
+4. **Personagem não fica no centro da tela** (fica mais para baixo). Em `updateCamera()`: `camera.position.z += 1.8 * camScale * camZoom` desloca a câmera;
+   reduzir/zerar para o jogador ficar centralizado (conferir no celular em paisagem).
+5. **Som da arma do médico está baixo** (médico usa a Colt M4). Aumentar o volume do som `m4` (ver `shotSound`/`WSND`) ou conferir o mp3.
+
 **Pendências pequenas no protótipo**
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
 - [ ] Som da chuva tem só 2 s (repete); gerar um mais longo se incomodar.
