@@ -58,6 +58,7 @@ function damage(t, dmg, from, pen = 0.5) {
   dmg = Math.round(dmg);
   t.hp -= dmg; t.lastHurt = now; from.stats.dmg += Math.max(0, Math.min(dmg, t.hp + dmg));
   if (t.armor <= 0) t.showGear();
+  if (t === player && t.hp > 0 && now - (t.gruntT ?? -9) > 0.7) { t.gruntT = now; sfx('dano', 0.5, { dur: 0.9 }); }
   if (t === player) { $('#hurt').style.opacity = 1; setTimeout(() => $('#hurt').style.opacity = 0, 160); if (from !== player) hitDir(from); }
   else if (from === player) { dmgNumber(t, dmg, toArmor > 0); if (!sfx('acerto', 0.45, { dur: 0.4 })) blip(1250, 0.03, 0.06); }
   if (t.isBot) botHeard(t, from.pos);
@@ -88,10 +89,12 @@ function renderCareer() {
   const c = career, kd = (c.abates / Math.max(1, c.mortes)).toFixed(2);
   const L = levelInfo(c.xp || 0);
   $('#career').innerHTML = `<b>NÍVEL ${L.lvl}</b> · ${L.cur}/${L.need} XP<div class="xpbar"><i style="width:${(L.cur / L.need) * 100}%"></i></div>` + (c.partidas || c.abates ? `<b>Seu histórico:</b> ${c.partidas} partidas · ${c.vitorias} vitórias · ${c.abates} abates · ${c.mortes} mortes · K/D ${kd}` + (c.melhorBR ? ` · melhor no BR: ${c.melhorBR}º` : '') : '');
+  if (window.lbReady) lobbyRefresh();   // menu (lobby) já montado
 }
 let killInfo = '';
 function die(t, by) {
   if (!t.alive) return;
+  if (player) sfxAt('dano', t.pos, t === player ? 0.7 : 0.45, { rate: 0.78, dur: 1.1 });   // gemido de morte (mais grave)
   t.downed = false;
   if (t.veh) { t.veh.driver = null; if (t === player) engineStop(); t.veh = null; t.y = groundAt(t.pos.x, t.pos.z, t.y + 1); }
   if (t.turret) leaveTurret(t);

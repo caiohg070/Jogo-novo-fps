@@ -144,11 +144,11 @@ class Soldier {
     if (this.air === 'plane' || this.veh || this.zip) return;
     if (this.air === 'chute') {
       this.y -= 4.5 * dt; const g = groundAt(this.pos.x, this.pos.z, this.y);
-      if (this.y <= g) { this.y = g; this.air = 0; this.m.chute.visible = false; if (this === player) toast('Pousou! Procure baús para pegar armas'); }
+      if (this.y <= g) { this.y = g; this.air = 0; this.m.chute.visible = false; if (player) sfxAt('aterrissar', this.pos, 0.6); if (this === player) toast('Pousou! Procure baús para pegar armas'); }
       return;
     }
     const g = groundAt(this.pos.x, this.pos.z, this.y);
-    if (this.y > g + 0.02) { this.vy -= 22 * dt; this.y = Math.max(g, this.y + this.vy * dt); if (this.y === g) this.vy = 0; }
+    if (this.y > g + 0.02) { this.vy -= 22 * dt; this.y = Math.max(g, this.y + this.vy * dt); if (this.y === g) { if (this.vy < -5 && player) sfxAt('aterrissar', this.pos, clamp(-this.vy / 14, 0.3, 0.8)); this.vy = 0; } }
     else { this.y = g; this.vy = 0; }
   }
   update(dt) {
@@ -230,6 +230,7 @@ class Soldier {
     spawnPart(muzzle, 0xffc066, quiet ? 0.25 : w.scope ? 0.8 : 0.55, 0.05, new V3(), true);
     if (quiet) { if (actx && dp < 18) { const v = 1 - dp / 18; noise(0.07, 0.16 * v, 'bandpass', 1400); tone(300, 90, 0.05, 0.06 * v); } }
     else shotSound(w, dp, this.weapon, this.pos);
+    if (!this.turret && dp < 12) shellSound(this.pos, this === player ? 1 : 0.6);   // cápsulas caindo
     if (this !== player && this.team !== player.team && dp < (quiet ? 10 : 45)) addPing(this.pos.x, this.pos.z, 'shot');
     if (this === player && (w.scope || w.pellets)) shakeT = 0.12;
     for (const b of bots) if (b.alive && b.team !== this.team && b.pos.distanceTo(this.pos) < (quiet ? 8 : 32)) botHeard(b, this.pos);
@@ -270,6 +271,10 @@ class Soldier {
     }
     if (Math.hypot(end.x - origin.x, end.z - origin.z) < Math.hypot(muzzle.x - origin.x, muzzle.z - origin.z) + 0.05) muzzle = origin;   // colado na parede: traçante não sai de trás dela
     tracer(muzzle, end, w.scope ? 0xfff2c8 : 0xffd894, w.scope ? 0.18 : w.pellets ? 0.05 : 0.07, path);
+    if (this !== player && player.alive && this.team !== player.team && now - (player.whizT ?? -9) > 0.25) {   // só som: bala passando perto do ouvido
+      const P = eye(player, 1.5), d = end.clone().sub(origin), L2 = d.lengthSq(), k = L2 > 0 ? clamp(P.clone().sub(origin).dot(d) / L2, 0, 1) : 0, near = P.distanceTo(origin.clone().addScaledVector(d, k));
+      if (near > 0.35 && near < 2.2 && k > 0.05 && k < 0.98) { player.whizT = now; sfx('zunido', 0.5 * (1 - near / 2.2) + 0.15, { pan: panOf(end) }); }
+    }
     glassAlong(origin, end);
   }
   stab(ang, enemies) {
@@ -283,12 +288,11 @@ class Soldier {
       damage(t, randInt(w.dmg[0], w.dmg[1]), this, w.pen); blood(eye(t, 1.2)); groundMark(t.pos.clone().setY(t.y), rand(0.25, 0.35), 0x5a0a07, 0.8, 12);
       return true;
     }
-    // golpe no vazio: risco na parede/caixa à frente ou no chão
+    // golpe no vazio: risco na parede/caixa à frente (no chão não, o personagem está em pé)
     for (const h of [1.1, 0.55]) {                              // altura do peito e baixa (caixas, sacos de areia)
       const o = eye(this, h), f = o.clone().add(new V3(Math.sin(ang) * (w.range + 0.3), 0, Math.cos(ang) * (w.range + 0.3)));
       if (firstHit(o, f) < Infinity && lastHit) { const hp = hitProp, lh = lastHit; wallChip(lh, true); bulletHit(lh.point); if (hp) hurtProp(hp, 25, this); return true; }
     }
-    groundMark(new V3(this.pos.x + Math.sin(ang) * 1.2, this.y, this.pos.z + Math.cos(ang) * 1.2), 0.32, 0x1a1410, 0.75, CHIP_LIFE, 0.18);
     return true;
   }
   useKit() {

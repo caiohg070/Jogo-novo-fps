@@ -7,7 +7,9 @@ A ordem de carregamento fica em `js/arquivos.js` (um arquivo pode usar o que vei
 |---|---|
 | Telas, botões, HUD (HTML) | `index.html` |
 | Visual dos menus/HUD (cores, tamanhos) | `css/estilo.css` |
-| Sons (mp3 embutidos) | `sons/sons.js` |
+| Sons (mp3 embutidos; para trocar/adicionar: ponha o .mp3 em `sons/` e regenere `sons/sons.js`) | `sons/sons.js` |
+| Tocar sons, música do menu, sons contínuos | `js/base/efeitos-som.js` |
+| Menu inicial (lobby) e personagem 3D do menu | `index.html`, `css/estilo.css`, `js/jogo/menu.js` |
 | Funções úteis, regras (vida, dano, armas, classes) | `js/base/utilidades-regras.js` |
 | Relevo do chão, luz, renderizador | `js/base/terreno-cena.js` |
 | Caixas/paredes e colisão | `js/base/construcao.js` |

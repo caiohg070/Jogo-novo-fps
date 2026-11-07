@@ -28,7 +28,7 @@ function setDoor(d, open, quiet) {
   if (open) { if (i >= 0) colliders.splice(i, 1); if (j < 0) colliders.push(d.colOpen); }
   else { if (j >= 0) colliders.splice(j, 1); if (i < 0) colliders.push(d.col); }
   if (typeof navRefresh === 'function') navRefresh(d.colOpen);   // bots desviam da folha aberta
-  if (!quiet && actx && player) { const v = vol(player.pos.distanceTo(new V3(d.cx, d.y0, d.cz)) * 2); if (v > 0.02) { noise(0.18, 0.12 * v, 'lowpass', 700); tone(open ? 240 : 180, open ? 140 : 90, 0.15, 0.06 * v, 'triangle'); } }
+  if (!quiet && actx && player) { const v = vol(player.pos.distanceTo(new V3(d.cx, d.y0, d.cz)) * 2); if (v > 0.02 && !sfx(open ? 'porta_abrir' : 'porta_fechar', 0.55 * v, { pan: panOf(new V3(d.cx, d.y0, d.cz)) })) { noise(0.18, 0.12 * v, 'lowpass', 700); tone(open ? 240 : 180, open ? 140 : 90, 0.15, 0.06 * v, 'triangle'); } }
 }
 function updateDoors(dt) {
   for (const d of doors) {

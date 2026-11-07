@@ -70,7 +70,7 @@ function updateCTF(dt) {
     if (home.atBase && Math.hypot(s.pos.x - home.base.x, s.pos.z - home.base.z) < 2) {
       ctfReturn(F, null); ctfS.score[s.team]++; if (s === player) addXP(300, 'captura');
       showCenter(s.team === player.team ? 'CAPTURA DO SEU TIME!' : 'O INIMIGO CAPTUROU', `${s.name} · AZUL ${ctfS.score.A} × ${ctfS.score.B} VERM.`, 2.5);
-      if (actx) { tone(520, 1040, 0.35, 0.1); }
+      if (actx && !sfx('bandeira', 0.6)) { tone(520, 1040, 0.35, 0.1); }
       if (ctfS.score[s.team] >= CTF_GOAL && !roundOver) { roundOver = 3; matchEnd = (s.team === 'A' ? 'VITÓRIA · ' : 'DERROTA · ') + `${ctfS.score.A} × ${ctfS.score.B}`; }
       updateScore();
     }

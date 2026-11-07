@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#1d1a16">
 <title>Protótipo Tático</title>
 <link rel="stylesheet" href="css/estilo.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap">
 </head>
 <body>
 <canvas id="game"></canvas>
@@ -56,6 +57,7 @@
 <div class="board" id="cfgBoard"><div class="card panel"><h2>CONFIGURAÇÕES</h2>
   <div class="cfg">
     <label>Volume geral <b id="cv-vol"></b><input type="range" id="c-vol" min="0" max="100" step="5"></label>
+    <label>Música do menu <b id="cv-mus"></b><input type="range" id="c-mus" min="0" max="100" step="5"></label>
     <label>Tamanho dos botões <b id="cv-size"></b><input type="range" id="c-size" min="70" max="140" step="5"></label>
     <label>Visibilidade dos botões <b id="cv-op"></b><input type="range" id="c-op" min="10" max="80" step="5"></label>
     <label>Altura dos controles <b id="cv-h"></b><input type="range" id="c-h" min="50" max="80" step="2"></label>
@@ -65,10 +67,34 @@
 <div id="objArrow"><i><svg viewBox="0 0 40 40" width="40" height="40"><circle cx="20" cy="20" r="17" fill="rgba(18,16,13,.82)" stroke="#e8a33a" stroke-width="2.5"/><path d="M20 9 L30 24 L23 22 L23 31 L17 31 L17 22 L10 24 Z" fill="#ffd36b" stroke="#7a4a10" stroke-width="1.2" stroke-linejoin="round"/></svg></i><span></span></div>
 
 <div id="start">
-  <div class="card panel">
-    <h1>PROTÓTIPO TÁTICO</h1>
-    <h3>MODO</h3>
-    <div class="opts" data-group="mode">
+  <div class="lb-bg"><i class="lb-sun"></i><i class="lb-city"></i><i class="lb-floor"></i></div>
+  <canvas id="lbHero"></canvas>
+  <div class="lb-top">
+    <div class="lb-lvl"><div class="lb-star"><span id="lbLvl">1</span></div><div class="lb-xp"><b>NÍVEL</b><div class="xpbar"><i id="lbXp"></i></div><small id="lbXpTxt"></small></div></div>
+    <div class="lb-logo">PROTÓTIPO<span>TÁTICO</span></div>
+    <div class="lb-stats"><div class="lb-chip" title="Abates"><i>💀</i><b id="lbK">0</b></div><div class="lb-chip" title="Vitórias"><i>🏆</i><b id="lbW">0</b></div><div class="lb-chip lb-hide-s" title="K/D"><i>🎯</i><b id="lbKD">0</b></div>
+      <button class="lb-ico" id="cfgOpen" aria-label="Configurações">⚙</button></div>
+  </div>
+  <div class="lb-side lb-left">
+    <button class="lb-tile t-cls" data-sheet="cls"><i>🎖️</i><span>CLASSE</span></button>
+    <button class="lb-tile t-skin" data-sheet="skin"><i>👕</i><span>ROUPA</span></button>
+    <button class="lb-tile t-acc" data-sheet="acc"><i>🎒</i><span>ACESSÓRIO</span></button>
+  </div>
+  <div class="lb-side lb-right">
+    <button class="lb-tile t-diff" data-sheet="diff"><i>🤖</i><span>BOTS</span><small id="lbDiff"></small></button>
+    <button class="lb-tile t-weather" data-sheet="weather"><i>🌦️</i><span>CLIMA</span><small id="lbWeather"></small></button>
+    <button class="lb-tile t-help" data-sheet="help"><i>❓</i><span>COMO JOGAR</span></button>
+  </div>
+  <div class="lb-hero-tag"><b id="lbClsName"></b><small id="lbClsGear"></small></div>
+  <div class="lb-bottom">
+    <p id="career"></p>
+    <button class="lb-mode" data-sheet="mode"><small>MODO DE JOGO · toque para trocar</small><b id="lbMode"></b><span id="lbModeSub"></span></button>
+    <button id="play">JOGAR</button>
+  </div>
+  <div class="lb-sheet" id="lbSheet"><div class="card panel">
+    <h2 id="lbSheetT"></h2>
+      <div class="lb-pane" data-pane="mode" data-title="MODO DE JOGO">
+        <div class="opts" data-group="mode">
       <button class="opt on" data-v="treino">TREINO<small>você vs 2 bots</small></button>
       <button class="opt" data-v="tdm">MATA-MATA<small>3 vs 3, 20 abates</small></button>
       <button class="opt" data-v="br">BATTLE ROYALE<small>8 jogadores, avião e paraquedas</small></button>
@@ -76,28 +102,32 @@
       <button class="opt" data-v="ctf">BANDEIRA<small>3 vs 3, capture 3 vezes</small></button>
       <button class="opt" data-v="tutorial">TUTORIAL<small>aprenda os controles passo a passo</small></button>
     </div>
-    <h3>CLASSE</h3>
-    <div class="opts" data-group="cls">
+      </div>
+      <div class="lb-pane" data-pane="cls" data-title="CLASSE">
+        <div class="opts" data-group="cls">
       <button class="opt on" data-v="tr">TERRORISTA<small>AK-47 · Desert Eagle · HE + flash</small></button>
       <button class="opt" data-v="ct">CT<small>Colt M4 · pistola · colete e capacete</small></button>
       <button class="opt" data-v="medic">MÉDICO<small>Colt M4 · pistola · cura (+40)</small></button>
       <button class="opt" data-v="sniper">SNIPER<small>AWP · Desert Eagle · smoke</small></button>
     </div>
-    <h3>DIFICULDADE DOS BOTS</h3>
-    <div class="opts w3" data-group="diff">
+      </div>
+      <div class="lb-pane" data-pane="diff" data-title="DIFICULDADE DOS BOTS">
+        <div class="opts w3" data-group="diff">
       <button class="opt" data-v="facil">FÁCIL<small>reagem devagar, erram mais</small></button>
       <button class="opt on" data-v="medio">MÉDIO<small>equilibrado</small></button>
       <button class="opt" data-v="dificil">DIFÍCIL<small>rápidos e precisos</small></button>
     </div>
-    <h3>CLIMA</h3>
-    <div class="opts" data-group="weather">
+      </div>
+      <div class="lb-pane" data-pane="weather" data-title="CLIMA">
+        <div class="opts" data-group="weather">
       <button class="opt on" data-v="dia">DIA<small>sol baixo</small></button>
       <button class="opt" data-v="chuva">CHUVA<small>nublado, chão molhado</small></button>
       <button class="opt" data-v="noite">NOITE<small>chuva e postes acesos</small></button>
       <button class="opt" data-v="neblina">NEBLINA<small>todos enxergam menos</small></button>
     </div>
-    <h3>ROUPA (CAMUFLAGEM)</h3>
-    <div class="opts" data-group="skin">
+      </div>
+      <div class="lb-pane" data-pane="skin" data-title="ROUPA (CAMUFLAGEM)">
+        <div class="opts" data-group="skin">
       <button class="opt on" data-v="padrao">PADRÃO<small>cor da classe</small></button>
       <button class="opt" data-v="deserto">DESERTO</button>
       <button class="opt" data-v="floresta">FLORESTA</button>
@@ -105,20 +135,22 @@
       <button class="opt" data-v="neve">NEVE</button>
       <button class="opt" data-v="ghillie">GHILLIE<small>roupa de mato</small></button>
     </div>
-    <h3>ACESSÓRIO</h3>
-    <div class="opts" data-group="acc">
+      </div>
+      <div class="lb-pane" data-pane="acc" data-title="ACESSÓRIO">
+        <div class="opts" data-group="acc">
       <button class="opt on" data-v="nenhum">NENHUM</button>
       <button class="opt" data-v="boina">BOINA</button>
       <button class="opt" data-v="oculos">ÓCULOS</button>
       <button class="opt" data-v="mascara">MÁSCARA</button>
       <button class="opt" data-v="mochila">MOCHILA</button>
     </div>
-    <button id="play">JOGAR</button>
-    <button class="cfgBtn" id="cfgOpen">⚙ CONFIGURAÇÕES (volume e botões)</button>
-    <p id="career"></p>
-    <p class="help"><b>Celular:</b> joystick anda; segure e arraste o botão vermelho para mirar (já atira); toque rápido mira sozinho. Botão de granada: segure, arraste e solte. Toque na lista à direita para trocar arma (o 4 troca a granada). Caixas verdes no mapa têm loot. O botão laranja serve para abrir baú/porta, entrar em veículo, usar metralhadora fixa e tirolesa.<br>
+      </div>
+      <div class="lb-pane" data-pane="help" data-title="COMO JOGAR">
+        <p class="help"><b>Celular:</b> joystick anda; segure e arraste o botão vermelho para mirar (já atira); toque rápido mira sozinho. Botão de granada: segure, arraste e solte. Toque na lista à direita para trocar arma (o 4 troca a granada). Caixas verdes no mapa têm loot. O botão laranja serve para abrir baú/porta, entrar em veículo, usar metralhadora fixa e tirolesa.<br>
     <b>PC:</b> WASD, mouse mira, clique atira, 1/2/3 armas, 4 troca granada, G joga, E cura (médico), F usar/entrar, V drone, R recarrega.</p>
-  </div>
+      </div>
+    <button id="lbSheetOk">OK</button>
+  </div></div>
 </div>
 
 <script>document.write('<script src="sons/sons.js?v=' + Date.now() + '"><\/script>');</script>

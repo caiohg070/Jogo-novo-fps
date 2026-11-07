@@ -80,9 +80,11 @@ function engineStart() {
   if (!actx || engine) return;
   const o = actx.createOscillator(), o2 = actx.createOscillator(), f = actx.createBiquadFilter(), g = actx.createGain();
   o.type = 'sawtooth'; o2.type = 'square'; o.frequency.value = 45; o2.frequency.value = 22.5; f.type = 'lowpass'; f.frequency.value = 500; g.gain.value = 0.05;
-  o.connect(f); o2.connect(f); f.connect(g).connect(masterOut); o.start(); o2.start(); engine = { o, o2, f, g };
+  const nz = actx.createBufferSource(), nf = actx.createBiquadFilter(), ng = actx.createGain();   // ronco grave do motor (ruído filtrado)
+  nz.buffer = noiseBuf; nz.loop = true; nf.type = 'lowpass'; nf.frequency.value = 160; ng.gain.value = 0.5; nz.connect(nf).connect(ng).connect(f);
+  o.connect(f); o2.connect(f); f.connect(g).connect(masterOut); o.start(); o2.start(); nz.start(); engine = { o, o2, f, g, nz, nf };
 }
-function engineStop() { if (!engine) return; try { engine.o.stop(); engine.o2.stop(); } catch {} engine = null; }
+function engineStop() { if (!engine) return; try { engine.o.stop(); engine.o2.stop(); engine.nz.stop(); } catch {} engine = null; }
 function driveVehicle(V, ix, iz, dt) {
   const D = V.def, l = Math.hypot(ix, iz);
   if (l > 0.15) {
@@ -134,7 +136,7 @@ function updateVehicles(dt) {
       if (s.team !== dr.team) { dr.lastKillWith = D.name; damage(s, 20 + Math.abs(V.v) * 5, dr, 1); if (s.alive) dr.lastKillWith = null; V.v *= 0.7; if (actx) noise(0.12, 0.3 * vol(player.pos.distanceTo(s.pos)), 'lowpass', 900); }
     }
     if (dr) { dr.pos.set(V.pos.x, 0, V.pos.z); dr.y = V.y + D.seat; dr.facing = V.ang; dr.m.root.rotation.y = V.ang; }
-    if (dr === player && engine) { engine.o.frequency.value = 45 + Math.abs(V.v) * 9; engine.o2.frequency.value = (45 + Math.abs(V.v) * 9) / 2; engine.g.gain.value = 0.04 + Math.abs(V.v) / D.max * 0.05; }
+    if (dr === player && engine) { engine.o.frequency.value = 45 + Math.abs(V.v) * 9; engine.o2.frequency.value = (45 + Math.abs(V.v) * 9) / 2; engine.g.gain.value = 0.04 + Math.abs(V.v) / D.max * 0.05; engine.f.frequency.value = 420 + Math.abs(V.v) * 40; engine.nf.frequency.value = 140 + Math.abs(V.v) * 18; }
   }
 }
 // pontos de veículos (procura um lugar livre perto do ponto pedido)
