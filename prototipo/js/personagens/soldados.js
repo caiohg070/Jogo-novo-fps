@@ -250,13 +250,19 @@ class Soldier {
     if (best) {
       origin.y = this.y + SHOT_H + lean(this, best);
       const P = aimPoint(best, undefined, undefined, this);   // centro do alvo (a borda podia ficar dentro da mureta)
-      const block = shotBlock(origin, P), dist = origin.distanceTo(P);
-      const hp1 = hitProp, lh = lastHit;
+      let block = shotBlock(origin, P), dist = origin.distanceTo(P);
+      let hp1 = hitProp, lh = lastHit;
+      // alvo no alto (telhado/terraço): se a linha reta até a cabeça/ombro está livre, acerta (antes a mureta/laje sempre barrava)
+      if (block < dist - 0.2 && best.y - this.y > 1.2) for (const hh of [1.65, 1.35]) {
+        const Q = new V3(best.pos.x, best.y + hh, best.pos.z), b2 = firstHit(origin, Q), d2 = origin.distanceTo(Q);
+        if (b2 >= d2 - 0.15 && !smokeBlocks(origin, Q)) { P.copy(Q); block = Infinity; dist = d2; break; }
+      }
+      hp1 = block < dist - 0.2 ? hp1 : null;
       if (block < dist - 0.2) { end = origin.clone().add(P.sub(origin).normalize().multiplyScalar(block)); bulletHit(end); if (hp1) hurtProp(hp1, randInt(w.dmg[0], w.dmg[1]), this); else wallChip(lh); }
       else { end = P; damage(best, randInt(w.dmg[0], w.dmg[1]) * (this.isBot ? diff.dmg : 1), this, w.pen); hitProp = null; blood(P); }
     } else {
       const g = groundShot(origin, dx, dz, range, this);
-      const lh = lastHit; end = g.end; path = g.pts.slice(1);
+      const lh = lastHit; end = g.end;   // bala em linha reta: traçante reto do cano até onde bateu
       if (g.dist < Infinity) { bulletHit(end); if (hitProp) hurtProp(hitProp, randInt(w.dmg[0], w.dmg[1]), this); else if (lh) wallChip(lh); else groundMark(end, rand(0.12, 0.18)); }
     }
     if (Math.hypot(end.x - origin.x, end.z - origin.z) < Math.hypot(muzzle.x - origin.x, muzzle.z - origin.z) + 0.05) muzzle = origin;   // colado na parede: traçante não sai de trás dela
