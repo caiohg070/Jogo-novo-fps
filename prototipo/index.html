@@ -123,6 +123,7 @@ body:not(.is-touch) #actBtn{right:50%;transform:translateX(50%);top:auto;bottom:
 #walkBtn{left:calc(var(--ctl-x) + 92px);top:calc(var(--ctl-y) - 78px);width:54px;height:54px;margin:-27px 0 0 -27px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.28)}
 #walkBtn.on{opacity:.6!important;border-color:var(--accent)}
 body.is-touch #healBtn.show{display:block}
+#fsBtn{position:fixed;top:calc(max(10px,env(safe-area-inset-top)) + 132px);left:max(10px,env(safe-area-inset-left));z-index:8;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(18,16,13,.55);border:1px solid rgba(241,233,216,.2);color:#f1e9d8;cursor:pointer;pointer-events:auto}
 .lootTag{position:absolute;left:0;top:0;padding:3px 8px;border-radius:5px;background:rgba(18,16,13,.75);color:#ffe28a;font-size:12px;font-weight:800;white-space:nowrap;pointer-events:none}
 
 #start{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
@@ -172,6 +173,7 @@ body.is-touch #healBtn.show{display:block}
 <div id="healBtn" class="rbtn"><span id="healLbl">CURA<b id="healCd">✚</b></span></div>
 <div id="reloadBtn">RECAR.</div>
 <div id="walkBtn" class="touch rbtn"><span>ANDAR<b>👣</b></span></div>
+<div id="fsBtn" title="Tela cheia">⛶</div>
 <div id="buyBtn">COMPRAR (B)</div>
 <div class="board" id="buy"><div class="card panel"><h2>COMPRAR · <span id="money">$0</span></h2><div class="buygrid" id="buyGrid"></div>
   <div class="row"><button id="buyClose">FECHAR</button></div></div></div>
@@ -1518,7 +1520,7 @@ function useSlot(id) {
   else player.switchTo(id === 'knife' ? 'knife' : player.inv[id]);
 }
 addEventListener('pointerdown', e => {
-  if (!started || e.target.closest?.('.board,#buyBtn,#actBtn')) return;
+  if (!started || e.target.closest?.('.board,#buyBtn,#actBtn,#fsBtn')) return;
   if (e.target.closest?.('#walkBtn') || (isTouch && e.pointerType !== 'mouse' && (() => { const [wx, wy, wr] = center($('#walkBtn')); return Math.hypot(e.clientX - wx, e.clientY - wy) < wr * 1.1; })())) { walkOn = !walkOn; $('#walkBtn').classList.toggle('on', walkOn); lastTouch = now; return; }
   const slot = e.target.closest?.('.slot');
   if (slot) { if (e.pointerType !== 'mouse') lastTouch = now; useSlot(slot.dataset.slot); return; }
@@ -1869,6 +1871,23 @@ function renderShop() {
 $('#buyGrid').addEventListener('click', e => { const b = e.target.closest('button'); if (b && buy(player, b.dataset.id)) { renderShop(); if (actx) tone(700, 900, 0.08, 0.08); } });
 $('#buyClose').addEventListener('click', () => { $('#buy').style.display = 'none'; });
 function openShop() { if (mode !== 'bomb' || !(bombS.buyT > 0) || !player.alive) return; renderShop(); $('#buy').style.display = 'flex'; }
+function toggleFS() {
+  const d = document, el = d.documentElement;
+  const isFS = d.fullscreenElement || d.webkitFullscreenElement;
+  try {
+    if (isFS) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+    else { const r = (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el, { navigationUI: 'hide' });
+      if (r && r.then) r.then(() => screen.orientation?.lock?.('landscape')).catch(() => toast('Tela cheia bloqueada aqui: abra o link no Chrome do celular'));
+      else if (!r) toast('Tela cheia não disponível neste app: abra o link no Chrome do celular'); }
+  } catch { toast('Tela cheia não disponível neste app: abra o link no Chrome do celular'); }
+}
+$('#fsBtn').addEventListener('pointerdown', e => { e.stopPropagation(); toggleFS(); });
+// celular bloqueado / aba escondida: pausa o som e o jogo
+document.addEventListener('visibilitychange', () => {
+  if (!actx) return;
+  if (document.hidden) actx.suspend(); else actx.resume();
+});
+addEventListener('pagehide', () => actx?.suspend());
 $('#buyBtn').addEventListener('pointerdown', e => { e.stopPropagation(); openShop(); });
 function startBombRound() {
   if (bombS.round === 0) for (const s of soldiers) { s.money = 800; s.stats = { k: 0, d: 0, dmg: 0 }; }
@@ -2018,6 +2037,7 @@ $('#again').addEventListener('click', () => { $('#board').style.display = 'none'
 $('#toMenu').addEventListener('click', () => { $('#board').style.display = 'none'; $('#start').style.display = 'flex'; });
 function frame() {
   const dt = Math.min(0.05, clock.getDelta());
+  if (document.hidden) { requestAnimationFrame(frame); return; }
   if (started) {
     now += dt;
     updatePlayer(dt);
