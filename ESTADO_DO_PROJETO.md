@@ -180,16 +180,12 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 
 ## 4. O que falta / próximos passos
 
-**➡️ PRÓXIMO CHAT — pedidos do usuário ainda NÃO feitos (fazer primeiro)**
-1. **Arma sem bala:** quando acaba toda a munição, o som de "seco" toca muito alto e muito rápido (repete a cada quadro enquanto segura o tiro).
-   Onde: `tryFire()` → linha com `sfx('seco', 0.5, ...)`. Ideia: tocar no máximo 1× a cada ~0,4 s e mais baixo.
-2. **Mensagem ao matar alguém** aparece grande no meio da tela e tampa tudo. Procurar o que mostra o abate (feed/`showCenter`/números de dano)
-   e trocar por um aviso pequeno (canto ou topo), sem cobrir o centro.
-3. **Mira tem que sair da arma como um laser:** hoje a linha (`aimLine`, em `updatePlayer`) sai do pé (`p.y + 0.06`).
-   Fazer sair do cano (`muzzlePos()`), na altura da arma, como um feixe fino de laser.
-4. **Personagem não fica no centro da tela** (fica mais para baixo). Em `updateCamera()`: `camera.position.z += 1.8 * camScale * camZoom` desloca a câmera;
-   reduzir/zerar para o jogador ficar centralizado (conferir no celular em paisagem).
-5. **Som da arma do médico está baixo** (médico usa a Colt M4). Aumentar o volume do som `m4` (ver `shotSound`/`WSND`) ou conferir o mp3.
+**✅ Pedidos do 5º chat (feitos no 6º chat)**
+1. Arma sem bala: clique "seco" agora toca baixo (0,16) e no máximo 1× a cada 0,5 s (`tryFire()`, campo `dryAt`).
+2. Aviso de abate (`#feed`): saiu do topo central; agora é pequeno (10 px), no canto superior direito ao lado das armas, no máximo 3 linhas.
+3. Mira laser: `aimLine` sai do cano (`muzzlePos()`), na altura da arma, fina e vermelha.
+4. Câmera: removido o deslocamento `z += 1.8`; a câmera mira o meio do corpo (`y += 0.9`). Jogador fica exatamente no centro (testado 844×390 e 390×844).
+5. Som da Colt M4: o `m4.mp3` é ~16 dB mais baixo que os outros; ganho extra `SND_GAIN = { m4: 5 }` em `shotSound`.
 
 **Pendências pequenas no protótipo**
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.

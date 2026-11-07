@@ -24,8 +24,9 @@ canvas#game{display:block;position:fixed;inset:0;width:100%;height:100%}
 #score{top:max(10px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);padding:6px 14px;font-size:14px;font-weight:600;letter-spacing:.04em;white-space:nowrap}
 #score b{color:var(--accent);font-variant-numeric:tabular-nums}
 #score .ta{color:var(--ally)} #score .tb{color:var(--danger)}
-#feed{top:calc(max(10px,env(safe-area-inset-top)) + 40px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:4px;align-items:center}
-#feed div{padding:3px 10px;font-size:12px;animation:fadeout 4s forwards;white-space:nowrap}
+#feed{top:max(10px,env(safe-area-inset-top));right:calc(max(10px,env(safe-area-inset-right)) + 112px);display:flex;flex-direction:column;gap:3px;align-items:flex-end;max-width:40vw;opacity:.85}
+#feed div{padding:2px 7px;font-size:10px;animation:fadeout 4s forwards;white-space:nowrap}
+@media (orientation:portrait){#feed{top:calc(max(10px,env(safe-area-inset-top)) + 42px);right:max(10px,env(safe-area-inset-right))}}
 #feed .k{color:var(--accent);font-weight:700} #feed .a{color:var(--ally)} #feed .e{color:#ffb3a8}
 @keyframes fadeout{0%,80%{opacity:1}100%{opacity:0}}
 #toast{bottom:calc(max(10px,env(safe-area-inset-bottom)) + 52px);left:max(10px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:4px}
@@ -1203,6 +1204,7 @@ function sfx(name, v, opts = {}) {
 }
 // som posicional: fonte à direita do jogador toca mais no fone/alto-falante direito
 const panOf = p => (p && player ? clamp((p.x - player.pos.x) / 14, -0.8, 0.8) : 0);
+const SND_GAIN = { m4: 5 };   // m4.mp3 foi gravado ~16 dB mais baixo que os outros tiros
 const WSND = { ak: 'ak', m4: 'm4', awp: 'awp', deagle: 'deagle', pistol: 'pistola' };
 function initAudio() {
   if (actx) return;
@@ -1236,7 +1238,7 @@ function tone(f0, f1, dur, vol, type = 'sine') {
 const vol = d => clamp(1 - d / 50, 0, 1);
 const pings = [];
 function addPing(x, z, kind) { pings.push({ x, z, kind, t: kind === 'shot' ? 1.4 : 0.7 }); if (pings.length > 40) pings.shift(); }
-function shotSound(w, d, id, pos) { if (!actx) return; const v = vol(d); if (sfx(WSND[id], 0.85 * v, { muffle: lerp(1200, 20000, v * v), dur: id === 'awp' ? 2 : 1.1, pan: panOf(pos) })) return; if (v <= 0.02) return; noise(w.scope ? 0.4 : 0.16, w.snd[2] * v, 'lowpass', lerp(700, w.snd[0], v)); tone(w.snd[1], 40, w.scope ? 0.25 : 0.12, 0.45 * v); }
+function shotSound(w, d, id, pos) { if (!actx) return; const v = vol(d); if (sfx(WSND[id], 0.85 * v * (SND_GAIN[id] || 1), { muffle: lerp(1200, 20000, v * v), dur: id === 'awp' ? 2 : 1.1, pan: panOf(pos) })) return; if (v <= 0.02) return; noise(w.scope ? 0.4 : 0.16, w.snd[2] * v, 'lowpass', lerp(700, w.snd[0], v)); tone(w.snd[1], 40, w.scope ? 0.25 : 0.12, 0.45 * v); }
 function blip(freq, dur = 0.05, v = 0.15) { if (actx) tone(freq, freq, dur, v, 'square'); }
 function whoosh(d, knife, pos) { if (knife && sfx('faca', 0.7 * clamp(1 - d / 20, 0, 1), { dur: 0.6, pan: panOf(pos) })) return; if (actx) noise(0.12, 0.25 * clamp(1 - d / 20, 0, 1), 'highpass', 2500); }
 function bang(d, deafen, pos) {
@@ -1472,7 +1474,12 @@ class Soldier {
     if (this.turret) { const T = this.turret; if (T.cool > 0) return false; ang = T.ang + clamp(angDiff(T.ang, ang), -1.1, 1.1); }
     this.facing = ang; this.m.root.rotation.y = ang;
     if (w.kind === 'melee') return this.stab(ang, enemies);
-    if (this.mag <= 0) { this.startReload(); if (!this.isBot && this.reserve <= 0 && !sfx('seco', 0.5, { dur: 0.3 })) blip(180, 0.04, 0.06); return false; }
+    if (this.mag <= 0) {
+      this.startReload();
+      // sem munição: clique seco baixo e no máximo 1× a cada 0,5 s (antes repetia a cada quadro)
+      if (!this.isBot && this.reserve <= 0 && now - (this.dryAt ?? -9) > 0.5) { this.dryAt = now; if (!sfx('seco', 0.16, { dur: 0.25 })) blip(180, 0.04, 0.025); }
+      return false;
+    }
     this.fireCd = w.rate; this.lastShot = now;
     if (this.turret) { const T = this.turret; T.heat += 0.05; if (T.heat >= 1) { T.cool = 4; if (this === player) toast('Metralhadora superaqueceu!'); } }
     else this.mag--;
@@ -1680,7 +1687,7 @@ function feed(by, t) {
   d.innerHTML = by === t ? `${n(t)} ▸ ${t.deathBy || 'se matou'}` : `${n(by)} ▸ ${by.lastKillWith || by.w.name} ▸ ${n(t)}`; t.deathBy = null;
   by.lastKillWith = null;
   $('#feed').prepend(d); setTimeout(() => d.remove(), 4000);
-  while ($('#feed').children.length > 4) $('#feed').lastChild.remove();
+  while ($('#feed').children.length > 3) $('#feed').lastChild.remove();
 }
 function toast(msg) { const d = document.createElement('div'); d.className = 'panel'; d.textContent = msg; $('#toast').prepend(d); setTimeout(() => d.remove(), 2500); }
 let centerTimer = 0;
@@ -2387,7 +2394,7 @@ const aimGeo = new THREE.PlaneGeometry(0.14, 1); aimGeo.rotateX(-Math.PI / 2); a
 const aimTex = (() => { const c = document.createElement('canvas'); c.width = 4; c.height = 128; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 128);
   gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.6, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 4, 128); return new THREE.CanvasTexture(c); })();
 const aimLine = new THREE.Mesh(aimGeo, new THREE.MeshBasicMaterial({ map: aimTex, color: 0xffffff, transparent: true, opacity: 0.6, depthTest: false, depthWrite: false, fog: false }));
-aimLine.renderOrder = 10; aimLine.visible = false; scene.add(aimLine);
+aimLine.material.opacity = 0.85; aimLine.renderOrder = 10; aimLine.visible = false; scene.add(aimLine);
 const ringGeo = new THREE.RingGeometry(0.55, 0.75, 32); ringGeo.rotateX(-Math.PI / 2);
 const nadeRing = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6, depthTest: false, depthWrite: false, fog: false }));
 nadeRing.renderOrder = 10; nadeRing.visible = false; scene.add(nadeRing);
@@ -2444,9 +2451,12 @@ function updatePlayer(dt) {
       const ox = t.pos.x - p.pos.x, oz = t.pos.z - p.pos.z, pr = ox * fx + oz * fz;
       if (pr > 0 && pr < h && ox * ox + oz * oz - pr * pr < HIT_R * HIT_R) h = Math.max(0.5, pr - HIT_R);
     }
-    aimLine.position.set(p.pos.x, p.y + 0.06, p.pos.z); aimLine.rotation.y = p.facing; aimLine.scale.z = h;
-    aimLine.scale.x = p.w.scope ? 0.5 : 1;
-    aimLine.material.color.set(p.w.scope ? 0xff3b30 : firing ? 0xffa060 : 0xffffff);
+    // laser: sai do cano da arma, na altura dela
+    const mz = p.w.kind === 'gun' && p.m.guns[p.weapon] ? p.muzzlePos() : eye(p, SHOT_H);
+    const fwd = (mz.x - p.pos.x) * fx + (mz.z - p.pos.z) * fz;
+    aimLine.position.set(mz.x, mz.y, mz.z); aimLine.rotation.y = p.facing; aimLine.scale.z = Math.max(0.2, h - fwd);
+    aimLine.scale.x = 0.25;
+    aimLine.material.color.set(p.w.scope ? 0xff2a1f : firing ? 0xff7a50 : 0xff4a3a);
   }
   nadeRing.visible = nadeT.id !== null && p.alive && p.nades[p.nadeSel] > 0;
   if (nadeRing.visible) { const [tx, tz] = nadeTarget(); nadeRing.position.set(tx, groundAt(tx, tz, p.y + 1) + 0.08, tz); }
@@ -2460,7 +2470,7 @@ function updateCamera(dt) {
   const kc = killCamTarget(), f = kc || player;
   camTarget.lerp(new V3(f.pos.x, f.air ? f.y - 2 : f.y, f.pos.z), Math.min(1, dt * (kc ? 4 : 8)));
   camZoom = lerp(camZoom, player.air === 'plane' ? 1.5 : player.air ? 1.35 : player.veh ? 1.25 + Math.abs(player.veh.v) / 60 : player.alive && player.w.scope ? 1.4 : player.alive && player.attOn.mira ? 1.15 : player.turret ? 1.2 : 1, Math.min(1, dt * 3));
-  camera.position.copy(camTarget).addScaledVector(CAM_OFF, camScale * camZoom); camera.position.z += 1.8 * camScale * camZoom;
+  camera.position.copy(camTarget).addScaledVector(CAM_OFF, camScale * camZoom); camera.position.y += 0.9;   // mira no meio do corpo: jogador no centro da tela
   if (shakeT > 0) { shakeT -= dt; camera.position.x += rand(-1, 1) * shakeT * 1.2; camera.position.z += rand(-1, 1) * shakeT * 1.2; }
   sun.position.copy(camTarget).add(SUN_OFF); sun.target.position.copy(camTarget);
   lantern.position.set(player.pos.x, player.y + 3, player.pos.z);
