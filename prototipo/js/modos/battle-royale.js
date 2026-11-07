@@ -15,9 +15,16 @@ const zone = { x: 0, z: 0, r: MAP * 1.47, r0: MAP * 1.47, r1: 6, t: 0, dur: BR_S
 const zoneMesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 40, 64, 1, true), new THREE.MeshBasicMaterial({ color: 0x4aa3ff, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }));
 zoneMesh.visible = false; scene.add(zoneMesh);
 let planeSnd = null;
+// som do avião: tenta de novo a cada quadro (no 1º clique o áudio ainda está carregando)
+function startPlaneSnd() {
+  if (planeSnd || !actx || !SFX.aviao) return;
+  if (actx.state === 'suspended') actx.resume();
+  planeSnd = actx.createBufferSource(); planeSnd.buffer = SFX.aviao; planeSnd.loop = true;
+  const g = actx.createGain(); g.gain.value = 0.5; planeSnd.connect(g).connect(masterOut); planeSnd.start();
+}
 function startBR() {
   planeSnd?.stop(); planeSnd = null;
-  if (actx && SFX.aviao) { planeSnd = actx.createBufferSource(); planeSnd.buffer = SFX.aviao; planeSnd.loop = true; const g = actx.createGain(); g.gain.value = 0.35; planeSnd.connect(g).connect(masterOut); planeSnd.start(); }
+  startPlaneSnd();
   const a = rand(0, Math.PI * 2), d = new V3(Math.cos(a), 0, Math.sin(a));
   plane.dir.copy(d); const P = MAP * 1.2; plane.pos.set(-d.x * P, PLANE_Y, -d.z * P + rand(-15, 15)); plane.len = P * 2; plane.t = 0; plane.active = true;
   plane.mesh.visible = true; plane.mesh.rotation.y = Math.atan2(d.x, d.z);
@@ -53,6 +60,7 @@ function jumpOut(s) {
 function updatePlane(dt) {
   if (!plane.active) return;
   plane.t += dt * 13; plane.pos.addScaledVector(plane.dir, dt * 13); plane.mesh.position.copy(plane.pos);
+  if (player?.air === 'plane') startPlaneSnd();
   for (const s of soldiers) if (s.air === 'plane') { s.pos.set(plane.pos.x, 0, plane.pos.z); s.y = PLANE_Y; }
   if (plane.t >= plane.len) { plane.active = false; plane.mesh.visible = false; for (const s of soldiers) jumpOut(s); }
   // pontos do jogador fora do mapa ficam presos dentro dos limites

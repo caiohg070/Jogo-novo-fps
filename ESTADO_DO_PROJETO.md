@@ -328,3 +328,9 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - Onde tocam: porta (`portas.js`), queda/paraquedas (`physics` em `soldados.js`), escada (`loot.js`), dano/morte (`estado.js`), zunido quando bala inimiga passa a 0,35–2,2 m da cabeça e cápsulas caindo depois do tiro (`soldados.js`, só som — lógica do tiro igual), quique (`granadas.js`), metralhadora fixa (`useTurret`), bandeira (`bandeira.js`), vitória/derrota (`showBoard` em `loop.js`), clique em botões do menu (`menu.js`). Contínuos a cada quadro (`loopSounds` em `loop.js`): drone no ar e chiado da tirolesa. Motor do veículo ganhou ronco grave (`engineStart` em `veiculos.js`).
 - Funções novas em `js/base/efeitos-som.js`: `sfxAt` (som num ponto: distância/abafado/lado), `loopSet`, `zipSound`, `shellSound`, `updateMusic` (música só com o menu aberto, some devagar ao jogar), `endJingle`, `uiClick`. Configurações: novo controle **Música do menu** (`cfg.mus`, `CFG_PADRAO`).
 - Teste (sem desenhar a tela, tempo acelerado): 35 sons carregam; música toca no menu e vai a 0 na partida; descendo a escada o ângulo fica igual ao da subida (de frente); faca no vazio = 0 marcas; zunido toca com bala a 0,4–1,2 m e não a ~4,5 m; Mata-mata 120 s sem erros. Menu conferido em tela de PC e de celular deitado.
+
+## Som do avião e sons de dano
+- **Avião sem som:** no 1º clique em JOGAR o áudio ainda estava carregando e o som do avião era pulado. Agora `startPlaneSnd()` (`js/modos/battle-royale.js`) tenta de novo a cada quadro enquanto o jogador está no avião (volume 0,5).
+- **Acerto (`sons/acerto.mp3`):** trocado por um "tic" curto e baixo do ElevenLabs (0,16 s); volume 0,35 e no máximo 1 a cada 0,07 s.
+- **Levar dano (`sons/dano.mp3`):** o gemido virou um baque abafado do ElevenLabs (0,28 s); volume 0,3, no máximo 1 por segundo (`js/jogo/estado.js`).
+- **Morte:** o gemido antigo foi guardado como `sons/morte.mp3`, tocado mais baixo (0,35 jogador / 0,25 outros).
