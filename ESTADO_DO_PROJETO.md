@@ -21,6 +21,7 @@
 | Manual do protótipo (controles, modos) | `prototipo/README.md` |
 | Página raiz para GitHub Pages (redireciona p/ `prototipo/`) | `index.html` + `.nojekyll` |
 | Jogo publicado (para testar no celular) | https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC |
+| **Jogo no GitHub Pages (link principal do usuário)** | https://caiohg070.github.io/Jogo-novo-fps/ (servido da branch `claude/save-game-files-repo-rdk6pf`) |
 | Sons no ElevenLabs | flow "Jogo tático - efeitos sonoros" (id `HB0RnWHvUUjmllWHYXRE`) |
 | Branch de trabalho | **`claude/game-fixes-republish-8n23ze`** (mais nova, 4º chat; baseada na `claude/game-expansion-ideas-2n8tnt`). Não existe `main` |
 
@@ -29,9 +30,11 @@
 **Como publicar o artifact de novo:** o artifact não aceita `<html>/<head>/<body>` nem arquivos externos;
 o script usado gera uma cópia sem essas tags e troca `<script src="sons/sons.js">` pelo conteúdo inline de `sons.js`.
 
-**GitHub Pages (ainda não ativado pelo usuário):** Settings → Pages → Deploy from a branch →
-`claude/save-game-files-repo-rdk6pf` / root → Save. Endereço: `https://caiohg070.github.io/jogo-novo-fps/`.
-Precisa estar logado no GitHub no Chrome (repo privado dá 404) e Pages grátis só em repositório público.
+**GitHub Pages (ATIVO):** https://caiohg070.github.io/Jogo-novo-fps/ — publicado da branch `claude/save-game-files-repo-rdk6pf` (raiz).
+⚠️ **REGRA DO USUÁRIO:** a cada atualização, além do push na branch de trabalho e de republicar o artifact, fazer push
+da mesma versão para `claude/save-game-files-repo-rdk6pf` (`git push origin HEAD:claude/save-game-files-repo-rdk6pf`,
+só avanço/fast-forward) para o site atualizar, e **sempre mostrar o link** https://caiohg070.github.io/Jogo-novo-fps/ na resposta.
+O site leva ~1–2 min para atualizar depois do push.
 
 ---
 
@@ -190,7 +193,7 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 **Pendências pequenas no protótipo**
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
 - [ ] Som da chuva tem só 2 s (repete); gerar um mais longo se incomodar.
-- [ ] Usuário ainda não ativou o GitHub Pages (ver seção 1).
+- [x] GitHub Pages ativo (ver seção 1).
 - [x] ~~Bots sem navegação de verdade~~ → A\* feito no 2º chat.
 - [ ] Investigar bots presos em "engage" sem inimigo (ver aviso acima).
 - [x] Artifact republicado e README atualizado (4º chat).
