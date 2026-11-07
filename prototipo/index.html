@@ -121,17 +121,19 @@
   </div>
 </div>
 
-<script src="sons/sons.js"></script>
+<script>document.write('<script src="sons/sons.js?v=' + Date.now() + '"><\/script>');</script>
 <script type="importmap">
 { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
 </script>
-<script src="js/arquivos.js"></script>
 <script type="module">
 // carrega o Three.js e depois os arquivos do jogo, na ordem de js/arquivos.js
+// ?v=... evita que o navegador use arquivos antigos guardados (cache) depois de uma atualização
 import * as THREE from 'three';
 window.THREE = THREE;
+const V = Date.now();
+await new Promise((ok, erro) => { const s = document.createElement('script'); s.src = 'js/arquivos.js?v=' + V; s.onload = ok; s.onerror = () => erro(new Error('falhou ao carregar js/arquivos.js')); document.body.appendChild(s); });
 for (const f of window.ARQUIVOS) {
-  await new Promise((ok, erro) => { const s = document.createElement('script'); s.src = f; s.onload = ok; s.onerror = () => erro(new Error('falhou ao carregar ' + f)); document.body.appendChild(s); });
+  await new Promise((ok, erro) => { const s = document.createElement('script'); s.src = f + '?v=' + V; s.onload = ok; s.onerror = () => erro(new Error('falhou ao carregar ' + f)); document.body.appendChild(s); });
 }
 </script>
 </body>
