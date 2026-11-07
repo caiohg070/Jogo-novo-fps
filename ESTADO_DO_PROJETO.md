@@ -28,7 +28,9 @@
 **Como abrir localmente:** abrir `prototipo/index.html` no Chrome (precisa de internet para baixar o Three.js da CDN).
 
 **Como publicar o artifact de novo:** o artifact não aceita `<html>/<head>/<body>` nem arquivos externos;
-o script usado gera uma cópia sem essas tags e troca `<script src="sons/sons.js">` pelo conteúdo inline de `sons.js`.
+rodar `python3 ferramentas/montar_artifact.py /caminho/jogo.html` (junta index.html + css + js + sons num arquivo só, sem essas tags) e publicar o resultado.
+
+**Código separado em arquivos (5º chat):** `prototipo/index.html` só tem o HTML; estilo em `css/`, código em `js/` (mapa, personagens, inimigos, itens, modos, jogo). Mapa de onde está cada coisa: `prototipo/ESTRUTURA.md`. Ordem de carregamento: `prototipo/js/arquivos.js`.
 
 **GitHub Pages (ATIVO):** https://caiohg070.github.io/Jogo-novo-fps/ — publicado da branch `claude/save-game-files-repo-rdk6pf` (raiz).
 ⚠️ **REGRA DO USUÁRIO:** a cada atualização, além do push na branch de trabalho e de republicar o artifact, fazer push

@@ -6,6 +6,9 @@ Protótipo jogável do `novojogo.md`. Sem assets pagos: modelos, cores e sons s�
 Abra `index.html` no navegador (precisa de internet para baixar o Three.js).
 Na tela inicial escolha **modo**, **classe** e **clima**.
 
+## Arquivos
+O código está separado por assunto (mapa, personagens, inimigos, modos...). Veja `ESTRUTURA.md`.
+
 ## Modos
 - **Treino:** você contra 2 bots.
 - **Mata-mata (3 vs 3):** você + 2 aliados (CT e médico) contra 3 inimigos; primeiro time a 20 abates vence.
