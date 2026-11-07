@@ -1311,18 +1311,39 @@ function boom(d, pos) { if (!actx) return; const v = clamp(1 - d / 70, 0.1, 1); 
 // sons sintetizados que faltavam (sem gastar créditos): bala no concreto/ricochete, pino da granada, alicate do desarme
 // pequena destruição: marca de tiro (buraco escuro) + lascas da cor da parede; some quando a parede some
 const chips = [], chipGeo = new THREE.BoxGeometry(1, 1, 1);
-function clearChips() { for (const c of chips) c.parent?.remove(c); chips.length = 0; }
+const debris = [], CHIP_LIFE = 8;   // marcas e lascas duram ~8 s e somem aos poucos
+function clearChips() { for (const c of chips) c.parent?.remove(c); chips.length = 0; for (const d of debris) scene.remove(d.m); debris.length = 0; }
+function updateChips(dt) {
+  for (let i = chips.length - 1; i >= 0; i--) if (now - chips[i].userData.t > CHIP_LIFE) { chips[i].parent?.remove(chips[i]); chips.splice(i, 1); }
+  for (let i = debris.length - 1; i >= 0; i--) {
+    const d = debris[i], age = now - d.t, m = d.m;
+    if (age > CHIP_LIFE) { scene.remove(m); debris.splice(i, 1); continue; }
+    if (!d.rest) {
+      d.v.y -= 12 * dt; m.position.addScaledVector(d.v, dt); m.rotation.x += d.spin * dt; m.rotation.z += d.spin * dt;
+      const gy = groundAt(m.position.x, m.position.z, m.position.y + 0.3) + 0.02;
+      if (m.position.y <= gy) { m.position.y = gy; d.rest = true; }
+    }
+    m.material.opacity = clamp((CHIP_LIFE - age) / 1.5, 0, 1);
+  }
+}
 function wallChip(hit) {
   if (!hit || !hit.face) return;
   const m = hit.object; if (m.userData.veh || !m.parent || m.geometry !== boxGeo) return;
   const n = hit.face.normal, col = m.material.color;
-  for (let i = 0; i < 4; i++) spawnPart(hit.point.clone().addScaledVector(n.clone().transformDirection(m.matrixWorld), 0.05), col.getHex(), rand(0.06, 0.13), rand(0.4, 0.8), new V3(rand(-1.2, 1.2), rand(0.6, 2), rand(-1.2, 1.2)), false, 0, 9);
+  const wn = n.clone().transformDirection(m.matrixWorld);
+  for (let i = 0; i < 4; i++) {                                    // lascas: caem e ficam no chão por ~8 s
+    const dm = new THREE.Mesh(chipGeo, new THREE.MeshStandardMaterial({ color: col.getHex(), roughness: 0.9, transparent: true }));
+    const k = rand(0.08, 0.15); dm.scale.set(k, k * rand(0.4, 0.8), k); dm.position.copy(hit.point).addScaledVector(wn, 0.06); scene.add(dm);
+    debris.push({ m: dm, t: now, rest: false, spin: rand(-8, 8), v: wn.clone().multiplyScalar(rand(1, 2.5)).add(new V3(rand(-0.8, 0.8), rand(0.5, 2), rand(-0.8, 0.8))) });
+  }
+  if (debris.length > 300) scene.remove(debris.shift().m);
   const mat = new THREE.MeshBasicMaterial({ color: 0x2a221b, transparent: true, opacity: 0.8, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
   const c = new THREE.Mesh(chipGeo, mat), sz = rand(0.09, 0.15), sc = m.scale;
   const local = m.worldToLocal(hit.point.clone()); local.addScaledVector(n, 0.004 / Math.max(Math.abs(n.x) * sc.x, Math.abs(n.y) * sc.y, Math.abs(n.z) * sc.z));
   c.position.copy(local);
   c.scale.set((Math.abs(n.x) > 0.5 ? 0.01 : sz) / sc.x, (Math.abs(n.y) > 0.5 ? 0.01 : sz) / sc.y, (Math.abs(n.z) > 0.5 ? 0.01 : sz) / sc.z);
-  c.onBeforeRender = () => { mat.opacity = 0.8 * (m.material.transparent ? m.material.opacity : 1); };
+  c.userData.t = now;
+  c.onBeforeRender = () => { mat.opacity = 0.8 * clamp((CHIP_LIFE - (now - c.userData.t)) / 1.5, 0, 1) * (m.material.transparent ? m.material.opacity : 1); };
   m.add(c); chips.push(c);
   if (chips.length > 220) { const o = chips.shift(); o.parent?.remove(o); }
 }
@@ -3143,6 +3164,7 @@ function frame() {
     updatePlayer(dt);
     if (!roundOver && !(tut && tut.step < TUT.length - 1)) for (const b of bots) updateBot(b, dt);
     if (tut) updateTut();
+    updateChips(dt);
     updateVehicles(dt); updateTurrets(dt);
     separate();
     for (const s of soldiers) {

@@ -206,7 +206,7 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 - **Tutorial:** opção TUTORIAL nos modos (roda no treino): 6 passos (`TUT`, `updateTut()`), bots parados e imortais até o último passo.
 - **Vidro que quebra:** `windowWall()` cria vidro (`glasses`), quebra com tiro (`glassAlong`) ou explosão; volta a cada partida (`resetGlass`).
   Não bloqueia visão nem tiro.
-- **Pequena destruição nas paredes:** cada tiro deixa marca escura + lascas da cor da parede (`wallChip`, até 220 marcas; somem em `clearChips`).
+- **Pequena destruição nas paredes:** cada tiro deixa marca escura + lascas da cor da parede (`wallChip`). Marcas e lascas (que caem e ficam no chão) duram `CHIP_LIFE = 8` s e somem aos poucos (`updateChips`).
 
 **➡️ PRÓXIMO CHAT:** nenhum pedido pendente do usuário.
 
