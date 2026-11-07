@@ -1223,7 +1223,7 @@ function updateBot(b, dt) {
   if (blind) {
     mx = Math.sin(ai.blindDir); mz = Math.cos(ai.blindDir); speed = 1.6;
     if (Math.random() < dt * 1.5) ai.blindDir += rand(-1.5, 1.5);
-  } else if (ai.state === 'engage' && t) {
+  } else if (ai.state === 'engage' && t && !mustDefuse(b)) {
     const d = Math.hypot(t.pos.x - b.pos.x, t.pos.z - b.pos.z);
     const ang = Math.atan2(t.pos.x - b.pos.x, t.pos.z - b.pos.z), dx = Math.sin(ang), dz = Math.cos(ang);
     b.facing = ang;
@@ -1249,7 +1249,7 @@ function updateBot(b, dt) {
       if (type) throwNade(b, type, t.pos.x + rand(-1.5, 1.5), t.pos.z + rand(-1.5, 1.5));
     }
     if (b.hp < 35 && b.nades.smoke > 0 && Math.random() < dt) throwNade(b, 'smoke', b.pos.x + dx * 3, b.pos.z + dz * 3);
-  } else if (ai.state === 'search') {
+  } else if (ai.state === 'search' && !mustDefuse(b)) {
     ai.searchT -= dt;
     const dx = ai.last.x - b.pos.x, dz = ai.last.z - b.pos.z, l = Math.hypot(dx, dz);
     if (l < 1.2 || ai.searchT <= 0) { ai.state = 'patrol'; ai.wp = nearestWP(b.pos); }
@@ -1721,6 +1721,7 @@ function bombExplode() {
   bombMesh.visible = false;
   endBombRound('A', 'a bomba explodiu');
 }
+const mustDefuse = b => mode === 'bomb' && b.team === 'B' && bombS.planted && !roundOver;
 function objectiveFor(b) {
   if (mode !== 'bomb' || roundOver) return null;
   if (b.team === 'A') {

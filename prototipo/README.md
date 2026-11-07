@@ -9,7 +9,11 @@ Na tela inicial escolha **modo**, **classe** e **clima**.
 ## Modos
 - **Treino:** você contra 2 bots.
 - **Mata-mata (3 vs 3):** você + 2 aliados (CT e médico) contra 3 inimigos; primeiro time a 20 abates vence.
-- Battle Royale e Bomba: em breve.
+- **Battle Royale:** 8 jogadores (todos contra todos). Todos começam no avião; toque SALTAR quando quiser e
+  guie o paraquedas com o joystick. Começa só com pistola e faca — armas e colete nos baús. A zona azul fecha;
+  fora dela você perde vida. Último vivo vence.
+- **Bomba:** 3 vs 3 por rodadas (sem renascer). Você leva a bomba: plante no **A** (barracão) ou **B** (oeste)
+  ficando parado 3 s; ela explode em 35 s. Os CTs tentam desarmar (5 s). Primeiro a 5 rodadas vence.
 
 ## Classes
 | Classe | Primária | Secundária | Granadas | Extra |
@@ -20,7 +24,7 @@ Na tela inicial escolha **modo**, **classe** e **clima**.
 | Sniper | AWP | Desert Eagle | flash + smoke | — |
 
 ## Armas
-AK-47, Colt M4, AWP (1 tiro mata sem colete; com colete + capacete precisa de 2), Desert Eagle, pistola, faca.
+AK-47, Colt M4, AWP (segure para mirar, solte para atirar; 1 tiro mata sem colete; com colete + capacete precisa de 2), Desert Eagle, pistola, faca.
 Granadas: HE (explode, dano em área), flash (cega quem olha), smoke (bloqueia a visão dos bots).
 
 ## Loot
@@ -37,5 +41,5 @@ Dia, chuva (chão molhado, poças) e noite com chuva (postes acesos).
 - **PC:** WASD, mouse mira, clique atira, 1/2/3 armas, 4 troca granada, G joga, E cura, R recarrega, roda troca arma.
 
 ## Ainda falta (próximas etapas)
-Battle Royale (avião/paraquedas), modo bomba, áreas subterrâneas, casas de 3 andares,
+áreas subterrâneas, casas de 3 andares,
 modelos 3D melhores dos personagens, sons reais (ElevenLabs) e imagens (Higgsfield/Magnific).
