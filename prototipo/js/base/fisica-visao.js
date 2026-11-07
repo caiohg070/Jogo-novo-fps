@@ -140,17 +140,27 @@ const straightOpen = (o, t) => [SHOT_H + 0.1, 1.35, 1.6, 0.7].some(hh => { const
 // terraço: quem está a até 3 m da casa (do lado de fora, no chão) fica protegido pela mureta — o tiro de cima bate nela
 const houseGap = t => Math.hypot(Math.max(HOUSE.x0 - t.pos.x, 0, t.pos.x - HOUSE.x1), Math.max(HOUSE.z0 - t.pos.z, 0, t.pos.z - HOUSE.z1));
 const roofCut = (a, t) => onTerrace(a) && houseGap(t) > 0 && houseGap(t) < 3 && t.y < H1 - 1;
+// barracão: mesma regra da mureta (quem está no telhado não acerta quem está no chão a até 3 m do barracão, e vice-versa)
+const BARN_TOP = () => BARN_Y + 3.52;
+const onBarnRoof = t => t.y > BARN_TOP() - 0.3 && t.pos.x > BARN.x0 && t.pos.x < BARN.x1 && t.pos.z > BARN.z0 && t.pos.z < BARN.z1;
+const barnGap = t => Math.hypot(Math.max(BARN.x0 - t.pos.x, 0, t.pos.x - BARN.x1), Math.max(BARN.z0 - t.pos.z, 0, t.pos.z - BARN.z1));
+const barnCut = (a, t) => onBarnRoof(a) && barnGap(t) > 0 && barnGap(t) < 3 && t.y < BARN_TOP() - 1;
 // vale nos dois sentidos: quem está embaixo, rente à casa, também não acerta quem está no terraço
 // escada: encostada na parede leste; quem está fora da casa, no chão, não acerta quem está nela (e vice-versa).
 // antes o último trecho do tiro corria na altura do peito de quem estava no alto da escada e passava por cima da parede
 const inStairwell = t => t.pos.x > 3.2 && t.pos.x < 5.9 && t.pos.z > -12.8 && t.pos.z < -6.3 && t.y > H0 + 0.2 && t.y < H1 + 0.3;   // escada inclusive o último degrau
 const stairCut = (a, t) => inStairwell(a) && houseGap(t) > 0 && t.y < H1 - 1;
-const roofBlocked = (a, t) => roofCut(a, t) || roofCut(t, a) || stairCut(a, t) || stairCut(t, a);
+const roofBlocked = (a, t) => roofCut(a, t) || roofCut(t, a) || barnCut(a, t) || barnCut(t, a) || stairCut(a, t) || stairCut(t, a);
 // ponto da mureta onde a bala bate (borda da casa na direção do alvo)
 function parapetPoint(o, t) {
   if (inStairwell(t) || o.x < HOUSE.x1 && o.y > H0 + 1.4 && o.y < H1 + 1.2 && o.x > 3.2) {   // escada: bate na parede leste, na altura de quem atira
     const dx = t.pos.x - o.x, k = Math.abs(dx) > 0.01 ? clamp((HOUSE.x1 - o.x) / dx, 0, 1) : 0;
     return new V3(o.x + dx * k, o.y, o.z + (t.pos.z - o.z) * k);
+  }
+  if (onBarnRoof(t) || onBarnRoof({ pos: o, y: o.y - SHOT_H })) {   // barracão: bate na borda do telhado, entre os dois
+    const up = onBarnRoof(t) ? t.pos : o, dn = onBarnRoof(t) ? o : t.pos, dx = dn.x - up.x, dz = dn.z - up.z, L = Math.hypot(dx, dz) || 1; let k = 0;
+    while (k < L && up.x + dx * k / L > BARN.x0 && up.x + dx * k / L < BARN.x1 && up.z + dz * k / L > BARN.z0 && up.z + dz * k / L < BARN.z1) k += 0.05;
+    return new V3(up.x + dx * k / L, BARN_TOP() + 0.3, up.z + dz * k / L);
   }
   if (onTerrace(t)) { const q = new V3(t.pos.x, H1 + 0.45, t.pos.z), d = new V3().subVectors(o, q); d.y = 0; d.normalize();   // de baixo: bate na mureta do lado de quem atira
     for (let k = 0; k < 20; k += 0.05) { const x = q.x + d.x * k, z = q.z + d.z * k; if (x <= HOUSE.x0 || x >= HOUSE.x1 || z <= HOUSE.z0 || z >= HOUSE.z1) return new V3(x, H1 + 0.3, z); } }

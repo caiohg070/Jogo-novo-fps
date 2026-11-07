@@ -54,6 +54,10 @@ const barnRoof = []; let ladderZ = null;
   for (let i = 1; i < 10; i++) barnRoof.push(box(x0 + i * 2 - 0.05, x0 + i * 2 + 0.05, z0, z1, top, top + 0.04, 0x5c5f58, { collide: false, solid: false, cast: false }));
   surfaces.push({ x0, x1, z0, z1, h: () => top });
   const LZ0 = -34.6, LZ1 = -33.8, LX = x1 + 0.12;
+  // mureta de 0,6 m em volta do telhado (igual à do terraço da casa), com abertura na escada de mão
+  const PT = 0.25, p1 = top + 0.6, PC = 0x6a6d66, pw = (a, b, c, d) => barnRoof.push(box(a, b, c, d, top, p1, PC, { rough: 0.55, metal: 0.35 }));
+  pw(x0, x1, z0, z0 + PT); pw(x0, x1, z1 - PT, z1); pw(x0, x0 + PT, z0 + PT, z1 - PT);
+  pw(x1 - PT, x1, z0 + PT, LZ0 - 0.5); pw(x1 - PT, x1, LZ1 + 0.5, z1 - PT);
   // escada de mão em pé, encostada na parede leste: sobe/desce pelo botão de ação (SUBIR/DESCER ESCADA)
   const LZ = (LZ0 + LZ1) / 2, la = { x: x1 + 0.75, z: LZ, y: BARN_Y }, lb = { x: x1 - 0.9, z: LZ, y: top };
   ladderZ = { a: la, b: lb, ladder: true, time: 1.6, cable: t => t < 0.1 ? new V3(lerp(la.x, x1 + 0.42, t / 0.1), BARN_Y + 1.95, LZ)

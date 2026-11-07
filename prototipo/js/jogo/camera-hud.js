@@ -38,7 +38,8 @@ function updateWalls() {
   const ghostUp = inside || behind;
   for (const m of upper) {
     m.castShadow = !ghostUp;
-    if (ghostUp) { m.material.transparent = true; m.material.opacity = 0.15; m.material.depthWrite = false; }
+    if (ghostUp) { if (!m.material.transparent) { m.material.transparent = true; m.material.needsUpdate = true; }   // sem needsUpdate o material desenhado antes como sólido continuava sólido
+      m.material.opacity = 0.15; m.material.depthWrite = false; }
     else if (m.material.opacity < 1) { m.material.opacity = 1; m.material.depthWrite = true; }
   }
   if (behind || behindBarn) for (const m of fadeables) {

@@ -306,10 +306,16 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 ## Terraço: mureta protege quem está a até 3 m da casa
 - `roofBlocked`/`parapetPoint` em `js/base/fisica-visao.js` (usado em `shootRay` de `soldados.js` e em `canShoot`): quem está no terraço não acerta quem está no chão, fora da casa, a menos de 3 m da parede — a bala bate na mureta. Vale nos dois sentidos (quem está embaixo rente à casa também não acerta quem está no terraço). A partir de 3 m, tudo igual a antes.
 - Teste: terraço → alvo a 0,5/1,5/2,9 m: 0 acertos (antes 10/10 a 1,5 e 2,9 m); 3,5 e 6 m: 10/10. Tiro no morro 97% igual. Mata-mata e BR rápidos sem erros.
-- Mureta no barracão: proposta, ainda não feita.
+- Mureta no barracão: feita depois (ver abaixo).
 
 ## Escada: tiro de fora pela parede leste e teto dentro da casa
 - **Teto** (`js/jogo/camera-hud.js`): a laje e as muretas de cima ficam 15% visíveis (20% → 45% tampava a visão; ficou 15%) quando se está dentro/atrás da casa, **inclusive na escada até pisar no terraço** (antes a laje voltava a ficar sólida nos últimos 20% da subida).
 - **Tiro na escada** (`stairCut`/`inStairwell` em `js/base/fisica-visao.js`, dentro de `roofBlocked`): quem está na escada (inclusive o último degrau) e quem está no chão fora da casa não se acertam — a bala bate na parede leste (`parapetPoint`). Causa: o último trecho do tiro "dobrado" corria na altura do peito de quem estava no alto da escada e passava por cima da parede/mureta. Quem está dentro da casa continua acertando quem está na escada.
 - Teste (atiradores em volta da casa sem linha reta até o alvo, alvo em 11 pontos da escada, 3 tiros cada): acertos 82 → 0. De dentro da casa: continua acertando. Partida rápida sem desenhar a tela: sem erros.
 - **Cache do navegador** (`prototipo/index.html`): os arquivos do jogo agora carregam com `?v=<hora>`, então o navegador sempre pega a versão nova depois de uma atualização (antes podia continuar com arquivos antigos guardados). `ferramentas/montar_artifact.py` ajustado para o novo `index.html` (artifact gerado igual).
+
+## Teto que não ficava transparente + mureta no barracão
+- **Causa real do teto sólido** (`js/jogo/camera-hud.js`): a laje começava como material sólido; ao entrar na casa o jogo trocava para transparente mas sem `needsUpdate`, e a placa de vídeo continuava desenhando sólido. Só funcionava se o jogador já começasse dentro da casa (por isso os testes anteriores passavam). Agora, ao trocar, marca `needsUpdate`. Teste começando fora e entrando (celular deitado e em pé): antes teto sólido, agora 15% visível.
+- **Mureta no barracão** (`js/mapa/bunker-barracao.js`): 0,6 m em volta do telhado, com abertura de 1,8 m na escada de mão; some junto com o telhado quando se está dentro/atrás do barracão.
+- **Tiro no barracão** (`barnCut`/`onBarnRoof` em `js/base/fisica-visao.js`, dentro de `roofBlocked`; ponto de impacto em `parapetPoint`): mesma regra da casa — telhado ↔ chão a até 3 m do barracão não se acertam. Teste: 0,5/1,5/2,9 m → 0 acertos (antes 2,9 m acertava 10/10); 3,5 e 6 m → 10/10 igual.
+- Escada da casa continua 0 acertos de fora; partida rápida sem erros.
