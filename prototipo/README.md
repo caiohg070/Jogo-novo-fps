@@ -31,6 +31,18 @@ Granadas: HE (explode, dano em área), flash (cega quem olha), smoke (bloqueia a
 Baús verdes (amarelo no minimapa): chegue perto, toque ABRIR (F no PC), veja o item e toque PEGAR. Itens: colete, capacete, kit médico, munição,
 arma (AK/M4/AWP) ou granada. Reabrem em 30 s. Os bots também pegam.
 
+## Mais recursos
+- **Dificuldade dos bots:** fácil, médio ou difícil (tempo de reação, mira e dano).
+- **Andar devagar:** botão ANDAR (celular) ou Shift (PC). Metade da velocidade, mira mais firme e sem barulho de passos.
+  Correndo, os bots inimigos perto ouvem seus passos.
+- **Minimapa com sons:** tiros inimigos aparecem como círculo vermelho; passos de inimigos perto, como pontinho amarelo.
+- **Economia no modo Bomba:** cada rodada começa só com a pistola; dinheiro por vitória ($3250), derrota ($1900),
+  abate ($300) e plantar ($300). Botão COMPRAR (ou B) nos primeiros 15 s.
+- **Kits médicos:** o baú dá um kit; use no botão KIT (ou E) — leva 2,5 s e cura 45. Atirar cancela.
+- **Caixotes de madeira quebram** com tiros ou granada HE.
+- **Bunker subterrâneo** a leste (rampa do lado leste, teto some quando você entra, baú dentro).
+- **Placar final** com abates, mortes e dano no fim de cada partida (mata-mata, bomba e battle royale).
+
 ## Clima
 Dia, chuva (chão molhado, poças) e noite com chuva (postes acesos).
 
@@ -41,5 +53,5 @@ Dia, chuva (chão molhado, poças) e noite com chuva (postes acesos).
 - **PC:** WASD, mouse mira, clique atira, 1/2/3 armas, 4 troca granada, G joga, E cura, R recarrega, roda troca arma.
 
 ## Ainda falta (próximas etapas)
-áreas subterrâneas, casas de 3 andares,
+casas de 3 andares,
 modelos 3D melhores dos personagens, sons reais (ElevenLabs) e imagens (Higgsfield/Magnific).
