@@ -34,8 +34,8 @@ function cycleNade() {
   for (let k = 1; k <= NADE_ORDER.length; k++) { const n = NADE_ORDER[(i + k) % NADE_ORDER.length]; if (p.nades[n] > 0) { p.nadeSel = n; blip(700, 0.03, 0.05); return; } }
 }
 function throwSelected() {
-  if (usingMouse()) { const m = mouseWorld(); if (m) throwNade(player, player.nadeSel, m.x, m.z); }
-  else throwNade(player, player.nadeSel, player.pos.x + Math.sin(player.facing) * 9, player.pos.z + Math.cos(player.facing) * 9);
+  if (usingMouse()) { const m = mouseWorld(); if (m) { throwNade(player, player.nadeSel, m.x, m.z); if (tut && !tut.done) tut.nadeDrag = true; } }
+  else { throwNade(player, player.nadeSel, player.pos.x + Math.sin(player.facing) * 9, player.pos.z + Math.cos(player.facing) * 9); if (tut && !tut.done) tut.nadeDrag = true; }
 }
 function useSlot(id) {
   if (id === 'nade') { if (usingMouse()) throwSelected(); else cycleNade(); }

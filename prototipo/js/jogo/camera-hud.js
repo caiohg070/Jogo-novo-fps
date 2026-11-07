@@ -24,12 +24,14 @@ function updateWalls() {
   const inBunker = inBK(player.pos.x, player.pos.z) && player.y < BK_TOP - 1;
   for (const m of bunkerRoof) m.visible = !inBunker;
   const inBarn = inBarnS(player);
-  for (const m of barnRoof) m.visible = !inBarn;
+  // atrás do barracão (lado de cima da tela): telhado e paredes tapavam o jogador perto da porta norte
+  const behindBarn = !inBarn && player.pos.x > BARN.x0 - 1.5 && player.pos.x < BARN.x1 + 1.5 && player.pos.z < BARN.z0 + 0.2 && player.pos.z > BARN.z0 - 8 && player.y < BARN_Y + 3;
+  for (const m of barnRoof) m.visible = !inBarn && !behindBarn;
   for (const m of faded) { m.material.opacity = 1; m.material.depthWrite = true; }
   faded.clear();
-  if (behind) for (const m of fadeables) {
-    const q = m.position;
-    if (q.x > HOUSE.x0 - 0.5 && q.x < HOUSE.x1 + 0.5 && q.z > HOUSE.z0 + 0.5 && q.z < HOUSE.z1 + 0.5) { m.material.opacity = 0.22; m.material.depthWrite = false; faded.add(m); }
+  if (behind || behindBarn) for (const m of fadeables) {
+    const q = m.position, A = behind ? HOUSE : BARN;
+    if (q.x > A.x0 - 0.5 && q.x < A.x1 + 0.5 && q.z > A.z0 + 0.5 && q.z < A.z1 + 0.5) { m.material.opacity = 0.22; m.material.depthWrite = false; faded.add(m); }
   }
   const targets = [[player, 1.2], [player, 0.3]];
   for (const s of soldiers) {
@@ -37,7 +39,9 @@ function updateWalls() {
     s.seen = s.alive && !s.air && !player.air && (s.team === player.team || s.revealT > 0 || los(player, s));
     let occl = false;
     if (s.seen) { const c = eye(s, 1.0); occl = firstHit(camera.position, c) < camera.position.distanceTo(c) - 0.5; targets.push([s, 1.0]); }
-    s.ghost.visible = s.seen && occl;
+    // em cima da casa/barracão não mostra a silhueta do inimigo através do telhado/chão (parecia hack); drone continua mostrando
+    const high = player.y - terrainHeight(player.pos.x, player.pos.z) > 1.5;
+    s.ghost.visible = s.seen && occl && (s.team === player.team || s.revealT > 0 || !high);
   }
   const kc = killCamTarget(); if (kc) kc.ghost.visible = true;
   for (const [who, h] of targets) {

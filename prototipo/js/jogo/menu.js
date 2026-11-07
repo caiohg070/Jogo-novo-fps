@@ -38,7 +38,7 @@ const TUT = [
   { t: () => T2('Mire e atire: segure e arraste o botão vermelho', 'Mire com o mouse e segure o clique'), hi: '#aimBtn', key: 'CLIQUE', ok: () => tut.shots >= 3 },
   { t: () => T2('Recarregue: toque em RECAR.', 'Recarregue'), hi: '#reloadBtn', key: 'R', ok: () => player.reloadT > 0 },
   { t: () => T2('Troque de arma: toque numa arma da lista à direita', 'Troque de arma'), hi: '#slots', key: '1 · 2 · 3', ok: () => player.weapon !== tut.w0 },
-  { t: () => T2('Granada: segure o botão da granada, ARRASTE para mirar e solte (só tocar não vale)', 'Jogue uma granada'), hi: '#nadeBtn', key: 'G', ok: () => isTouch ? !!tut.nadeDrag : tut.nadeCount() < tut.n0 },
+  { t: () => T2('Granada: segure o botão da granada, ARRASTE para mirar e solte (só tocar não vale)', 'Jogue uma granada'), hi: '#nadeBtn', key: 'G', nade: true, ok: () => !!tut.nadeDrag },
   { t: () => T2('Siga a seta até o baú e toque em ABRIR BAÚ (botão laranja)', 'Siga a seta até o baú e abra'), hi: '#actBtn', key: 'F', label: 'BAÚ',
     pick: () => nearest(loots.filter(l => !l.drop && l.state === 'closed'), l => l), at: l => new V3(l.x, l.y, l.z), ok: () => tut.acts.has('ABRIR') },
   { t: () => T2('Agora toque em PEGAR para levar o item', 'Agora pegue o item'), hi: '#actBtn', key: 'F', ok: () => tut.acts.has('PEGAR') },
@@ -62,6 +62,7 @@ function updateTut() {
   // acabou a bala: lembra da faca e do baú
   if (player.w.kind === 'gun' && player.mag <= 0 && player.reserve <= 0 && !player.reloadT && !(tut.noAmmoT > now)) { tut.noAmmoT = now + 6; toast(T2('Sem balas! Use a FACA (lista de armas) ou abra um baú para achar munição', 'Sem balas! Aperte 3 para a FACA ou abra um baú para achar munição')); }
   const S = TUT[tut.step];
+  if (S.nade && !(player.nades[player.nadeSel] > 0)) { player.nades[player.nadeSel] = 1; if (!player.nadeSel) player.nadeSel = 'he'; }   // granada infinita até jogar certo
   if (tut.shown !== tut.step) {                                     // entrou num passo novo
     tut.shown = tut.step; tut.acts.clear(); tut.tgt = S.pick ? S.pick() : null;
     for (const e of document.querySelectorAll('.tutHi')) e.classList.remove('tutHi');

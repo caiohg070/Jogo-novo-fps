@@ -76,10 +76,17 @@ function updateFalling(dt) {
 function thud(m) { if (actx) { const v = vol(player.pos.distanceTo(m.position)); tone(110, 55, 0.15, 0.2 * v, 'triangle'); noise(0.12, 0.15 * v, 'lowpass', 600); } }
 // tiro/mira sem alvo acompanha o relevo: sobe nos morros e desce nas partes baixas (em trechos de 1,5 m)
 function groundShot(o, dx, dz, range, shooter) {
+  const STEP = 1.5;
   // a bala acompanha o chão onde a mira passa: sobe o morro, desce do telhado/morro (em qualquer parte do mapa)
-  const base = o.y - shooter.y; let gy = shooter.y;
-  const yAt = (x, z) => { gy = groundAt(x, z, gy + 0.3); return gy + base; };
-  let a = o.clone(), d = 0; const STEP = 1.5, pts = [];   // pts: caminho do tiro (sobe/desce com o morro)
+  // a bala vai em linha reta: se o chão sobe ela sobe junto e continua subindo nessa inclinação (não volta a descer no topo);
+  // se desce (telhado/morro abaixo) continua descendo reto até bater
+  const base = o.y - shooter.y; let gy = shooter.y, y = o.y, s = 0;
+  const yAt = (x, z) => { gy = groundAt(x, z, Math.max(gy, y - base) + 0.3); const want = gy + base, nx = y + s * STEP;
+    if (want > nx + 0.05) { s = Math.max(s, (want - y) / STEP); y = want; }
+    else if (s <= 0 && want < nx - 0.05) { s = Math.min(s, (want - y) / STEP); y = want; }
+    else y = nx;
+    return y; };
+  let a = o.clone(), d = 0, pts = [];   // pts: caminho do tiro (sobe/desce com o morro)
   while (d < range) {
     const n = Math.min(range, d + STEP), x = o.x + dx * n, z = o.z + dz * n, b = new V3(x, yAt(x, z), z);
     const h = firstHit(a, b); if (h < Infinity) { const seg = a.distanceTo(b); return { dist: d + (n - d) * h / seg, end: a.clone().lerp(b, h / seg), pts }; }
