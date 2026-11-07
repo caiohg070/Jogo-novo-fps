@@ -770,6 +770,7 @@ function sfx(name, v, opts = {}) {
 }
 const WSND = { ak: 'ak', m4: 'm4', awp: 'awp', deagle: 'deagle', pistol: 'pistola' };
 function initAudio() {
+  if (actx) return;
   try {
     actx = new (window.AudioContext || window.webkitAudioContext)();
     noiseBuf = actx.createBuffer(1, actx.sampleRate * 1, actx.sampleRate);
@@ -902,7 +903,7 @@ class Soldier {
   switchTo(id) {
     if (!this.alive || id === this.weapon || !this.loadout.includes(id)) return;
     this.weapon = id; this.reloadT = 0; this.fireCd = WEAPONS[id].scope ? 0.6 : 0.3; this.showGear();
-    if (!this.isBot) blip(620, 0.04, 0.06);
+    if (!this.isBot && !sfx('sacar', 0.35, { dur: 0.6 })) blip(620, 0.04, 0.06);
   }
   startReload() {
     if (!this.alive || this.w.kind !== 'gun' || this.reloadT > 0 || this.mag >= this.w.mag || this.reserve <= 0) return;
@@ -933,7 +934,7 @@ class Soldier {
     if (this.alive && this.moving && !this.air && player && (this.sndStep = (this.sndStep || 0) - dt) <= 0) {
       this.sndStep = this.walking ? 0.6 : 0.36;
       const dd = this === player ? 0 : this.pos.distanceTo(player.pos);
-      if (dd < 16) sfx('passo', (this === player ? (this.walking ? 0.08 : 0.2) : 0.3 * (1 - dd / 16)), { dur: 0.4, rate: rand(0.9, 1.1) });
+      if (dd < 16) sfx('passo', (this === player ? (this.walking ? 0.035 : 0.09) : 0.16 * (1 - dd / 16)), { dur: 0.28, rate: rand(0.92, 1.12), muffle: this === player ? 2500 : 1800 });
     }
     if (this.healChan > 0) { this.healChan -= dt; if (this.healChan <= 0) { this.hp = Math.min(MAX_HP, this.hp + 45); if (this === player) toast('+45 vida (kit)'); } }
     if (this.fireCd > 0) this.fireCd -= dt;
@@ -971,7 +972,7 @@ class Soldier {
     const w = this.w, enemies = enemiesOf(this);
     this.facing = ang; this.m.root.rotation.y = ang;
     if (w.kind === 'melee') return this.stab(ang, enemies);
-    if (this.mag <= 0) { this.startReload(); if (!this.isBot && this.reserve <= 0) blip(180, 0.04, 0.06); return false; }
+    if (this.mag <= 0) { this.startReload(); if (!this.isBot && this.reserve <= 0 && !sfx('seco', 0.5, { dur: 0.3 })) blip(180, 0.04, 0.06); return false; }
     this.fireCd = w.rate; this.mag--; this.lastShot = now;
     const spread = (this.moving ? (this.walking ? w.spread * 1.15 : (w.moveSpread ?? w.spread * 1.7)) : w.spread) + extraSpread;
     const a = ang + (Math.random() - 0.5) * 2 * spread;
@@ -1067,7 +1068,7 @@ function damage(t, dmg, from, pen = 0.5) {
   t.hp -= dmg; t.lastHurt = now; from.stats.dmg += Math.max(0, Math.min(dmg, t.hp + dmg));
   if (t.armor <= 0) t.showGear();
   if (t === player) { $('#hurt').style.opacity = 1; setTimeout(() => $('#hurt').style.opacity = 0, 160); }
-  else if (from === player) { dmgNumber(t, dmg, toArmor > 0); blip(1250, 0.03, 0.06); }
+  else if (from === player) { dmgNumber(t, dmg, toArmor > 0); if (!sfx('acerto', 0.45, { dur: 0.4 })) blip(1250, 0.03, 0.06); }
   if (t.isBot) botHeard(t, from.pos);
   if (t.hp <= 0) { t.hp = 0; die(t, from); }
 }
@@ -1273,9 +1274,10 @@ function giveLoot(s, L) {
     if (wasPrimary) { s.weapon = L.sub; s.reloadT = 0; }
   }
   s.showGear();
-  if (s === player) { toast('+ ' + lootName(L) + (k === 'medkit' ? ' · use em CURA/E (2,5 s)' : k === 'colete' ? ' (100)' : '')); if (actx) tone(520, 880, 0.15, 0.1); }
+  if (s === player) { toast('+ ' + lootName(L) + (k === 'medkit' ? ' · use em CURA/E (2,5 s)' : k === 'colete' ? ' (100)' : '')); if (!sfx('pegar', 0.5, { dur: 1 }) && actx) tone(520, 880, 0.15, 0.1); }
 }
 function openLoot(l) {
+  { const d = Math.hypot(player.pos.x - l.x, player.pos.z - l.z); if (d < 18 && sfx('bau', 0.55 * (1 - d / 18), { dur: 2 })) l.quiet = true; }
   l.state = 'open'; l.item.material.color.set(ITEM_COLOR[l.loot.k]); l.item.visible = true;
   if (actx) { noise(0.25, 0.12, 'lowpass', 900); tone(180, 120, 0.2, 0.08); }
 }
@@ -1283,7 +1285,7 @@ function takeLoot(l, s) { giveLoot(s, l.loot); l.state = 'empty'; l.t = 30; l.it
 let nearLoot = null;
 function lootAction() {
   if (player.air === 'plane') { jumpOut(player); return; }
-  if (mode === 'bomb' && bombS.carrier === player && siteOf(player) && !bombS.planted) { bombS.plantBy = player; bombS.plantT = 0; return; }
+  if (mode === 'bomb' && bombS.carrier === player && siteOf(player) && !bombS.planted) { bombS.plantBy = player; bombS.plantT = 0; sfx('plantar', 0.6); return; }
   const l = nearLoot; if (!l || !player.alive) return;
   if (l.state === 'closed') openLoot(l); else if (l.state === 'open') takeLoot(l, player);
 }
@@ -1776,7 +1778,10 @@ const plane = { mesh: new THREE.Group(), pos: new V3(), dir: new V3(), t: 0, len
 const zone = { x: 0, z: 0, r: 60, r0: 60, r1: 5, t: 0, dur: 150, delay: 25 };
 const zoneMesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 40, 64, 1, true), new THREE.MeshBasicMaterial({ color: 0x4aa3ff, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }));
 zoneMesh.visible = false; scene.add(zoneMesh);
+let planeSnd = null;
 function startBR() {
+  planeSnd?.stop(); planeSnd = null;
+  if (actx && SFX.aviao) { planeSnd = actx.createBufferSource(); planeSnd.buffer = SFX.aviao; planeSnd.loop = true; const g = actx.createGain(); g.gain.value = 0.35; planeSnd.connect(g).connect(actx.destination); planeSnd.start(); }
   const a = rand(0, Math.PI * 2), d = new V3(Math.cos(a), 0, Math.sin(a));
   plane.dir.copy(d); plane.pos.set(-d.x * 52, PLANE_Y, -d.z * 52 + rand(-10, 10)); plane.len = 104; plane.t = 0; plane.active = true;
   plane.mesh.visible = true; plane.mesh.rotation.y = Math.atan2(d.x, d.z);
@@ -1792,6 +1797,7 @@ function startBR() {
 }
 function jumpOut(s) {
   if (s.air !== 'plane') return;
+  if (s === player) { planeSnd?.stop(); planeSnd = null; sfx('paraquedas', 0.6); }
   s.air = 'chute'; s.y = PLANE_Y - 2; s.m.chute.visible = true;
   if (s.isBot) { s.ai.wp = nearestWP(new V3(s.dropX, 0, s.dropZ)); }
 }
@@ -1930,7 +1936,7 @@ function objectiveFor(b) {
   if (b.team === 'A') {
     if (bombS.carrier === b) {
       const st = SITES.reduce((a, c) => Math.hypot(c.x - b.pos.x, c.z - b.pos.z) < Math.hypot(a.x - b.pos.x, a.z - b.pos.z) ? c : a);
-      return { x: st.x, z: st.z, stop: 1.2, act: bb => { if (!bombS.plantBy && siteOf(bb)) { bombS.plantBy = bb; bombS.plantT = 0; } } };
+      return { x: st.x, z: st.z, stop: 1.2, act: bb => { if (!bombS.plantBy && siteOf(bb)) { bombS.plantBy = bb; bombS.plantT = 0; sfx('plantar', 0.5 * vol(bb.pos.distanceTo(player.pos) * 1.5)); } } };
     }
     if (!bombS.carrier && bombS.pos && !bombS.planted) return { x: bombS.pos.x, z: bombS.pos.z, stop: 0.3 };
     // bomba plantada: o time que plantou se posiciona em volta e fica de tocaia
@@ -1983,7 +1989,7 @@ function updateBomb(dt) {
     if ((S.beep -= dt) <= 0) { S.beep = S.timer > 10 ? 1 : S.timer > 4 ? 0.5 : 0.2; { const bv = vol(player.pos.distanceTo(S.pos) * 0.6); if (!sfx('bipe', 0.35 * bv, { dur: 0.25 })) blip(1600, 0.05, 0.07 * bv); } bombMesh.userData.led.visible = !bombMesh.userData.led.visible; }
     // desarme: um CT parado ao lado por 5 s
     const def = soldiers.find(s => s.alive && s.team === 'B' && !s.moving && Math.hypot(s.pos.x - S.pos.x, s.pos.z - S.pos.z) < 1.4);
-    if (def) { S.defuseT += dt; def.tagSt.textContent = 'DESARMANDO'; if (S.defuseT >= 5) { bombMesh.visible = false; endBombRound('B', 'bomba desarmada'); return; } }
+    if (def) { if (S.defuseT === 0) sfx('plantar', 0.5 * vol(def.pos.distanceTo(player.pos) * 1.5), { rate: 0.8 }); S.defuseT += dt; def.tagSt.textContent = 'DESARMANDO'; if (S.defuseT >= 5) { bombMesh.visible = false; endBombRound('B', 'bomba desarmada'); return; } }
     else S.defuseT = 0;
     if (S.timer <= 0) { bombExplode(); return; }
   } else if ((S.roundT -= dt) <= 0) { endBombRound('B', 'tempo esgotado'); return; }
@@ -2007,6 +2013,7 @@ function setupMatch(cls) {
   document.body.classList.toggle('medic', !!player.C.heal);
   kills = deaths = 0; teamScore = { A: 0, B: 0 };
   for (const site of SITES) site.g.visible = mode === 'bomb';
+  planeSnd?.stop(); planeSnd = null;
   zoneMesh.visible = false; plane.mesh.visible = false; bombMesh.visible = false; $('#buyBtn').style.display = 'none'; matchEnd = ''; roundOver = 0; pings.length = 0;
   for (const st of soldiers) st.stats = { k: 0, d: 0, dmg: 0 };
   if (mode === 'br') startBR();
@@ -2089,6 +2096,7 @@ for (const grp of document.querySelectorAll('.opts')) {
   });
 }
 mode = 'treino'; setupMatch('tr'); updateCamera(1); updateWalls(); updateHud();
+$('#start').addEventListener('pointerdown', () => initAudio(), { once: true });
 $('#play').addEventListener('click', () => {
   initAudio();
   mode = choice.mode; diff = DIFF[choice.diff]; setupMatch(choice.cls); applyWeather(choice.weather);

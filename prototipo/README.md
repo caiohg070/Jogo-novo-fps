@@ -59,4 +59,11 @@ modelos 3D melhores dos personagens, sons reais (ElevenLabs) e imagens (Higgsfie
 ## Sons
 Efeitos gerados no ElevenLabs, em `sons/` (mp3) e embutidos em `sons/sons.js`: tiros de AK-47, Colt M4, AWP,
 Desert Eagle e pistola, faca, recarga, explosão (HE e bomba), flash, smoke, passos, chuva e bipe da bomba.
+Também: avião, paraquedas, plantar/desarmar bomba, abrir baú, pegar item, arma sem bala, sacar arma e acerto no inimigo.
 Tiros distantes ficam mais baixos e abafados. Os mesmos mp3 servem para a versão Unity.
+
+## Jogar pelo navegador (GitHub Pages)
+1. No GitHub: **Settings → Pages**.
+2. Em *Build and deployment*: Source = **Deploy from a branch**; Branch = `claude/save-game-files-repo-rdk6pf`, pasta **/ (root)** → **Save**.
+3. Em 1–2 minutos o jogo fica em `https://caiohg070.github.io/jogo-novo-fps/` (o `index.html` da raiz leva para `prototipo/`).
+Obs.: Pages grátis só em repositório público.
