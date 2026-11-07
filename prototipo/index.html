@@ -1682,9 +1682,10 @@ function updateScore() {
     const t = bombS.planted ? `<span class="tb">BOMBA ${Math.ceil(bombS.timer)} s</span>` : `${Math.floor(bombS.roundT / 60)}:${String(Math.floor(bombS.roundT % 60)).padStart(2, '0')}`;
     $('#score').innerHTML = `$${player.money} · RODADA ${bombS.round} · <span class="ta">AZUL <b>${bombS.score.A}</b></span> × <span class="tb"><b>${bombS.score.B}</b> VERM.</span> · ${t}`; return;
   }
-  if (mode === 'ctf') { const fl = F => F.carrier ? '⚑ ' + F.carrier.name : F.atBase ? 'na base' : 'caída'; $('#score').innerHTML = `<span class="ta">AZUL <b>${ctfS.score.A}</b></span> × <span class="tb"><b>${ctfS.score.B}</b> VERM.</span> · sua: ${fl(FLAGS.A)} · inimiga: ${fl(FLAGS.B)}`; return; }
+  // só o placar dos times + meta (sem segunda contagem pessoal; seus abates estão no TAB/fim de partida)
+  if (mode === 'ctf') { $('#score').innerHTML = `<span class="ta">AZUL <b>${ctfS.score.A}</b></span> × <span class="tb"><b>${ctfS.score.B}</b> VERM.</span> &nbsp;·&nbsp; até ${CTF_GOAL}`; return; }
   $('#score').innerHTML = mode === 'tdm'
-    ? `<span class="ta">AZUL <b>${teamScore.A}</b></span> × <span class="tb"><b>${teamScore.B}</b> VERMELHO</span> &nbsp;·&nbsp; ${kills}/${deaths}`
+    ? `<span class="ta">AZUL <b>${teamScore.A}</b></span> × <span class="tb"><b>${teamScore.B}</b> VERMELHO</span> &nbsp;·&nbsp; até ${TDM_GOAL}`
     : `ABATES <b>${kills}</b> &nbsp;·&nbsp; MORTES <b>${deaths}</b>`;
 }
 function feed(by, t) {

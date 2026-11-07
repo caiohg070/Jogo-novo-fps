@@ -196,6 +196,8 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
   que aponta para o objetivo com texto e distância (BANDEIRA INIMIGA / LEVE PARA SUA BASE / RECUPERE SUA BANDEIRA / PROTEJA …)
   e anel pulsando no minimapa em volta da bandeira inimiga.
 
+**✅ 6º chat (3ª rodada)** — Placar (`updateScore`): tirado "sua: na base · inimiga: na base" do Bandeira e o "abates/mortes" pessoal do Mata-mata (parecia 2ª contagem); agora mostra `até N`. Conferido nos 5 modos.
+
 **Pendências pequenas no protótipo**
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
 - [ ] Som da chuva tem só 2 s (repete); gerar um mais longo se incomodar.
