@@ -77,8 +77,7 @@ if (MIL) {
   for (const [u, v] of [[12, -12], [12.9, -11.2], [-12, 12], [-13, 11]]) barrel(X(u), Z(v), 0x4a5a36);
   crate(X(12), Z(0), 2); crate(X(12), Z(1.2), 1); crate(X(-3), Z(-8), 1);
 
-  // loot: 6 baús (um em cima da torre) + 10 itens flutuando, todos com a tabela melhor
+  // loot: 6 baús + 10 itens flutuando, todos com a tabela melhor
   for (const [u, v] of [[-9, -5.6], [4, -6], [0, 0], [11, 3], [-12, 8], [5, 12]]) MIL_LOOT.push([X(u), Z(v)]);
-  MIL_LOOT.push([X(tc), Z(tc), TOP]);
   for (const [u, v] of [[-5, -12], [9.5, -2], [-12, -12], [2, 8], [-6, 6], [12, -6], [-13, 0], [6, 4], [-1, -5], [0, 13]]) MIL_FLOAT.push([X(u), Z(v)]);
 }
