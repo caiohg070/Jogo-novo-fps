@@ -250,7 +250,7 @@ class Soldier {
     if (best) {
       origin.y = this.y + SHOT_H + lean(this, best);
       const P = aimPoint(best, undefined, undefined, this);   // centro do alvo (a borda podia ficar dentro da mureta)
-      let block = shotBlock(origin, P), dist = origin.distanceTo(P);
+      let block = shotBlock(origin, P), dist = shotLen;   // compara com o caminho percorrido, não com a linha reta
       let hp1 = hitProp, lh = lastHit;
       // relevo com altos e baixos (morro, telhado, terraço): se o caminho padrão bate em algo, tenta linhas retas
       // de verdade até o peito, ombro e cabeça do alvo; a primeira livre vale (a bala sai reta, sem curva)

@@ -35,7 +35,7 @@
   box(3.2, x1, z0, -12.6, H1 - 0.25, H1, SL, { collide: false, upper: true });
   surfaces.push({ x0, x1: 3.2, z0, z1, h: () => H1 });
   surfaces.push({ x0: 3.2, x1, z0, z1: -12.6, h: () => H1 });
-  const PT = 0.25, py0 = H1, py1 = H1 + 0.95, PC = 0xcbb895;
+  const PT = 0.25, py0 = H1, py1 = H1 + 0.6, PC = 0xcbb895;
   wall(x0, x1, z1 - PT, z1, py0, py1, { upper: true, color: PC });
   wall(x0, x1, z0, z0 + PT, py0, py1, { upper: true, color: PC });
   wall(x0, x0 + PT, z0, z1, py0, py1, { upper: true, color: PC });

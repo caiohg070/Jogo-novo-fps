@@ -100,12 +100,14 @@ function firstHit(a, b) {
   return Math.min(h.length ? h[0].distance : Infinity, terrainBlocks(a, b));
 }
 // tiro em 3 trechos: perto de quem atira e perto do alvo corre na horizontal, na altura do peito de cada um
+let shotLen = 0;   // comprimento do caminho do último shotBlock (o caminho dobrado é maior que a linha reta)
 function shotBlock(o, P) {
+  shotLen = o.distanceTo(P);
   const hx = P.x - o.x, hz = P.z - o.z, hl = Math.hypot(hx, hz);
   if (hl < 0.01) return Infinity;
   const up = o.y - P.y > 1.5, k = Math.min(up ? 2.2 : 1.5, hl * (up ? 0.5 : 0.4)) / hl;
   const A = new V3(o.x + hx * k, o.y, o.z + hz * k), B = new V3(P.x - hx * k, P.y, P.z - hz * k);
-  const dA = o.distanceTo(A), dAB = A.distanceTo(B);
+  const dA = o.distanceTo(A), dAB = A.distanceTo(B); shotLen = dA + dAB + B.distanceTo(P);
   let h = firstHit(o, A); if (h < Infinity) return h;
   h = firstHit(A, B); if (h < Infinity) return dA + h;
   h = firstHit(B, P); return h < Infinity ? dA + dAB + h : Infinity;
@@ -126,7 +128,9 @@ const bushHidden = (t, from) => inBush(t) && now - t.lastShot > 1.5 && Math.hypo
 const los = (a, b) => { if (bushHidden(b, a)) return false; const A = eye(a), B = eye(b); return !smokeBlocks(A, B) && firstHit(A, B) === Infinity; };
 // no alto (terraço/escada) quem atira se inclina por cima da mureta; o alvo no alto só expõe a cabeça quando está atirando
 // quem usa a metralhadora fixa atira por cima dos sacos de areia (e fica com a cabeça exposta)
-const lean = (a, b) => (a.y - b.y > 1.5 ? 0.45 : 0) + (a.turret ? 0.5 : 0);
+// na escada da casa não há mureta para se debruçar (antes a arma subia acima da parede e o tiro varava para fora)
+const onStairs = t => t.pos.x > 3.2 && t.pos.x < 5.9 && t.pos.z > -12.8 && t.pos.z < -6.3 && t.y > H0 + 0.2 && t.y < H1 - 0.3;
+const lean = (a, b) => (a.y - b.y > 1.5 && !onStairs(a) ? 0.45 : 0) + (a.turret ? 0.5 : 0);
 const onTerrace = t => t.y > H1 - 0.3 && t.pos.x > HOUSE.x0 && t.pos.x < HOUSE.x1 && t.pos.z > HOUSE.z0 && t.pos.z < HOUSE.z1;
 const nearEdge = t => Math.min(t.pos.x - HOUSE.x0, HOUSE.x1 - t.pos.x, t.pos.z - HOUSE.z0, HOUSE.z1 - t.pos.z) < 1.3;
 const peek = (t, from) => (t.y - from.y > 1.5 && onTerrace(t) && nearEdge(t) ? (now - t.lastShot < 0.7 ? 0.3 : -0.3) : 0);
