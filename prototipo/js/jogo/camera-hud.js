@@ -34,11 +34,11 @@ function updateWalls() {
   for (const m of barnRoof) m.visible = !inBarn && !behindBarn;
   for (const m of faded) { m.material.opacity = 1; m.material.depthWrite = true; }
   faded.clear();
-  // dentro/atrás da casa: a laje e as muretas de cima ficam meio transparentes (45%) (antes sumiam e quem estava no telhado parecia flutuar)
+  // dentro/atrás da casa: a laje e as muretas de cima ficam quase invisíveis (15%; com 45% tampava a visão) (antes sumiam e quem estava no telhado parecia flutuar)
   const ghostUp = inside || behind;
   for (const m of upper) {
     m.castShadow = !ghostUp;
-    if (ghostUp) { m.material.transparent = true; m.material.opacity = 0.45; m.material.depthWrite = false; }
+    if (ghostUp) { m.material.transparent = true; m.material.opacity = 0.15; m.material.depthWrite = false; }
     else if (m.material.opacity < 1) { m.material.opacity = 1; m.material.depthWrite = true; }
   }
   if (behind || behindBarn) for (const m of fadeables) {
