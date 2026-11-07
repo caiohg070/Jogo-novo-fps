@@ -24,8 +24,8 @@ const bombMesh = new THREE.Group();
 const bombS = { round: 0, score: { A: 0, B: 0 }, carrier: null, pos: null, planted: false, timer: 0, roundT: 0, plantBy: null, plantT: 0, defuseT: 0, beep: 0 };
 const siteOf = s => SITES.find(st => Math.hypot(s.pos.x - st.x, s.pos.z - st.z) < st.r && Math.abs(s.y - st.y) < 1.5);
 const SHOP = [['deagle', 'Desert Eagle', 700], ['shotgun', 'Escopeta', 1100], ['smg', 'SMG', 1250], ['ak', 'AK-47', 2700], ['m4', 'Colt M4', 3100], ['awp', 'AWP', 4750], ['lmg', 'Metralhadora', 5200],
-  ['colete', 'Colete', 650], ['kitcap', 'Colete + capacete', 1000], ['sil', 'Silenciador', 400], ['mira', 'Mira', 500], ['drone', 'Drone', 600],
-  ['he', 'Granada HE', 300], ['flash', 'Flash', 200], ['smoke', 'Smoke', 300], ['molotov', 'Molotov', 400], ['impact', 'Impacto', 300], ['mine', 'Mina', 400]];
+  ['colete', 'Colete', 650], ['kitcap', 'Colete + capacete', 1000], ['sil', 'Silenciador', 400], ['drone', 'Drone', 600],
+  ['he', 'Granada HE', 300], ['flash', 'Flash', 200], ['smoke', 'Smoke', 300], ['molotov', 'Molotov', 400], ['mine', 'Mina', 400]];
 function buy(s, id) {
   const it = SHOP.find(i => i[0] === id); if (!it || s.money < it[2]) return false;
   if (WEAPONS[id]) { const slot = WEAPONS[id].slot; if (s.inv[slot] === id) return false; s.inv[slot] = id; s.giveAmmo(id); s.weapon = id; s.reloadT = 0; }
@@ -40,7 +40,7 @@ function botBuy(b) {
   const want = b.cls === 'sniper' ? ['awp', 'ak'] : b.team === 'A' ? [pick(['ak', 'ak', 'smg', 'shotgun'])] : [pick(['m4', 'm4', 'smg', 'shotgun']), 'ak'];
   for (const w of want) if (b.money >= SHOP.find(i => i[0] === w)[2] + 650) { buy(b, w); break; }
   if (!buy(b, 'kitcap')) buy(b, 'colete');
-  if (b.money > 400) buy(b, pick(['he', 'flash', 'smoke', 'molotov', 'impact']));
+  if (b.money > 400) buy(b, pick(['he', 'flash', 'smoke', 'molotov']));
   if (!b.inv.primary && b.money >= 700) buy(b, 'deagle');
 }
 function renderShop() {
@@ -153,7 +153,7 @@ function updateBomb(dt) {
     const pb = S.plantBy;
     if (!pb.alive || pb.downed || pb.moving || !siteOf(pb)) S.plantBy = null;
     else if ((S.plantT += dt) >= 3) {
-      if (pb === player) addXP(150, 'bomba plantada'); pb.money += 300; S.planted = true; S.pos = new V3(pb.pos.x, pb.y, pb.pos.z); S.carrier = null; S.plantBy = null; S.timer = 35;
+      if (pb === player) addXP(150, 'bomba plantada'); pb.money = Math.min(16000, pb.money + 300); S.planted = true; S.pos = new V3(pb.pos.x, pb.y, pb.pos.z); S.carrier = null; S.plantBy = null; S.timer = 35;
       showCenter('BOMBA PLANTADA', 'defenda até explodir', 2.5);
       for (const b of bots) if (b.team === 'B' && b.alive) { b.ai.state = 'patrol'; }
     }

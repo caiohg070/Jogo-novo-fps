@@ -35,7 +35,7 @@ function removeLoot(L) {
 function rollLoot() {
   let r = rand(0, LOOT_TABLE.reduce((a, b) => a + b[1], 0)), k = 'medkit';
   for (const [kk, w] of LOOT_TABLE) if ((r -= w) <= 0) { k = kk; break; }
-  const sub = k === 'arma' ? pick(['ak', 'm4', 'awp', 'awp', 'shotgun', 'shotgun', 'smg', 'smg', 'lmg']) : k === 'granada' ? pick(NADE_ORDER) : k === 'acessorio' ? pick(['sil', 'mira']) : null;
+  const sub = k === 'arma' ? pick(['ak', 'm4', 'awp', 'awp', 'shotgun', 'shotgun', 'smg', 'smg', 'lmg']) : k === 'granada' ? pick(NADE_ORDER) : k === 'acessorio' ? 'sil' : null;
   return { k, sub };
 }
 const ATT_NAME = { sil: 'Silenciador', mira: 'Mira' };

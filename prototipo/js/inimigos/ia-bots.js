@@ -70,7 +70,7 @@ function updateBot(b, dt) {
     }
     ai.nadeCd -= dt;
     if (ai.nadeCd <= 0 && d > 6 && d < 13) {
-      const type = ['molotov', 'he', 'impact', 'flash'].find(n => b.nades[n] > 0);
+      const type = ['molotov', 'he', 'flash'].find(n => b.nades[n] > 0);
       ai.nadeCd = rand(10, 18);
       if (type) throwNade(b, type, t.pos.x + rand(-1.5, 1.5), t.pos.z + rand(-1.5, 1.5));
     }

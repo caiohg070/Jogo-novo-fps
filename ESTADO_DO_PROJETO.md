@@ -268,3 +268,12 @@ Jogador novo (sem partidas, sem tutorial e sem ter pulado) vê `#firstBoard` "PR
 - Granada: marca suave que segue o relevo (`scorchMark` em `js/base/efeitos-som.js`).
 - 8 postes extras (`js/mapa/objetos.js`), luz só à noite via lâmpada + círculo no chão (sem PointLight).
 - Ideia futura: online por código de sala (PeerJS), ainda não feito.
+
+## Ajustes em 4 etapas (pedido após teste automático a 4x)
+Teste jogou todos os modos sozinho: sem erros de código. Problemas achados viraram as etapas abaixo.
+O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
+
+- [x] **Etapa 1 – loja e armas (feita):** tirado o item "Mira" (loja, baús, caixa do BR); tirada a granada de Impacto (loja, ordem das granadas, bots, BR — agora só HE); escopeta mais forte (dano 14–19 por chumbo, alcance 15); Bomba: espaço vazio diz "compre (B)" e dinheiro de plantar respeita limite de $16.000.
+- [ ] **Etapa 2 – AWP:** pequeno zoom da câmera na direção da mira com a AWP (`js/jogo/camera-hud.js`).
+- [ ] **Etapa 3 – bots:** bots travam parados (principalmente perto de x −3, z −5.7, ao lado da casa; também (4,28), (−14.7,5), (−6.5,−29.8)); se preso, pular para o próximo ponto. Dificuldade MÉDIO errar um pouco mais (`js/inimigos/ia-bots.js`, `navegacao.js`, `DIFF` em `utilidades-regras.js`).
+- [ ] **Etapa 4 – modos:** Bandeira: ninguém captura (carregador sempre morre no meio, perto de −6,−5) → desviar da casa central, aliados escoltam, e tempo máximo de partida (`js/modos/bandeira.js`). Battle Royale: saltos mais espalhados e zona fechando mais devagar (`js/modos/battle-royale.js`). Aumentar o mapa do BR: deixar para outro chat.

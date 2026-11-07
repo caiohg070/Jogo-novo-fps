@@ -69,7 +69,7 @@ function updateDrops(dt) {
     if (D.y <= D.gy) {
       scene.remove(D.g); drops.splice(i, 1);
       const L = makeLoot(D.x, D.z, D.gy, true);
-      L.loot = { k: 'drop', items: [{ k: 'arma', sub: pick(['lmg', 'awp', 'lmg']) }, { k: 'colete' }, { k: 'capacete' }, { k: 'acessorio', sub: pick(['sil', 'mira']) }, { k: 'granada', sub: pick(['molotov', 'impact', 'mine']) }] };
+      L.loot = { k: 'drop', items: [{ k: 'arma', sub: pick(['lmg', 'awp', 'lmg']) }, { k: 'colete' }, { k: 'capacete' }, { k: 'acessorio', sub: 'sil' }, { k: 'granada', sub: pick(['molotov', 'he', 'mine']) }] };
     }
   }
 }
