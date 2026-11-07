@@ -92,6 +92,7 @@ $('#play').addEventListener('click', () => {
   if (tutorial) {
     const nc = () => Object.values(player.nades).reduce((a, b) => a + b, 0);
     tut = { step: 0, moved: 0, shots: 0, kills: 0, drove: 0, last: null, vlast: null, shown: -1, acts: new Set(), tgt: null, w0: player.weapon, n0: nc(), nadeCount: nc };
+    player.nades = { flash: 2, he: 2 }; player.nadeSel = 'he';   // tutorial: só flash e HE
     for (const k in player.ammo) player.ammo[k].res = WEAPONS[k].mag * 8;   // tutorial: bastante pente
     $('#tut').style.display = 'block'; hideCenter(); return;
   }

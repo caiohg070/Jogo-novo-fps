@@ -158,7 +158,7 @@ function wallChip(hit, slash) {
   c.position.copy(local);
   const sy = slash ? 0.05 : sz, sh = slash ? 0.42 : sz;              // faca: risco comprido e fino
   c.scale.set((Math.abs(n.x) > 0.5 ? 0.01 : sh) / sc.x, (Math.abs(n.y) > 0.5 ? 0.01 : sy) / sc.y, (Math.abs(n.z) > 0.5 ? 0.01 : sh) / sc.z);
-  c.userData.t = now;
+  c.userData.t = now; c.renderOrder = 3;   // desenha depois da parede (paredes da casa são transparentes e cobriam a marca)
   c.onBeforeRender = () => { mat.opacity = 0.9 * clamp((CHIP_LIFE - (now - c.userData.t)) / 1.5, 0, 1) * (m.material.transparent ? m.material.opacity : 1); };
   m.add(c); chips.push(c);
   if (chips.length > 220) { const o = chips.shift(); o.parent?.remove(o); }

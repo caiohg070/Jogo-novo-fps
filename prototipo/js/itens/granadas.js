@@ -54,9 +54,11 @@ function updateNades(dt) {
 }
 // molotov: fogo no chão por 7 s, queima quem pisa (o time de quem jogou não se queima)
 const fires = [];
+// luzes do fogo criadas uma vez só: criar luz nova a cada molotov recompilava todos os materiais (travava o jogo)
+const fireLights = [0, 1, 2].map(() => { const l = new THREE.PointLight(0xff7a2a, 0, 9, 1.6); scene.add(l); return l; });
 function startFire(P, owner) {
   const y = groundAt(P.x, P.z, P.y + 0.5);
-  const light = new THREE.PointLight(0xff7a2a, 30, 9, 1.6); light.position.set(P.x, y + 1, P.z); scene.add(light);
+  const light = fireLights.find(l => !fires.some(f => f.light === l)) || null; if (light) light.position.set(P.x, y + 1, P.z);
   fires.push({ x: P.x, z: P.z, y, r: 3.0, life: 7, owner, light, tick: 0 });
   if (actx) { const v = vol(player.pos.distanceTo(P)); noise(0.12, 0.35 * v, 'highpass', 3000); noise(0.9, 0.3 * v, 'lowpass', 900); }
 }
@@ -64,7 +66,7 @@ const inFire = s => fires.find(f => Math.hypot(s.pos.x - f.x, s.pos.z - f.z) < f
 function updateFires(dt) {
   for (let i = fires.length - 1; i >= 0; i--) {
     const f = fires[i]; f.life -= dt; f.tick -= dt;
-    f.light.intensity = (f.life > 1 ? 30 : 30 * f.life) * rand(0.7, 1.1);
+    if (f.light) f.light.intensity = (f.life > 1 ? 30 : 30 * f.life) * rand(0.7, 1.1);
     for (let k = 0; k < 3; k++) { const a = rand(0, 6.28), r = Math.sqrt(Math.random()) * f.r;
       spawnPart(new V3(f.x + Math.cos(a) * r, f.y + 0.2, f.z + Math.sin(a) * r), Math.random() < 0.7 ? 0xff8a2a : 0xffd04a, rand(0.35, 0.7), rand(0.3, 0.6), new V3(0, rand(1, 2.2), 0), true, -0.2, 0); }
     if (Math.random() < dt * 4) spawnPart(new V3(f.x + rand(-1, 1), f.y + 1.5, f.z + rand(-1, 1)), 0x3a3530, 1.2, 1.5, new V3(0, 1.5, 0), false, 1.5, 0);
@@ -78,7 +80,7 @@ function updateFires(dt) {
         f.owner.lastKillWith = null;
       }
     }
-    if (f.life <= 0) { scene.remove(f.light); fires.splice(i, 1); }
+    if (f.life <= 0) { if (f.light) f.light.intensity = 0; fires.splice(i, 1); }
   }
 }
 // mina: arma em 1 s; explode quando um inimigo pisa perto

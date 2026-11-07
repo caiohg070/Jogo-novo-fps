@@ -78,14 +78,11 @@ function thud(m) { if (actx) { const v = vol(player.pos.distanceTo(m.position));
 function groundShot(o, dx, dz, range, shooter) {
   const STEP = 1.5;
   // a bala acompanha o chão onde a mira passa: sobe o morro, desce do telhado/morro (em qualquer parte do mapa)
-  // a bala vai em linha reta: se o chão sobe ela sobe junto e continua subindo nessa inclinação (não volta a descer no topo);
-  // se desce (telhado/morro abaixo) continua descendo reto até bater
-  const base = o.y - shooter.y; let gy = shooter.y, y = o.y, s = 0;
-  const yAt = (x, z) => { gy = groundAt(x, z, Math.max(gy, y - base) + 0.3); const want = gy + base, nx = y + s * STEP;
-    if (want > nx + 0.05) { s = Math.max(s, (want - y) / STEP); y = want; }
-    else if (s <= 0 && want < nx - 0.05) { s = Math.min(s, (want - y) / STEP); y = want; }
-    else y = nx;
-    return y; };
+  // tiro em linha reta: a inclinação é escolhida uma vez (pelo chão à frente) e não muda mais — sobe o morro reto, desce do alto reto
+  const base = o.y - shooter.y; let s = -Infinity, gy = shooter.y;
+  for (let d = 1.5; d <= Math.min(14, range); d += 1.5) { gy = groundAt(o.x + dx * d, o.z + dz * d, gy + 0.3); s = Math.max(s, (gy + base - o.y) / d); }
+  if (s < 0) { const d = Math.min(10, range); s = Math.max(-0.6, (groundAt(o.x + dx * d, o.z + dz * d, shooter.y + 0.3) + base - o.y) / d); }
+  const yAt = (x, z) => o.y + s * Math.hypot(x - o.x, z - o.z);
   let a = o.clone(), d = 0, pts = [];   // pts: caminho do tiro (sobe/desce com o morro)
   while (d < range) {
     const n = Math.min(range, d + STEP), x = o.x + dx * n, z = o.z + dz * n, b = new V3(x, yAt(x, z), z);
