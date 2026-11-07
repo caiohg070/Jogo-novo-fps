@@ -28,20 +28,24 @@ function makeLoot(x, z, yy, drop = false) {
   loots.push(L); return L;
 }
 for (const [x, z, yy] of LOOT_SPOTS) makeLoot(x, z, yy);
+for (const [x, z, yy] of MIL_LOOT) makeLoot(x, z, yy).mil = true;   // baús da Base Militar (tabela melhor)
 function removeLoot(L) {
   scene.remove(L.g); L.tag.remove(); const i = loots.indexOf(L); if (i >= 0) loots.splice(i, 1);
   const ci = colliders.indexOf(L.col); if (ci >= 0) colliders.splice(ci, 1);
 }
-function rollLoot() {
-  let r = rand(0, LOOT_TABLE.reduce((a, b) => a + b[1], 0)), k = 'medkit';
-  for (const [kk, w] of LOOT_TABLE) if ((r -= w) <= 0) { k = kk; break; }
-  const sub = k === 'arma' ? pick(['ak', 'm4', 'awp', 'awp', 'shotgun', 'shotgun', 'smg', 'smg', 'lmg']) : k === 'granada' ? pick(NADE_ORDER) : k === 'acessorio' ? 'sil' : null;
+// Base Militar: mais armas fortes, colete e capacete; pouco kit médico e munição
+const MIL_TABLE = [['arma', 34], ['colete', 20], ['capacete', 18], ['granada', 10], ['acessorio', 8], ['medkit', 6], ['municao', 4]];
+const MIL_GUNS = ['awp', 'lmg', 'ak', 'm4', 'ak', 'm4', 'awp', 'lmg'];
+function rollLoot(L, table = L && L.mil ? MIL_TABLE : LOOT_TABLE) {
+  let r = rand(0, table.reduce((a, b) => a + b[1], 0)), k = 'medkit';
+  for (const [kk, w] of table) if ((r -= w) <= 0) { k = kk; break; }
+  const sub = k === 'arma' ? pick(L && L.mil ? MIL_GUNS : ['ak', 'm4', 'awp', 'awp', 'shotgun', 'shotgun', 'smg', 'smg', 'lmg']) : k === 'granada' ? pick(NADE_ORDER) : k === 'acessorio' ? 'sil' : null;
   return { k, sub };
 }
 const ATT_NAME = { sil: 'Silenciador', mira: 'Mira' };
 const lootName = L => L.k === 'colete' ? 'Colete' : L.k === 'capacete' ? 'Capacete' : L.k === 'medkit' ? 'Kit médico' : L.k === 'municao' ? 'Munição'
   : L.k === 'arma' ? WEAPONS[L.sub].name : L.k === 'acessorio' ? ATT_NAME[L.sub] : L.k === 'drone' ? 'Drone' : L.k === 'drop' ? 'Airdrop: ' + L.items.map(lootName).join(' + ') : 'Granada ' + NADES[L.sub].name;
-for (const l of loots) l.loot = rollLoot();
+for (const l of loots) l.loot = rollLoot(l);
 function giveLoot(s, L) {
   if (typeof L === 'string') L = { k: L, sub: L === 'arma' ? 'awp' : L === 'granada' ? 'he' : L === 'acessorio' ? 'sil' : null };
   const k = L.k;
@@ -69,6 +73,7 @@ function openLoot(l) {
 function takeLoot(l, s) {
   giveLoot(s, l.loot); l.state = 'empty'; l.t = 30; l.item.visible = false; l.tag.style.display = 'none';
   if (l.drop) { l.state = 'gone'; setTimeout(() => removeLoot(l), 2500); }
+  if (l.float) { l.state = 'gone'; removeLoot(l); }
 }
 let nearLoot = null, curAct = null;
 // ação do botão laranja / tecla F: escolhe a coisa mais importante perto do jogador
@@ -102,10 +107,10 @@ actBtn.addEventListener('pointerdown', e => { e.stopPropagation(); lastTouch = e
 function updateLoot(dt) {
   nearLoot = null; let nd = 1.7;
   for (const l of loots) {
-    l.ang = lerp(l.ang, l.state === 'closed' ? 0 : -1.9, Math.min(1, dt * 10)); l.hinge.rotation.x = l.ang;
+    if (l.float) { if (l.state === 'open') floatAnim(l, dt); } else { l.ang = lerp(l.ang, l.state === 'closed' ? 0 : -1.9, Math.min(1, dt * 10)); l.hinge.rotation.x = l.ang; }
     if (l.state === 'gone') continue;
-    if (l.state === 'empty') { if ((l.t -= dt) <= 0) { l.state = 'closed'; l.loot = rollLoot(); } continue; }
-    if (l.state === 'open') { l.item.rotation.y += dt * 2; l.item.position.y = 0.85 + Math.sin(now * 3) * 0.05; }
+    if (l.state === 'empty') { if ((l.t -= dt) <= 0) { l.state = 'closed'; l.loot = rollLoot(l); } continue; }
+    if (l.state === 'open' && !l.float) { l.item.rotation.y += dt * 2; l.item.position.y = 0.85 + Math.sin(now * 3) * 0.05; }
     for (const s of soldiers) {
       if (!s.alive || s.air || s.downed || s.veh || Math.abs(s.y - l.y) > 1) continue;
       const d = Math.hypot(s.pos.x - l.x, s.pos.z - l.z);
@@ -113,7 +118,7 @@ function updateLoot(dt) {
       else if (d < 1.4) { if (l.state === 'closed') openLoot(l); takeLoot(l, s); break; }   // bots abrem e pegam direto
     }
     // etiqueta com o nome do item quando aberto
-    if (l.state === 'open') {
+    if (l.state === 'open' && (!l.float || Math.hypot(player.pos.x - l.x, player.pos.z - l.z) < 9)) {   // item solto: nome só quando está perto
       const [x, y, ok] = toScreen(new V3(l.x, l.y + 1.4, l.z));
       const hidden = !ok || (upper.includes(l.item) && !upper[0].visible);
       l.tag.style.display = hidden ? 'none' : ''; l.tag.textContent = lootName(l.loot);
