@@ -208,6 +208,11 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
   Não bloqueia visão nem tiro.
 - **Pequena destruição nas paredes:** cada tiro deixa marca escura + lascas da cor da parede (`wallChip`). Marcas e lascas (que caem e ficam no chão) duram `CHIP_LIFE = 8` s e somem aos poucos (`updateChips`).
 
+**✅ 6º chat (5ª rodada) — tutorial completo:** 13 passos em `TUT` (andar, atirar, recarregar, trocar arma, granada, abrir baú,
+pegar item, entrar no carro, dirigir, sair, abrir porta, subir escada, eliminar bots). No celular o botão certo pisca (`.tutHi`);
+no PC aparece a tecla (`#tutKey`). Baú/carro/porta/escada têm seta (`tutTarget()` → `#objArrow`). Ações registradas em `lootAction` (`tut.acts`).
+Jogador novo (sem partidas, sem tutorial e sem ter pulado) vê `#firstBoard` "PRIMEIRA VEZ AQUI?" (Fazer/Pular → `career.tutSkip`).
+
 **➡️ PRÓXIMO CHAT:** nenhum pedido pendente do usuário.
 
 **Pendências pequenas no protótipo**
