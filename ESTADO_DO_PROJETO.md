@@ -168,6 +168,7 @@ bots travados sem linha de tiro, CTs correndo direto para desarmar, avião fora 
 - **Escada de mão do barracão** agora é botão: SUBIR ESCADA / DESCER ESCADA (usa o mesmo sistema da tirolesa, `ladderZ` em `zips`, 1,3 s). Não é mais rampa.
 - **Portas** não ficam mais transparentes (saíram de `fadeables`).
 - **Mira/tiro sem alvo acompanham o relevo** (`groundShot`, trechos de 1,5 m): sobem morro e descem em parte baixa em vez de bater no chão. Linha de mira conta o acessório mira.
+- **Metralhadora fixa:** só aparece no modo Bandeira; superaquece com 20 tiros (~1,5 s) e fica 4 s sem atirar; tiro sai na frente dos sacos de areia (antes batia neles).
 - **SMG:** dispersão 0,036 → 0,026, alcance 22 → 26; traçante não sai de trás da parede quando colado nela (todas as armas).
 
 **Não feito (combinado com o usuário):**

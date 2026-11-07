@@ -75,7 +75,7 @@ Obs.: Pages grátis só em repositório público.
 - Armas: Escopeta, SMG, Metralhadora; acessórios silenciador e mira (baús/loja).
 - Granadas: Molotov, Impacto, Mina.
 - Roupas de camuflagem e acessórios (só visual) no menu.
-- Quadriciclo e jipe, metralhadora fixa, tirolesa, portas, telhado do barracão com escada, cabanas de madeira quebráveis, mato alto.
+- Quadriciclo e jipe, metralhadora fixa (só no modo Bandeira; superaquece rápido), tirolesa, portas, telhado do barracão com escada, cabanas de madeira quebráveis, mato alto.
 - BR: airdrop. Drone (tecla V / botão DRONE). Caído/reanimar nos modos de time.
 - Modo Capture a Bandeira e clima Neblina.
 - Tecla **F** / botão laranja: ação do que estiver perto (baú, porta, veículo, metralhadora, tirolesa).
