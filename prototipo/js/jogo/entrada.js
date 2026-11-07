@@ -28,6 +28,24 @@ function mouseWorld() {
   ray.setFromCamera(ndc, camera); mousePlane.constant = -(player.y + 1.0);
   return ray.ray.intersectPlane(mousePlane, mouseHit) ? mouseHit : null;
 }
+// alvo mais alto/baixo (morro, telhado): na tela ele aparece deslocado em relação à altura do jogador.
+// Se a mira passa por cima da IMAGEM do inimigo, a direção vai para a posição real dele.
+const _ap = new V3();
+function aimSnap(ang) {
+  const p = player, fx = Math.sin(ang), fz = Math.cos(ang), range = p.w.range * (p.attOn.mira ? 1.25 : 1);
+  let best = null, bd = Infinity;
+  for (const t of enemiesOf(p)) {
+    if (!t.alive || Math.abs(t.y - p.y) < 0.6) continue;
+    _ap.set(t.pos.x, t.y + SHOT_H, t.pos.z).project(camera);
+    ray.setFromCamera(ndc.set(_ap.x, _ap.y), camera); mousePlane.constant = -(p.y + SHOT_H);
+    if (!ray.ray.intersectPlane(mousePlane, _ap)) continue;
+    const ox = _ap.x - p.pos.x, oz = _ap.z - p.pos.z, pr = ox * fx + oz * fz;
+    if (pr <= 0 || Math.hypot(t.pos.x - p.pos.x, t.pos.z - p.pos.z) > range) continue;
+    const perp = Math.sqrt(Math.max(0, ox * ox + oz * oz - pr * pr));
+    if (perp < HIT_R + 0.3 && pr < bd && los(p, t)) { bd = pr; best = t; }
+  }
+  return best ? Math.atan2(best.pos.x - p.pos.x, best.pos.z - p.pos.z) : ang;
+}
 const usingMouse = () => mouse.has && now - lastTouch > 1.5;
 function cycleNade() {
   const p = player, i = NADE_ORDER.indexOf(p.nadeSel);
@@ -150,6 +168,7 @@ function updatePlayer(dt) {
   p.move(mx, mz, p.w.speed * (firing && p.w.kind === 'gun' ? 0.82 : 1) * (p.walking ? 0.5 : 1), dt);
   // passos correndo: bots inimigos por perto ouvem
   if (p.moving && !p.walking && (stepT -= dt) <= 0) { stepT = 0.5; for (const b of enemiesOf(p)) if (b.isBot && b.pos.distanceTo(p.pos) < 13) botHeard(b, p.pos); }
+  if (aimAng !== null && showAim) aimAng = aimSnap(aimAng);
   if (aimAng !== null) p.facing = aimAng; else if (p.moving) p.facing = Math.atan2(mx, mz);
   // AWP (luneta): segurar = mirar com a linha vermelha; soltar = atirar
   if (p.w.scope) {

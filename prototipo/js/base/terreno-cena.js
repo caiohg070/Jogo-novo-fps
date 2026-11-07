@@ -12,7 +12,7 @@ if (BR_SEED) for (let i = 0, n = 9 + Math.floor(srnd() * 5); i < n; i++) {
   const a = srnd() * 6.283, r = 58 + srnd() * 24;
   BR_HILLS.push([Math.cos(a) * r, Math.sin(a) * r, 3 + srnd() * 6, 70 + srnd() * 150]);
 }
-function rawHeight(x, z) {
+function baseHeight(x, z) {
   let h = 1.6 * Math.sin(x * 0.09 + 0.5) * Math.cos(z * 0.075 - 0.3)
         + 0.7 * Math.sin(x * 0.21 + z * 0.17)
         + 5.5 * Math.exp(-((x - 24) ** 2 + (z - 20) ** 2) / 110)
@@ -22,8 +22,14 @@ function rawHeight(x, z) {
   for (const [hx, hz, hh, hw] of BR_HILLS) h += hh * Math.exp(-((x - hx) ** 2 + (z - hz) ** 2) / hw);
   const e = Math.max(Math.abs(x), Math.abs(z));
   h += smooth(MAP - 4, MAP + 9, e) * 15;
-  h = lerp(h, -0.5 + 0.035 * x - 0.03 * z, roadFactor(x, z) * 0.75);
   return h;
+}
+// rua: acompanha a altura MÉDIA do relevo em volta (sobe/desce o morro suave), em vez de cortar o morro num paredão
+function rawHeight(x, z) {
+  const h = baseHeight(x, z), rf = roadFactor(x, z);
+  if (rf <= 0) return h;
+  const D = 7, avg = (h + baseHeight(x + D, z) + baseHeight(x - D, z) + baseHeight(x, z + D) + baseHeight(x, z - D)) / 5;
+  return lerp(h, lerp(-0.5 + 0.035 * x - 0.03 * z, avg, 0.85), rf * 0.75);
 }
 const BARN = { x0: 6, x1: 26, z0: -36, z1: -21 };
 let BARN_Y = 0;
@@ -97,6 +103,9 @@ let terrainMat;
   const g = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG);
   g.rotateX(-Math.PI / 2);
   const p = g.attributes.position, col = new Float32Array(p.count * 3), c = new THREE.Color();
+  // bunker: as linhas da malha mais próximas das paredes vão exatamente para a borda dele (sem rampa afundando por fora)
+  const cell = SIZE / SEG, snap = (v, a, b) => Math.abs(v - a) < cell / 2 ? a : Math.abs(v - b) < cell / 2 ? b : v;
+  for (let i = 0; i < p.count; i++) { p.setX(i, snap(p.getX(i), BK.x0, BK.x1)); p.setZ(i, snap(p.getZ(i), BK.z0, BK.z1)); }
   for (let i = 0; i < p.count; i++) {
     const x = p.getX(i), z = p.getZ(i);
     p.setY(i, terrainHeight(x, z));
@@ -105,6 +114,13 @@ let terrainMat;
     col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
   }
   g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  // tira os triângulos de dentro do bunker (o buraco é fechado pelas paredes e pelo teto)
+  const idx = g.index.array, keep = [];
+  for (let i = 0; i < idx.length; i += 3) {
+    const [a, b, c] = [idx[i], idx[i + 1], idx[i + 2]];
+    if (!inBK((p.getX(a) + p.getX(b) + p.getX(c)) / 3, (p.getZ(a) + p.getZ(b) + p.getZ(c)) / 3)) keep.push(a, b, c);
+  }
+  g.setIndex(keep);
   g.computeVertexNormals();
   terrainMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 });
   const m = new THREE.Mesh(g, terrainMat);
