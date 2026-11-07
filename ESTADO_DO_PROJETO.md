@@ -213,7 +213,14 @@ pegar item, entrar no carro, dirigir, sair, abrir porta, subir escada, eliminar 
 no PC aparece a tecla (`#tutKey`). Baú/carro/porta/escada têm seta (`tutTarget()` → `#objArrow`). Ações registradas em `lootAction` (`tut.acts`).
 Jogador novo (sem partidas, sem tutorial e sem ter pulado) vê `#firstBoard` "PRIMEIRA VEZ AQUI?" (Fazer/Pular → `career.tutSkip`).
 
-**➡️ PRÓXIMO CHAT:** nenhum pedido pendente do usuário.
+**➡️ PRÓXIMO CHAT — pedidos do usuário ainda NÃO feitos (fazer primeiro)**
+1. **Caixotes empilhados:** a caixa só some quando é quebrada, e a de **cima fica flutuando** quando a de baixo quebra.
+   Onde: `crate()` (pilha com `stack`) e `hurtProp()` (remove mesh + collider). Fazer a de cima cair até o chão/caixa de baixo
+   (ou quebrar junto), atualizando o collider (`m.userData.col`).
+2. **Andar de cima da casa:** quando o jogador está no 2º andar **não aparece o personagem** e **não dá para ver portas e janelas**.
+   Onde: `updateWalls()` / `fadeables` / `upper` / `insideHouse()` (lógica que esconde o telhado/andar de cima e deixa paredes
+   transparentes). Garantir que, no andar de cima, o jogador fique visível (paredes/laje acima dele transparentes) e que portas e
+   janelas (`doors`, `glasses`, vãos de `windowWall`) continuem visíveis ou marcadas.
 
 **Pendências pequenas no protótipo**
 - [ ] Sons que falharam por fila do ElevenLabs: puxar pino da granada, alicate de desarme, bala no concreto, caixote quebrando.
