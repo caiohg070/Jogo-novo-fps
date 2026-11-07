@@ -134,8 +134,9 @@ const OUTER_LOOT = [];
 for (const [x, z, r] of [[-16, 21, 2], [31, -13, 2.2], [-31, -19, 1.8], [7, 35, 2.2], [-36, 13, 2], [21, 33, 1.8], [36, 24, 2], [-8, -40, 2]])
   if (!colliders.some(c => x > c.x0 - r && x < c.x1 + r && z > c.z0 - r && z < c.z1 + r)) bushes.push({ x, z, r });
 {
-  const mat = new THREE.MeshStandardMaterial({ color: srgb(0x5a6a32), roughness: 1, flatShading: true });
-  const mat2 = new THREE.MeshStandardMaterial({ color: srgb(0x6e7a3a), roughness: 1, flatShading: true });
+  // folhas meio transparentes: quem está dentro do arbusto aparece (antes sumia por completo)
+  const mat = new THREE.MeshStandardMaterial({ color: srgb(0x5a6a32), roughness: 1, flatShading: true, transparent: true, opacity: 0.55, depthWrite: false });
+  const mat2 = new THREE.MeshStandardMaterial({ color: srgb(0x6e7a3a), roughness: 1, flatShading: true, transparent: true, opacity: 0.55, depthWrite: false });
   const geo = new THREE.IcosahedronGeometry(0.75, 0), N = bushes.reduce((a, k) => a + Math.ceil(k.r * 5), 0);
   const im = [new THREE.InstancedMesh(geo, mat, N), new THREE.InstancedMesh(geo, mat2, N)], cnt = [0, 0], d = new THREE.Object3D();
   for (const k of bushes) {
