@@ -252,11 +252,13 @@ class Soldier {
       const P = aimPoint(best, undefined, undefined, this);   // centro do alvo (a borda podia ficar dentro da mureta)
       let block = shotBlock(origin, P), dist = origin.distanceTo(P);
       let hp1 = hitProp, lh = lastHit;
-      // alvo no alto (telhado/terraço): se a linha reta até a cabeça/ombro está livre, acerta (antes a mureta/laje sempre barrava)
-      if (block < dist - 0.2 && best.y - this.y > 1.2) for (const hh of [1.65, 1.35]) {
-        const Q = new V3(best.pos.x, best.y + hh, best.pos.z), b2 = firstHit(origin, Q), d2 = origin.distanceTo(Q);
+      // relevo com altos e baixos (morro, telhado, terraço): se o caminho padrão bate em algo, tenta linhas retas
+      // de verdade até o peito, ombro e cabeça do alvo; a primeira livre vale (a bala sai reta, sem curva)
+      if (block < dist - 0.2) for (const hh of [SHOT_H + 0.1, 1.35, 1.6, 0.7]) {
+        const Q = new V3(best.pos.x, best.y + hh + (best.downed ? -0.6 : 0), best.pos.z), b2 = firstHit(origin, Q), d2 = origin.distanceTo(Q);
         if (b2 >= d2 - 0.15 && !smokeBlocks(origin, Q)) { P.copy(Q); block = Infinity; dist = d2; break; }
       }
+      if (block < dist - 0.2) { block = shotBlock(origin, P); hp1 = hitProp; lh = lastHit; }   // nada livre: volta ao bloqueio original (marca e dano no que barrou)
       hp1 = block < dist - 0.2 ? hp1 : null;
       if (block < dist - 0.2) { end = origin.clone().add(P.sub(origin).normalize().multiplyScalar(block)); bulletHit(end); if (hp1) hurtProp(hp1, randInt(w.dmg[0], w.dmg[1]), this); else wallChip(lh); }
       else { end = P; damage(best, randInt(w.dmg[0], w.dmg[1]) * (this.isBot ? diff.dmg : 1), this, w.pen); hitProp = null; blood(P); }

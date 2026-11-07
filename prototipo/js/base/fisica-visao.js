@@ -131,5 +131,7 @@ const onTerrace = t => t.y > H1 - 0.3 && t.pos.x > HOUSE.x0 && t.pos.x < HOUSE.x
 const nearEdge = t => Math.min(t.pos.x - HOUSE.x0, HOUSE.x1 - t.pos.x, t.pos.z - HOUSE.z0, HOUSE.z1 - t.pos.z) < 1.3;
 const peek = (t, from) => (t.y - from.y > 1.5 && onTerrace(t) && nearEdge(t) ? (now - t.lastShot < 0.7 ? 0.3 : -0.3) : 0);
 function aimPoint(t, x, z, from) { const hi = from && t.y - from.y > 1.5 && !onTerrace(t); return new V3(x ?? t.pos.x, t.y + SHOT_H + (t.turret ? 0.45 : 0) + (t.downed ? -0.6 : 0) + (from ? peek(t, from) : 0) + (hi ? rand(0.1, 0.5) : rand(-0.05, 0.1)), z ?? t.pos.z); }
-const canShoot = (a, b) => shotBlock(eye(a, SHOT_H + lean(a, b)), aimPoint(b, null, null, a)) === Infinity;
+// linha reta livre até peito/ombro/cabeça (morro, telhado): mesma regra do tiro em shootRay
+const straightOpen = (o, t) => [SHOT_H + 0.1, 1.35, 1.6, 0.7].some(hh => { const Q = new V3(t.pos.x, t.y + hh + (t.downed ? -0.6 : 0), t.pos.z); return firstHit(o, Q) >= o.distanceTo(Q) - 0.15 && !smokeBlocks(o, Q); });
+const canShoot = (a, b) => { const o = eye(a, SHOT_H + lean(a, b)); return shotBlock(o, aimPoint(b, null, null, a)) === Infinity || straightOpen(o, b); };
 
