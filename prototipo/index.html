@@ -242,8 +242,8 @@ const WEAPONS = {
   ak:     { name: 'AK-47', kind: 'gun', slot: 'primary', mag: 30, reserve: 90, rate: 0.1, dmg: [27, 36], spread: 0.03, range: 32, reload: 2.4, speed: 5.0, pen: 0.55, snd: [3200, 150, 0.38] },
   m4:     { name: 'Colt M4', kind: 'gun', slot: 'primary', mag: 30, reserve: 90, rate: 0.085, dmg: [22, 29], spread: 0.019, range: 34, reload: 2.1, speed: 5.2, pen: 0.5, snd: [4300, 190, 0.3] },
   awp:    { name: 'AWP', kind: 'gun', slot: 'primary', mag: 5, reserve: 20, rate: 1.45, dmg: [108, 122], spread: 0.002, moveSpread: 0.14, range: 60, reload: 3.6, speed: 4.3, pen: 0.85, scope: true, snd: [1800, 90, 0.6] },
-  deagle: { name: 'Desert Eagle', kind: 'gun', slot: 'secondary', mag: 7, reserve: 35, rate: 0.36, dmg: [46, 60], spread: 0.022, range: 28, reload: 2.2, speed: 5.4, pen: 0.6, snd: [2400, 120, 0.45] },
-  pistol: { name: 'Pistola', kind: 'gun', slot: 'secondary', mag: 20, reserve: 120, rate: 0.15, dmg: [16, 22], spread: 0.03, range: 24, reload: 2.0, speed: 5.5, pen: 0.3, snd: [5000, 220, 0.22] },
+  deagle: { name: 'Desert Eagle', kind: 'gun', slot: 'secondary', mag: 7, reserve: 35, rate: 0.5, dmg: [46, 60], spread: 0.022, range: 28, reload: 2.2, speed: 5.4, pen: 0.6, snd: [2400, 120, 0.45] },
+  pistol: { name: 'Pistola', kind: 'gun', slot: 'secondary', mag: 20, reserve: 120, rate: 0.3, dmg: [16, 22], spread: 0.03, range: 24, reload: 2.0, speed: 5.5, pen: 0.3, snd: [5000, 220, 0.22] },
   knife:  { name: 'Faca', kind: 'melee', slot: 'knife', rate: 0.55, dmg: [50, 60], range: 1.8, speed: 6.2, pen: 0.5 },
 };
 const NADES = { flash: { name: 'Flash', fuse: 1.5 }, he: { name: 'HE', fuse: 1.6 }, smoke: { name: 'Smoke', fuse: 1.2 } };
@@ -437,7 +437,7 @@ function windowWall(x0, x1, z0, z1, y0, y1) { wall(x0, x1, z0, z1, y0, y0 + 1.0)
   box(3.2, x1, z0, -12.6, H1 - 0.25, H1, SL, { collide: false, upper: true });
   surfaces.push({ x0, x1: 3.2, z0, z1, h: () => H1 });
   surfaces.push({ x0: 3.2, x1, z0, z1: -12.6, h: () => H1 });
-  const PT = 0.25, py0 = H1, py1 = H1 + 1.15, PC = 0xcbb895;
+  const PT = 0.25, py0 = H1, py1 = H1 + 0.95, PC = 0xcbb895;
   wall(x0, x1, z1 - PT, z1, py0, py1, { upper: true, color: PC });
   wall(x0, x1, z0, z0 + PT, py0, py1, { upper: true, color: PC });
   wall(x0, x0 + PT, z0, z1, py0, py1, { upper: true, color: PC });
@@ -676,7 +676,7 @@ function firstHit(a, b) {
 function shotBlock(o, P) {
   const hx = P.x - o.x, hz = P.z - o.z, hl = Math.hypot(hx, hz);
   if (hl < 0.01) return Infinity;
-  const k = Math.min(1.5, hl * 0.4) / hl;
+  const up = o.y - P.y > 1.5, k = Math.min(up ? 2.2 : 1.5, hl * (up ? 0.5 : 0.4)) / hl;
   const A = new V3(o.x + hx * k, o.y, o.z + hz * k), B = new V3(P.x - hx * k, P.y, P.z - hz * k);
   const dA = o.distanceTo(A), dAB = A.distanceTo(B);
   let h = firstHit(o, A); if (h < Infinity) return h;
@@ -695,9 +695,9 @@ function smokeBlocks(a, b) {
 const eye = (s, h = 1.5) => new V3(s.pos.x, s.y + h, s.pos.z);
 const los = (a, b) => { const A = eye(a), B = eye(b); return !smokeBlocks(A, B) && firstHit(A, B) === Infinity; };
 // no alto (terraço/escada) quem atira se inclina por cima da mureta; o alvo no alto só expõe a cabeça quando está atirando
-const lean = (a, b) => (a.y - b.y > 1.5 ? 0.35 : 0);
+const lean = (a, b) => (a.y - b.y > 1.5 ? 0.45 : 0);
 const onTerrace = t => t.y > H1 - 0.3 && t.pos.x > HOUSE.x0 && t.pos.x < HOUSE.x1 && t.pos.z > HOUSE.z0 && t.pos.z < HOUSE.z1;
-const peek = (t, from) => (t.y - from.y > 1.5 && onTerrace(t) ? (now - t.lastShot < 0.7 ? 0.3 : -0.1) : 0);
+const peek = (t, from) => (t.y - from.y > 1.5 && onTerrace(t) ? (now - t.lastShot < 0.7 ? 0.3 : -0.3) : 0);
 function aimPoint(t, x, z, from) { return new V3(x ?? t.pos.x, t.y + SHOT_H + (from ? peek(t, from) : 0) + rand(-0.05, 0.1), z ?? t.pos.z); }
 const canShoot = (a, b) => shotBlock(eye(a, SHOT_H + lean(a, b)), aimPoint(b, null, null, a)) === Infinity;
 
@@ -991,10 +991,10 @@ class Soldier {
     let end;
     if (best) {
       origin.y = this.y + SHOT_H + lean(this, best);
-      const P = aimPoint(best, origin.x + dx * bestT, origin.z + dz * bestT, this);
+      const P = aimPoint(best, undefined, undefined, this);   // centro do alvo (a borda podia ficar dentro da mureta)
       const block = shotBlock(origin, P), dist = origin.distanceTo(P);
-      if (block < dist - 0.2) { end = origin.clone().add(P.sub(origin).normalize().multiplyScalar(block)); impact(end); }
-      const hp1 = hitProp; if (block < dist - 0.2 && hp1) hurtProp(hp1, randInt(w.dmg[0], w.dmg[1]));
+      const hp1 = hitProp;
+      if (block < dist - 0.2) { end = origin.clone().add(P.sub(origin).normalize().multiplyScalar(block)); impact(end); if (hp1) hurtProp(hp1, randInt(w.dmg[0], w.dmg[1])); }
       else { end = P; damage(best, randInt(w.dmg[0], w.dmg[1]) * (this.isBot ? diff.dmg : 1), this, w.pen); hitProp = null; blood(P); }
     } else {
       const far = new V3(origin.x + dx * w.range, origin.y, origin.z + dz * w.range);
@@ -1640,8 +1640,8 @@ function updatePlayer(dt) {
 // ================= câmera, paredes, HUD =================
 const camTarget = new V3();
 function updateCamera(dt) {
-  camTarget.lerp(new V3(player.pos.x, player.air ? Math.min(player.y, 6) : player.y, player.pos.z), Math.min(1, dt * 8));
-  camZoom = lerp(camZoom, player.air === 'plane' ? 2.3 : player.air ? 1.7 : player.alive && player.w.scope ? 1.4 : 1, Math.min(1, dt * 3));
+  camTarget.lerp(new V3(player.pos.x, player.air ? player.y - 2 : player.y, player.pos.z), Math.min(1, dt * 8));
+  camZoom = lerp(camZoom, player.air === 'plane' ? 1.5 : player.air ? 1.35 : player.alive && player.w.scope ? 1.4 : 1, Math.min(1, dt * 3));
   camera.position.copy(camTarget).addScaledVector(CAM_OFF, camScale * camZoom); camera.position.z += 1.8 * camScale * camZoom;
   if (shakeT > 0) { shakeT -= dt; camera.position.x += rand(-1, 1) * shakeT * 1.2; camera.position.z += rand(-1, 1) * shakeT * 1.2; }
   sun.position.copy(camTarget).add(SUN_OFF); sun.target.position.copy(camTarget);
@@ -1706,7 +1706,7 @@ function updateHud() {
     const [x, y, ok] = toScreen(new V3(s.pos.x, s.y + 2.15, s.pos.z));
     const enemy = s.team !== p.team;
     const covered = enemy && ((insideHouse(s) && upper[0].visible) || (inBK(s.pos.x, s.pos.z) && s.y < BK_TOP - 1 && bunkerRoof[0].visible) || inSmoke(s));
-    const hidden = !s.alive || !ok || covered;
+    const hidden = !s.alive || !ok || covered || s.air === 'plane';
     s.tag.style.display = hidden ? 'none' : '';
     if (!hidden) {
       s.tag.style.transform = `translate(${x}px,${y}px) translate(-50%,-100%)`; s.tagFill.style.width = s.hp + '%';
@@ -1760,7 +1760,7 @@ function drawMinimap() {
 }
 
 // ================= Battle Royale =================
-const PLANE_Y = 34;
+const PLANE_Y = 20;
 const plane = { mesh: new THREE.Group(), pos: new V3(), dir: new V3(), t: 0, len: 0, active: false };
 {
   const m = new THREE.MeshStandardMaterial({ color: srgb(0x7c8279), roughness: 0.6, metalness: 0.3 });
