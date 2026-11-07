@@ -97,9 +97,10 @@ body:not(.is-touch) #actBtn{right:50%;transform:translateX(50%);top:auto;bottom:
 .edge{position:absolute;left:0;top:0;color:#ff5a4a;font-size:22px;text-shadow:0 0 4px #000;pointer-events:none}
 .edge.ally{display:none!important}
 #objArrow{position:fixed;left:0;top:0;z-index:6;pointer-events:none;display:none;text-align:center;white-space:nowrap}
-#objArrow i{display:block;font-style:normal;font-size:34px;line-height:1;color:var(--accent);text-shadow:0 0 6px #000,0 0 12px rgba(232,163,58,.8)}
+#objArrow i{display:block;width:40px;height:40px;margin:0 auto;font-style:normal;line-height:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)) drop-shadow(0 0 8px rgba(232,163,58,.55))}
 #objArrow span{display:inline-block;margin-top:2px;padding:2px 7px;border-radius:5px;background:rgba(18,16,13,.75);color:#ffe28a;font-size:11px;font-weight:800;letter-spacing:.04em}
-#objArrow.on-screen i{animation:bob .8s ease-in-out infinite alternate}
+#objArrow.on-screen i{animation:bobd .8s ease-in-out infinite alternate}
+@keyframes bobd{from{transform:rotate(180deg)}to{transform:rotate(180deg) translateY(-8px)}}
 @keyframes bob{to{transform:translateY(8px)}}
 .board{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;background:rgba(14,12,10,.8)}
 .board .card{width:min(560px,calc(100% - 24px));padding:16px 18px;max-height:calc(100% - 24px);overflow:auto}

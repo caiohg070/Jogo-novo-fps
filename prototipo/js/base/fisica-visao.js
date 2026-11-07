@@ -76,8 +76,9 @@ function updateFalling(dt) {
 function thud(m) { if (actx) { const v = vol(player.pos.distanceTo(m.position)); tone(110, 55, 0.15, 0.2 * v, 'triangle'); noise(0.12, 0.15 * v, 'lowpass', 600); } }
 // tiro/mira sem alvo acompanha o relevo: sobe nos morros e desce nas partes baixas (em trechos de 1,5 m)
 function groundShot(o, dx, dz, range, shooter) {
-  const onGround = Math.abs(shooter.y - terrainHeight(shooter.pos.x, shooter.pos.z)) < 0.35, base = o.y - shooter.y;
-  const yAt = (x, z) => onGround ? Math.max(terrainHeight(x, z) + base, o.y - 4) : Math.max(o.y, terrainHeight(x, z) + base);
+  // a bala acompanha o chão onde a mira passa: sobe o morro, desce do telhado/morro (em qualquer parte do mapa)
+  const base = o.y - shooter.y; let gy = shooter.y;
+  const yAt = (x, z) => { gy = groundAt(x, z, gy + 0.3); return gy + base; };
   let a = o.clone(), d = 0; const STEP = 1.5, pts = [];   // pts: caminho do tiro (sobe/desce com o morro)
   while (d < range) {
     const n = Math.min(range, d + STEP), x = o.x + dx * n, z = o.z + dz * n, b = new V3(x, yAt(x, z), z);

@@ -141,7 +141,7 @@ function updateChips(dt) {
     m.material.opacity = clamp((CHIP_LIFE - age) / 1.5, 0, 1);
   }
 }
-function wallChip(hit) {
+function wallChip(hit, slash) {
   if (!hit || !hit.face) return;
   const m = hit.object; if (m.userData.veh || !m.parent || m.geometry !== boxGeo) return;
   const n = hit.face.normal, col = m.material.color;
@@ -156,7 +156,8 @@ function wallChip(hit) {
   const c = new THREE.Mesh(chipGeo, mat), sz = rand(0.16, 0.26), sc = m.scale;
   const local = m.worldToLocal(hit.point.clone()); local.addScaledVector(n, 0.004 / Math.max(Math.abs(n.x) * sc.x, Math.abs(n.y) * sc.y, Math.abs(n.z) * sc.z));
   c.position.copy(local);
-  c.scale.set((Math.abs(n.x) > 0.5 ? 0.01 : sz) / sc.x, (Math.abs(n.y) > 0.5 ? 0.01 : sz) / sc.y, (Math.abs(n.z) > 0.5 ? 0.01 : sz) / sc.z);
+  const sy = slash ? 0.05 : sz, sh = slash ? 0.42 : sz;              // faca: risco comprido e fino
+  c.scale.set((Math.abs(n.x) > 0.5 ? 0.01 : sh) / sc.x, (Math.abs(n.y) > 0.5 ? 0.01 : sy) / sc.y, (Math.abs(n.z) > 0.5 ? 0.01 : sh) / sc.z);
   c.userData.t = now;
   c.onBeforeRender = () => { mat.opacity = 0.9 * clamp((CHIP_LIFE - (now - c.userData.t)) / 1.5, 0, 1) * (m.material.transparent ? m.material.opacity : 1); };
   m.add(c); chips.push(c);

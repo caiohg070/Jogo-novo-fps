@@ -67,10 +67,10 @@ function updateObjArrow() {
   const side = Math.min(150, innerWidth * 0.22), L = side, R = innerWidth - side, Tp = tt ? 150 : 90, B = innerHeight - 100;
   const inside = ok && sx > L && sx < R && sy > Tp && sy < B;
   objEl.classList.toggle('on-screen', inside);
-  if (inside) { objIco.textContent = '▼'; objIco.style.transform = ''; objEl.style.transform = `translate(${sx}px,${sy}px) translate(-50%,-100%)`; return; }
+  if (inside) { objIco.style.transform = 'rotate(180deg)'; objEl.style.transform = `translate(${sx}px,${sy}px) translate(-50%,-100%)`; return; }
   const cx = innerWidth / 2, cy = innerHeight / 2; let dx = (ok ? sx : 2 * cx - sx) - cx, dy = (ok ? sy : 2 * cy - sy) - cy;
   const k = Math.min((dx > 0 ? R - cx : cx - L) / Math.abs(dx || 1e-3), (dy > 0 ? B - cy : cy - Tp) / Math.abs(dy || 1e-3));
-  objIco.textContent = '▲'; objIco.style.transform = `rotate(${Math.atan2(dx, -dy)}rad)`;
+  objIco.style.transform = `rotate(${Math.atan2(dx, -dy)}rad)`;
   objEl.style.transform = `translate(${cx + dx * k}px,${cy + dy * k}px) translate(-50%,-50%)`;
 }
 function updateHud() {

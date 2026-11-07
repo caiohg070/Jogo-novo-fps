@@ -275,9 +275,11 @@ class Soldier {
       return true;
     }
     // golpe no vazio: risco na parede/caixa à frente ou no chão
-    const o = eye(this, 1.1), f = o.clone().add(new V3(Math.sin(ang) * w.range, 0, Math.cos(ang) * w.range));
-    if (firstHit(o, f) < Infinity && lastHit) { if (hitProp) hurtProp(hitProp, 25, this); else wallChip(lastHit); }
-    else groundMark(new V3(this.pos.x + Math.sin(ang) * 1.2, this.y, this.pos.z + Math.cos(ang) * 1.2), 0.32, 0x1a1410, 0.75, CHIP_LIFE, 0.18);
+    for (const h of [1.1, 0.55]) {                              // altura do peito e baixa (caixas, sacos de areia)
+      const o = eye(this, h), f = o.clone().add(new V3(Math.sin(ang) * (w.range + 0.3), 0, Math.cos(ang) * (w.range + 0.3)));
+      if (firstHit(o, f) < Infinity && lastHit) { const hp = hitProp, lh = lastHit; wallChip(lh, true); bulletHit(lh.point); if (hp) hurtProp(hp, 25, this); return true; }
+    }
+    groundMark(new V3(this.pos.x + Math.sin(ang) * 1.2, this.y, this.pos.z + Math.cos(ang) * 1.2), 0.32, 0x1a1410, 0.75, CHIP_LIFE, 0.18);
     return true;
   }
   useKit() {
