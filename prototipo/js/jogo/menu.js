@@ -23,7 +23,7 @@ $('#cfgOpen').addEventListener('click', openCfg); $('#cfgOpen2').addEventListene
 $('#cfgClose').addEventListener('click', () => { $('#cfgBoard').style.display = 'none'; document.body.classList.remove('cfg-open'); });
 $('#cfgReset').addEventListener('click', () => { Object.assign(cfg, { vol: 80, size: 100, op: 20, h: 64 }); for (const k in cfg) { $('#c-' + k).value = cfg[k]; $('#cv-' + k).textContent = cfg[k] + '%'; } applyCfg(); try { localStorage.removeItem('tatico.cfg'); } catch {} });
 // jogador novo (nunca jogou nem fez/pulou o tutorial): oferece o tutorial antes
-if (!career.tutorial && !career.partidas && !career.tutSkip) $('#firstBoard').style.display = 'flex';
+if (!PEND && !career.tutorial && !career.partidas && !career.tutSkip) $('#firstBoard').style.display = 'flex';
 const selMode = v => { choice.mode = v; for (const o of document.querySelectorAll('.opts[data-group="mode"] .opt')) o.classList.toggle('on', o.dataset.v === v); };
 $('#firstYes').addEventListener('click', () => { $('#firstBoard').style.display = 'none'; selMode('tutorial'); $('#play').click(); });
 $('#firstNo').addEventListener('click', () => { $('#firstBoard').style.display = 'none'; career.tutSkip = true; saveCareer(); });
@@ -78,7 +78,32 @@ function updateTut() {
     } else if (tut.step === TUT.length - 1) for (const b of bots) b.revealT = 99;
   }
 }
+// Battle Royale: mapa grande e sorteado a cada partida → guarda as escolhas e recarrega a página
+let brUsed = false;
+function mapOverlay(txt, btn) {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center;background:rgba(20,16,10,.88);color:#f3e6c8;font:700 22px system-ui,sans-serif;text-align:center';
+  d.textContent = txt; document.body.appendChild(d);
+  if (btn) { const b = document.createElement('button'); b.textContent = btn; b.style.cssText = 'font:800 20px system-ui,sans-serif;padding:14px 34px;border:0;border-radius:10px;background:#e0892a;color:#1a120a'; d.appendChild(b); b.onclick = () => { d.remove(); $('#play').click(); }; }
+  return d;
+}
+function newMap() {
+  try {
+    const p = { mode: choice.mode, cls: choice.cls, weather: choice.weather, diff: choice.diff, seed: 1 + Math.floor(Math.random() * 2147483000) };
+    sessionStorage.setItem('tatico.pend', JSON.stringify(p));
+    if (JSON.parse(sessionStorage.getItem('tatico.pend')).seed !== p.seed) return false;
+  } catch { return false; }   // sem sessionStorage: joga no mapa que já está carregado
+  mapOverlay(choice.mode === 'br' ? 'Gerando mapa novo…' : 'Carregando mapa…');
+  setTimeout(() => location.reload(), 60); return true;
+}
+if (PEND) {   // voltou do recarregamento: restaura as escolhas e espera um toque (som e tela cheia precisam de toque)
+  for (const g of ['mode', 'cls', 'weather', 'diff']) if (PEND[g]) { choice[g] = PEND[g]; for (const o of document.querySelectorAll(`.opts[data-group="${g}"] .opt`)) o.classList.toggle('on', o.dataset.v === PEND[g]); }
+  applyWeather(choice.weather);
+  mapOverlay(BR_SEED ? `MAPA NOVO PRONTO (nº ${BR_SEED % 100000})` : 'MAPA PRONTO', 'JOGAR');
+}
 $('#play').addEventListener('click', () => {
+  if (choice.mode === 'br' ? !BR_SEED || brUsed : BR_SEED) { if (newMap()) return; }
+  if (choice.mode === 'br') brUsed = true;
   initAudio();
   const tutorial = choice.mode === 'tutorial';
   mode = tutorial ? 'treino' : choice.mode; diff = DIFF[choice.diff]; setupMatch(choice.cls); applyWeather(choice.weather);
