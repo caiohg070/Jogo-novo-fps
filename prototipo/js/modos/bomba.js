@@ -61,6 +61,16 @@ function toggleFS() {
   } catch { toast('Tela cheia não disponível neste app: abra o link no Chrome do celular'); }
 }
 $('#fsBtn').addEventListener('pointerdown', e => { e.stopPropagation(); toggleFS(); });
+// tela cheia automática no celular: no 1º toque em qualquer lugar (o navegador só deixa após um toque)
+const isFSnow = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function autoFS() {
+  if (!isTouch || isFSnow()) return;
+  const el = document.documentElement, r = (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el, { navigationUI: 'hide' });
+  r?.then?.(() => screen.orientation?.lock?.('landscape')).catch(() => {});
+}
+if (isTouch) document.addEventListener('pointerdown', e => { if (!e.target.closest?.('#fsBtn')) autoFS(); }, true);
+const fsSync = () => document.body.classList.toggle('fs', isFSnow());
+document.addEventListener('fullscreenchange', fsSync); document.addEventListener('webkitfullscreenchange', fsSync);
 // celular bloqueado / aba escondida: pausa o som e o jogo
 document.addEventListener('visibilitychange', () => {
   if (!actx) return;

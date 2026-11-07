@@ -94,7 +94,7 @@ function renderCareer() {
 let killInfo = '';
 function die(t, by) {
   if (!t.alive) return;
-  if (player) sfxAt('morte', t.pos, t === player ? 0.35 : 0.25, { rate: 0.85, dur: 1.1 });   // gemido de morte (mais grave e baixo)
+  if (player) sfxAt('morte', t.pos, 0.1, { rate: 0.85, dur: 1.1 });   // gemido de morte (bem baixo: 10%)
   t.downed = false;
   if (t.veh) { t.veh.driver = null; if (t === player) engineStop(); t.veh = null; t.y = groundAt(t.pos.x, t.pos.z, t.y + 1); }
   if (t.turret) leaveTurret(t);

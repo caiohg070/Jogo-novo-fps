@@ -334,3 +334,10 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - **Acerto (`sons/acerto.mp3`):** trocado por um "tic" curto e baixo do ElevenLabs (0,16 s); volume 0,35 e no máximo 1 a cada 0,07 s.
 - **Levar dano (`sons/dano.mp3`):** o gemido virou um baque abafado do ElevenLabs (0,28 s); volume 0,3, no máximo 1 por segundo (`js/jogo/estado.js`).
 - **Morte:** o gemido antigo foi guardado como `sons/morte.mp3`, tocado mais baixo (0,35 jogador / 0,25 outros).
+
+## Gemido 10%, tela cheia automática e aviso de girar
+- Gemido de morte em volume 0,1 (`js/jogo/estado.js`).
+- Celular: o 1º toque em qualquer lugar já coloca em tela cheia e trava na horizontal (Android) — `autoFS()` em `js/modos/bomba.js`.
+- Botão ⛶ pequeno e meio transparente no topo, no centro: só aparece em tela cheia e serve para sair.
+- Celular em pé: aviso discreto "↻ Gire o celular" embaixo (iPhone não deixa travar a rotação).
+- Modo app (manifesto / ícone na tela inicial) ficou para depois.
