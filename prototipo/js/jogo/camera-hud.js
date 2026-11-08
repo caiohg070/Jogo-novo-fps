@@ -10,8 +10,8 @@ function updateCamera(dt) {
   camTarget.lerp(new V3(f.pos.x, f.air ? f.y - 2 : f.y, f.pos.z), Math.min(1, dt * (kc ? 4 : 8)));
   camZoom = lerp(camZoom, player.air === 'plane' ? 1.5 : player.air ? 1.35 : player.veh ? 1.25 + Math.abs(player.veh.v) / 60 : player.alive && player.w.scope && scopeHeld ? 0.92 : player.alive && player.attOn.mira ? 1.15 : player.turret ? 1.2 : 1, Math.min(1, dt * 3));
   const sc = !kc && player.alive && !player.air && !player.veh && player.w.scope && scopeHeld;   // AWP: só mexe a câmera enquanto mira
-  _so.set(sc ? Math.sin(player.facing) * 4.5 : 0, 0, sc ? Math.cos(player.facing) * 4.5 : 0);
-  scopeOff.lerp(_so, Math.min(1, dt * 4));
+  _so.set(sc ? Math.sin(player.facing) * 1 : 0, 0, sc ? Math.cos(player.facing) * 1 : 0);
+  scopeOff.lerp(_so, Math.min(1, dt * 2));   // metade da velocidade: desliza devagar
   camera.position.copy(camTarget).add(scopeOff).addScaledVector(CAM_OFF, camScale * camZoom); camera.position.y += 0.9;   // mira no meio do corpo: jogador no centro da tela
   if (shakeT > 0) { shakeT -= dt; camera.position.x += rand(-1, 1) * shakeT * 1.2; camera.position.z += rand(-1, 1) * shakeT * 1.2; }
   sun.position.copy(camTarget).add(SUN_OFF); sun.target.position.copy(camTarget);

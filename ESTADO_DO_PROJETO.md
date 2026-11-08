@@ -9,7 +9,7 @@
 ## Técnica (essencial)
 - `prototipo/index.html` (HTML) + `css/` + `js/` (ordem em `js/arquivos.js`). Sons em base64: `sons/sons.js`.
 - Câmera perspectiva fixa a 75° (quase de cima, vê o mesmo tanto para cima e para baixo) + "cantos cortados":
-  inimigo (boneco, vida e minimapa) só aparece se ele também te veria (`fairView`/`fairPair` em `camera-hud.js`; bots usam a mesma regra para mirar). AWP: câmera só muda enquanto mira, justo para quem está em cima ou embaixo.
+  inimigo (boneco, vida e minimapa) só aparece se ele também te veria (`fairView`/`fairPair` em `camera-hud.js`; bots usam a mesma regra para mirar). AWP: câmera só muda enquanto mira (zoom pequeno, 1 m para o lado da mira, som de ferrolho ao carregar), justo para quem está em cima ou embaixo.
   Personagens 3D de caixas, física própria (círculo × caixas).
 - Tiro hitscan: acerto 2D (`HIT_R`), bloqueio 3D com `shotBlock` em 3 trechos. Regras especiais em
   `js/base/fisica-visao.js`: `roofBlocked`/`parapetPoint` (terraço e telhado do barracão: chão a < 3 m não acerta),
