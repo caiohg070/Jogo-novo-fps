@@ -1,6 +1,6 @@
 # Estado do projeto (resumo atual)
 
-Última atualização: 07/11/2026. Histórico completo de cada chat: `HISTORICO.md` (só abrir se precisar).
+Última atualização: 08/11/2026. Histórico completo de cada chat: `HISTORICO.md` (só abrir se precisar).
 
 ## Links
 - Site: https://caiohg070.github.io/Jogo-novo-fps/ · Artifact: https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC
@@ -8,7 +8,9 @@
 
 ## Técnica (essencial)
 - `prototipo/index.html` (HTML) + `css/` + `js/` (ordem em `js/arquivos.js`). Sons em base64: `sons/sons.js`.
-- Câmera perspectiva fixa (estilo Brawl Stars), personagens 3D de caixas, física própria (círculo × caixas).
+- Câmera perspectiva fixa a 80° (quase de cima, vê o mesmo tanto para cima e para baixo) + "cantos cortados":
+  inimigo só aparece se ele também te veria (`fairView` em `camera-hud.js`), justo para quem está em cima ou embaixo.
+  Personagens 3D de caixas, física própria (círculo × caixas).
 - Tiro hitscan: acerto 2D (`HIT_R`), bloqueio 3D com `shotBlock` em 3 trechos. Regras especiais em
   `js/base/fisica-visao.js`: `roofBlocked`/`parapetPoint` (terraço e telhado do barracão: chão a < 3 m não acerta),
   `stairCut` (escada × fora da casa), `lean` (não vale na escada). Transparência de parede não afeta tiro.
@@ -35,3 +37,6 @@
 - Desempenho do BR em celular fraco não medido. Som da chuva curto (2 s).
 - Depois: Modo Zumbi, online (PeerJS), modo app. Plano final: migrar para Unity.
 - O usuário **não quer**: besta, barris explosivos, camuflagem afetando visão dos bots.
+
+## Versão Unity (planejamento)
+- Decisões em `RESPOSTAS_UNITY.md` (questionário em `QUESTIONARIO_UNITY.md`). Parte 2 do BR (sortear prédios) ficou para depois.
