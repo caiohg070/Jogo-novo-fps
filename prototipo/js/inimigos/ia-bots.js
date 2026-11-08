@@ -33,8 +33,8 @@ function updateBot(b, dt) {
   if (ai.scanT <= 0) {
     ai.scanT = 0.2; ai.target = null;
     if (!blind) {
-      let bd = sight;
-      for (const e of enemiesOf(b)) { if (e === ai.ignore && ai.ignoreT > 0) continue; const d = Math.hypot(e.pos.x - b.pos.x, e.pos.z - b.pos.z), dd = d + (e.downed ? 10 : 0); if (dd < bd && d < sight && los(b, e)) { bd = dd; ai.target = e; } }
+      let bd = sight;   // fairPair: bot só mira em quem estaria na tela dele (e que também veria ele)
+      for (const e of enemiesOf(b)) { if (e === ai.ignore && ai.ignoreT > 0) continue; const d = Math.hypot(e.pos.x - b.pos.x, e.pos.z - b.pos.z), dd = d + (e.downed ? 10 : 0); if (dd < bd && d < sight && fairPair(b, e) && los(b, e)) { bd = dd; ai.target = e; } }
     }
   }
   const t = ai.target && ai.target.alive && !ai.target.air && !blind ? ai.target : null;
