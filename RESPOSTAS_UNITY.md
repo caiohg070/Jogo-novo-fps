@@ -114,3 +114,30 @@ Público: **18+**.
 ## Organização e prioridade
 - Projeto Unity numa pasta no computador do usuário. Os `.md` deste repositório seguem valendo.
 - **Modo principal: Battle Royale** (fazer primeiro).
+
+## Como criar os modelos, sons e animações (decidido em 08/11/2026)
+- **Ferramentas no PC do usuário:**
+  - Claude Code com o plugin oficial da Unity (CLI e MCP).
+  - Blender, que o Claude roda escondido (`blender -b -P script.py`); o usuário não precisa abrir.
+  - Add-on MPFB/MakeHuman no Blender.
+- **Fluxo:** Blender exporta `.fbx` para `Assets/_Jogo/Modelos/` → script de importação (AssetPostprocessor) na Unity acerta escala, materiais, esqueleto Humanoid, animações e cria o Prefab.
+- **Personagens:**
+  - O MPFB gera homem e mulher, com corpo gordo, magro e forte (blend shapes), rosto, pele e cabelo.
+  - Ajustar as proporções para o estilo do jogo, para não ficar com cara de padrão.
+  - O personagem base usa roupa íntima (regra das lojas).
+  - Mostrar os 2 personagens base para o usuário aprovar antes de fazer as roupas.
+- **Rostos:** opções prontas (ex.: 10 por sexo), geradas por script; sem controles livres no jogo. Cores de pele, olhos e cabelo são materiais (paleta).
+- **Roupas que vestem o corpo** (camiseta, calça, shorts, luva, bota): MPFB, todas no mesmo esqueleto, para misturar.
+- **Maioria das skins:** mesmo modelo com outra textura. Estampas simples (camuflado, listras, cores, desgaste) feitas por código.
+- **Peças rígidas** (capacete, mochila, colete, óculos): básicas modeladas pelo Claude no Blender; especiais (épicas, lendárias) geradas pelo usuário no Meshy, depois otimizadas e encaixadas.
+- **Objetos, prédios e mapa:** Blender por script (ou ProBuilder), com LOD e otimização.
+- **Armas:** *low poly* por script no Blender; armas muito detalhadas vêm do Meshy. Conferir a licença de tudo o que vier de biblioteca.
+- **Vem do usuário:**
+  - Áudios.
+  - Animações do Mixamo (conta Adobe; o Claude passa a lista do que baixar).
+  - Imagem de referência do estilo (**lembrar de pedir**).
+  - Artes especiais: skins lendárias, ícone do app, imagens da loja.
+- **Sons de tiro:**
+  - 4 variações por arma (perto, distante, silenciador, dentro de casa) num arquivo só, nessa ordem, com 1–2 s de silêncio entre elas. O Claude corta em `arma_perto/distante/silenciador/interno.ogg`.
+  - Configuração: mono, Vorbis, limite de ~16 sons ao mesmo tempo. Total de uns 1–2 MB.
+- **Ordem:** jogo com objetos simples primeiro (greybox, começando pelo Battle Royale); visual final depois.

@@ -35,3 +35,6 @@
 - Desempenho do BR em celular fraco não medido. Som da chuva curto (2 s).
 - Depois: Modo Zumbi, online (PeerJS), modo app. Plano final: migrar para Unity.
 - O usuário **não quer**: besta, barris explosivos, camuflagem afetando visão dos bots.
+
+## Versão Unity (planejamento)
+- Decisões em `RESPOSTAS_UNITY.md` (questionário em `QUESTIONARIO_UNITY.md`). Parte 2 do BR (sortear prédios) ficou para depois.
