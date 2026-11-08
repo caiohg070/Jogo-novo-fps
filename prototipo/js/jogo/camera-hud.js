@@ -20,9 +20,12 @@ function updateCamera(dt) {
 const faded = new Set();
 // o ponto espelhado (onde eu estaria na tela do inimigo) cabe na minha tela? (câmera igual para todos)
 const _fv = new V3();
+const onScr = () => _fv.z < 1 && Math.abs(_fv.x) <= 1 && Math.abs(_fv.y) <= 1;
+// justo = eu vejo ele na tela  <=>  ele me vê na tela dele. Se só um lado vê, esconde tudo (boneco, vida e seta)
 function fairView(s) {
+  _fv.set(s.pos.x, s.y + 1, s.pos.z).project(camera); const eu = onScr();
   _fv.set(2 * player.pos.x - s.pos.x, player.y + 1, 2 * player.pos.z - s.pos.z).project(camera);
-  return _fv.z < 1 && Math.abs(_fv.x) <= 1 && Math.abs(_fv.y) <= 1;
+  return eu === onScr();
 }
 const inBarnS = s => s.pos.x > BARN.x0 - 0.2 && s.pos.x < BARN.x1 + 0.2 && s.pos.z > BARN.z0 - 0.2 && s.pos.z < BARN.z1 + 0.2 && s.y < BARN_Y + 3;
 const insideHouse = s => s.pos.x > HOUSE.x0 && s.pos.x < HOUSE.x1 && s.pos.z > HOUSE.z0 && s.pos.z < HOUSE.z1 && s.y < H1 - 0.6;
@@ -63,7 +66,8 @@ function updateWalls() {
     const high = player.y - terrainHeight(player.pos.x, player.pos.z) > 1.5;
     s.ghost.visible = s.seen && occl && (s.team === player.team || s.revealT > 0 || !high);
     // cantos cortados: inimigo só aparece se ele também conseguiria te ver na tela dele (perspectiva mostra mais nos cantos de cima)
-    if (s.team !== player.team && s.alive && s.m.root.visible && !player.air && !s.air && !(s.revealT > 0) && !kcNow && !fairView(s)) { s.m.root.visible = false; s.ghost.visible = false; s.seen = false; }
+    s.fairHid = s.team !== player.team && s.alive && !player.air && !s.air && !(s.revealT > 0) && !kcNow && !fairView(s);
+    if (s.fairHid) { s.m.root.visible = false; s.ghost.visible = false; s.seen = false; }
   }
   const kc = killCamTarget(); if (kc) kc.ghost.visible = true;
   for (const [who, h] of targets) {
@@ -139,7 +143,7 @@ function updateHud() {
     const [x, y, ok] = toScreen(new V3(s.pos.x, s.y + 2.15, s.pos.z));
     const enemy = s.team !== p.team;
     const covered = enemy && !(s.revealT > 0) && ((insideHouse(s) && upper[0].visible) || (inBK(s.pos.x, s.pos.z) && s.y < BK_TOP - 1 && bunkerRoof[0].visible) || (inBarnS(s) && barnRoof[0].visible) || inSmoke(s) || bushHidden(s, p));
-    const hidden = !s.alive || !ok || covered || s.air === 'plane';
+    const hidden = !s.alive || !ok || covered || s.air === 'plane' || s.fairHid;
     s.tag.style.display = hidden ? 'none' : '';
     if (!hidden) {
       s.tag.style.transform = `translate(${x}px,${y}px) translate(-50%,-100%)`; s.tagFill.style.width = s.hp + '%';
@@ -170,6 +174,7 @@ function drawMinimap() {
   for (const b of bots) {
     if (!b.alive) continue;
     const ally = b.team === player.team;
+    if (!ally && b.fairHid) continue;
     if (!ally && !(b.revealT > 0 || los(player, b) || (now - b.lastShot < 1.2 && !b.attOn.sil))) continue;
     mctx.fillStyle = ally ? '#5fb0ff' : '#e0493c'; mctx.beginPath(); mctx.arc(w2m(b.pos.x), w2m(b.pos.z), 6, 0, Math.PI * 2); mctx.fill();
   }
