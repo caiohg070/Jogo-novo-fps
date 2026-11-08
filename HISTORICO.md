@@ -361,3 +361,4 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - Escolhido: 80° (`CAM_OFF` 0, 20.47, 4.06, lookAt 0,0,0.45) + `fairView`: inimigo (e sombra) escondido se o ponto espelhado não cabe na tela. Resultado: 0% de vantagem.
 - Ajuste: quando o inimigo fica escondido pelo corte, a barra de vida, a seta de borda e o ponto no minimapa também somem (antes só o boneco sumia). Seta só aparece se os dois lados estiverem fora da tela um do outro.
 - Seta vermelha de inimigo fora da tela removida.
+- Câmera trocada para 75° (CAM_OFF 0, 20.07, 6.06, lookAt 0,0,0.68) para teste do usuário; corte continua justo (400 posições, 0 injustas).

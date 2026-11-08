@@ -8,7 +8,7 @@
 
 ## Técnica (essencial)
 - `prototipo/index.html` (HTML) + `css/` + `js/` (ordem em `js/arquivos.js`). Sons em base64: `sons/sons.js`.
-- Câmera perspectiva fixa a 80° (quase de cima, vê o mesmo tanto para cima e para baixo) + "cantos cortados":
+- Câmera perspectiva fixa a 75° (quase de cima, vê o mesmo tanto para cima e para baixo) + "cantos cortados":
   inimigo (boneco, vida, seta e minimapa) só aparece se ele também te veria (`fairView` em `camera-hud.js`), justo para quem está em cima ou embaixo.
   Personagens 3D de caixas, física própria (círculo × caixas).
 - Tiro hitscan: acerto 2D (`HIT_R`), bloqueio 3D com `shotBlock` em 3 trechos. Regras especiais em
