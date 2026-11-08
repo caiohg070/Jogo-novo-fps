@@ -354,3 +354,8 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - Só no Battle Royale; os outros modos não mudaram (testado no Mata-mata).
 - Testado a toda velocidade: 3 mapas, bots caem na base, ninguém preso no muro, pegar item, subir na torre e descer pela tirolesa, sem erros.
 - **Próximo (parte 2, combinado com o usuário):** sortear também casa, barracão e bunker no BR, com distância mínima (~40 m) entre eles e a base. Exige trocar coordenadas fixas por "posição do prédio + distância" em vários arquivos, inclusive `js/base/fisica-visao.js` (só os números, a regra do tiro fica igual) — **pedir autorização antes**.
+
+## 08/11/2026 — Câmera justa (80° + cantos cortados)
+- Problema: câmera a 57° via 9,8 m para cima e 7,2 m para baixo; quem ficava em cima na tela do outro era visto antes (41% da área só um via o outro).
+- Testados 57°, 70°, 80° e 90° (com jogador deslocado na tela para igualar cima/baixo). Mexer na posição do personagem não resolve os cantos (perspectiva = trapézio).
+- Escolhido: 80° (`CAM_OFF` 0, 20.47, 4.06, lookAt 0,0,0.45) + `fairView`: inimigo (e sombra) escondido se o ponto espelhado não cabe na tela. Resultado: 0% de vantagem.
