@@ -161,7 +161,11 @@ class Soldier {
       if (dd < 16) sfx('passo', (this === player ? (this.walking ? 0.035 : 0.09) : 0.16 * (1 - dd / 16)), { dur: 0.28, rate: rand(0.92, 1.12), muffle: this === player ? 2500 : 1800, pan: this === player ? 0 : panOf(this.pos) });
     }
     if (this.healChan > 0) { this.healChan -= dt; if (this.healChan <= 0) { this.hp = Math.min(MAX_HP, this.hp + 45); if (this === player) toast('+45 vida (kit)'); } }
-    if (this.fireCd > 0) this.fireCd -= dt;
+    if (this.fireCd > 0) {
+      this.fireCd -= dt;
+      // AWP: barulhinho de ferrolho quando a próxima bala entra (só para você)
+      if (this.fireCd <= 0 && !this.isBot && this.w.scope && this.mag > 0 && this.reloadT <= 0 && !sfx('sacar', 0.22, { dur: 0.35, rate: 1.25 })) blip(520, 0.035, 0.05);
+    }
     if (this.blindT > 0) this.blindT -= dt;
     if (this.healCd > 0) this.healCd -= dt;
     if (this.reloadT > 0) {
