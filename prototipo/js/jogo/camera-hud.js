@@ -18,6 +18,12 @@ function updateCamera(dt) {
   lantern.position.set(player.pos.x, player.y + 3, player.pos.z);
 }
 const faded = new Set();
+// o ponto espelhado (onde eu estaria na tela do inimigo) cabe na minha tela? (câmera igual para todos)
+const _fv = new V3();
+function fairView(s) {
+  _fv.set(2 * player.pos.x - s.pos.x, player.y + 1, 2 * player.pos.z - s.pos.z).project(camera);
+  return _fv.z < 1 && Math.abs(_fv.x) <= 1 && Math.abs(_fv.y) <= 1;
+}
 const inBarnS = s => s.pos.x > BARN.x0 - 0.2 && s.pos.x < BARN.x1 + 0.2 && s.pos.z > BARN.z0 - 0.2 && s.pos.z < BARN.z1 + 0.2 && s.y < BARN_Y + 3;
 const insideHouse = s => s.pos.x > HOUSE.x0 && s.pos.x < HOUSE.x1 && s.pos.z > HOUSE.z0 && s.pos.z < HOUSE.z1 && s.y < H1 - 0.6;
 const inSmoke = s => smokes.some(k => k.age > 0.8 && eye(s, 1.2).distanceTo(k.pos) < k.r * 0.85);
@@ -47,6 +53,7 @@ function updateWalls() {
     if (q.x > A.x0 - 0.5 && q.x < A.x1 + 0.5 && q.z > A.z0 + 0.5 && q.z < A.z1 + 0.5) { m.material.opacity = 0.22; m.material.depthWrite = false; faded.add(m); }
   }
   const targets = [[player, 1.2], [player, 0.3]];
+  const kcNow = killCamTarget();
   for (const s of soldiers) {
     if (s === player) continue;
     s.seen = s.alive && !s.air && !player.air && (s.team === player.team || s.revealT > 0 || los(player, s));
@@ -55,6 +62,8 @@ function updateWalls() {
     // em cima da casa/barracão não mostra a silhueta do inimigo através do telhado/chão (parecia hack); drone continua mostrando
     const high = player.y - terrainHeight(player.pos.x, player.pos.z) > 1.5;
     s.ghost.visible = s.seen && occl && (s.team === player.team || s.revealT > 0 || !high);
+    // cantos cortados: inimigo só aparece se ele também conseguiria te ver na tela dele (perspectiva mostra mais nos cantos de cima)
+    if (s.team !== player.team && s.alive && s.m.root.visible && !player.air && !s.air && !(s.revealT > 0) && !kcNow && !fairView(s)) { s.m.root.visible = false; s.ghost.visible = false; s.seen = false; }
   }
   const kc = killCamTarget(); if (kc) kc.ghost.visible = true;
   for (const [who, h] of targets) {
