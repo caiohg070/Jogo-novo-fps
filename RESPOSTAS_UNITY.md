@@ -1,5 +1,7 @@
 # Respostas do questionário Unity (resumo das decisões)
 
+Público: **18+**.
+
 ## Geral
 - Visto de cima, inclinado. Lançamento só no Brasil, em português e inglês. Feito sozinho. Sem data; talvez beta.
 - Nome: decidir depois. **Estilo visual: o usuário vai mandar uma referência (lembrar de pedir).**
@@ -26,11 +28,11 @@
 - Vai tudo do protótipo, **menos o drone**.
 - BR com mapa **procedural**: as estruturas mudam de lugar e até de forma. Mata-mata, Bandeira e Bomba com mapas próprios, novos.
 - Avião e paraquedas no BR (como hoje).
-- Modos jogáveis **offline contra bots**. Ranqueada com patentes. Amigos, equipe e clã. Frases prontas e emotes (sem voz).
+- Modos jogáveis **offline contra bots**. Ranqueada com patentes, **sem bots**. Offline não dá nenhuma recompensa. Amigos, equipe e clã. Frases prontas e emotes (sem voz).
 
 ## Armas
 - Pistolas: P92, Desert Eagle.
-- Fuzis: FAMAS, AK-47, "ALG", M16A4, "SACAR" (confirmar).
+- Fuzis: FAMAS, AK-47, ALG, M16A4, SCAR.
 - Submetralhadoras: UMP45, Bizon, P90.
 - Escopetas: S1897, S12K.
 - Snipers: AWM, M24.
@@ -53,7 +55,7 @@
 - Homem e mulher, escolhendo rosto, pele, cabelo e corpo (gordo, magro, forte).
 - Skin só muda a aparência. A mesma skin serve para os dois, com pequenas diferenças.
 - Peças separadas que podem ser misturadas: camiseta, calça, shorts, tênis, luvas, capacete, mochila, máscara, óculos, paraquedas, pintura de veículo. Também roupas de corpo inteiro, skins de arma (para uma arma específica) e faca, emotes, sprays, molduras e efeito de abate.
-- CT e TR: no BR pode usar qualquer skin. Nos modos de time, só as skins do lado escolhido.
+- CT e TR: no BR pode usar e **misturar** qualquer peça. Nos modos de time, só as skins do lado escolhido.
 - Raridades: comum (cinza), rara (azul), épica (roxa) e lendária (dourada), talvez só como marca colorida no canto.
 - Lançamento com ~10 roupas, 10 skins de arma e 3 facas.
 - Pacotes de voz vendidos na loja.
@@ -94,7 +96,7 @@
 ## Menus
 - Personagem gira com o dedo; tocar nele troca a skin; fundo muda por temporada; sem zoom.
 - Tela de espera estilo "takeover": a câmera passeia pelos outros esquadrões em miniatura e o seu fica em destaque.
-- Bots entram depois de ~1 min, com mínimo de 14 jogadores. Não aparecem como bots e usam skins básicas.
+- BR: bots entram depois de ~1 min e completam até 20 (mínimo de 14 jogadores). Não aparecem como bots e usam skins básicas.
 - Tutorial perguntando "iniciar ou pular". Tela de fim de partida.
 
 ## Online e segurança
@@ -109,5 +111,6 @@
 - Tela de permissão da LGPD. Unity Analytics e relatório de travamentos.
 - Atualização a cada 2 meses (temporada), com correções no meio.
 
-## Pendente
-- Partes 13 (organização dos arquivos) e 14 (prioridades) não respondidas.
+## Organização e prioridade
+- Projeto Unity numa pasta no computador do usuário. Os `.md` deste repositório seguem valendo.
+- **Modo principal: Battle Royale** (fazer primeiro).
