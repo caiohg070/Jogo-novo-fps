@@ -360,3 +360,4 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - Testados 57°, 70°, 80° e 90° (com jogador deslocado na tela para igualar cima/baixo). Mexer na posição do personagem não resolve os cantos (perspectiva = trapézio).
 - Escolhido: 80° (`CAM_OFF` 0, 20.47, 4.06, lookAt 0,0,0.45) + `fairView`: inimigo (e sombra) escondido se o ponto espelhado não cabe na tela. Resultado: 0% de vantagem.
 - Ajuste: quando o inimigo fica escondido pelo corte, a barra de vida, a seta de borda e o ponto no minimapa também somem (antes só o boneco sumia). Seta só aparece se os dois lados estiverem fora da tela um do outro.
+- Seta vermelha de inimigo fora da tela removida.

@@ -133,7 +133,8 @@ function updateHud() {
   if (T) { const i = $('#heat i'); i.style.width = (T.cool > 0 ? 100 : T.heat * 100) + '%'; i.style.background = T.cool > 0 ? 'var(--danger)' : ''; }
   for (const s of soldiers) {
     const [ex, ey, eok] = toScreen(eye(s, 1));
-    const off = s !== p && s.seen && s.team !== p.team && (!eok || ex < 20 || ex > innerWidth - 20 || ey < 20 || ey > innerHeight - 20);
+    // seta vermelha de inimigo fora da tela: desligada (pedido do usuário; dava informação de quem não aparece na tela)
+    const off = false && s !== p && s.seen && s.team !== p.team && (!eok || ex < 20 || ex > innerWidth - 20 || ey < 20 || ey > innerHeight - 20);
     s.edge.style.display = off ? '' : 'none';
     if (off) {
       const cx = innerWidth / 2, cy = innerHeight / 2; let dx = (eok ? ex : 2 * cx - ex) - cx, dy = (eok ? ey : 2 * cy - ey) - cy;
