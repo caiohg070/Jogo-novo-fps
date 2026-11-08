@@ -8,9 +8,9 @@ const killCamTarget = () => { const k = player.killer, t = now - (player.diedAt 
 function updateCamera(dt) {
   const kc = killCamTarget(), f = kc || player;
   camTarget.lerp(new V3(f.pos.x, f.air ? f.y - 2 : f.y, f.pos.z), Math.min(1, dt * (kc ? 4 : 8)));
-  camZoom = lerp(camZoom, player.air === 'plane' ? 1.5 : player.air ? 1.35 : player.veh ? 1.25 + Math.abs(player.veh.v) / 60 : player.alive && player.w.scope ? 1.2 : player.alive && player.attOn.mira ? 1.15 : player.turret ? 1.2 : 1, Math.min(1, dt * 3));
-  const sc = !kc && player.alive && !player.air && !player.veh && player.w.scope;
-  _so.set(sc ? Math.sin(player.facing) * 3.5 : 0, 0, sc ? Math.cos(player.facing) * 3.5 : 0);
+  camZoom = lerp(camZoom, player.air === 'plane' ? 1.5 : player.air ? 1.35 : player.veh ? 1.25 + Math.abs(player.veh.v) / 60 : player.alive && player.w.scope && scopeHeld ? 0.92 : player.alive && player.attOn.mira ? 1.15 : player.turret ? 1.2 : 1, Math.min(1, dt * 3));
+  const sc = !kc && player.alive && !player.air && !player.veh && player.w.scope && scopeHeld;   // AWP: só mexe a câmera enquanto mira
+  _so.set(sc ? Math.sin(player.facing) * 4.5 : 0, 0, sc ? Math.cos(player.facing) * 4.5 : 0);
   scopeOff.lerp(_so, Math.min(1, dt * 4));
   camera.position.copy(camTarget).add(scopeOff).addScaledVector(CAM_OFF, camScale * camZoom); camera.position.y += 0.9;   // mira no meio do corpo: jogador no centro da tela
   if (shakeT > 0) { shakeT -= dt; camera.position.x += rand(-1, 1) * shakeT * 1.2; camera.position.z += rand(-1, 1) * shakeT * 1.2; }
@@ -18,14 +18,21 @@ function updateCamera(dt) {
   lantern.position.set(player.pos.x, player.y + 3, player.pos.z);
 }
 const faded = new Set();
-// o ponto espelhado (onde eu estaria na tela do inimigo) cabe na minha tela? (câmera igual para todos)
-const _fv = new V3();
+// visão justa: câmera "base" (sem zoom nem luneta) igual para todos. Um inimigo a uma distância d só aparece
+// se d E -d cabem nessa tela (eu vejo ele <=> ele me vê). Luneta da AWP mirando: mostra também o que ela alcança a mais.
+const _fv = new V3(), _bc = camera.clone();
 const onScr = () => _fv.z < 1 && Math.abs(_fv.x) <= 1 && Math.abs(_fv.y) <= 1;
-// justo = eu vejo ele na tela  <=>  ele me vê na tela dele. Se só um lado vê, esconde tudo (boneco, vida e seta)
+function onBase(dx, dy, dz) {
+  _bc.position.copy(CAM_OFF).multiplyScalar(camScale); _bc.position.y += 0.9; _bc.quaternion.copy(camera.quaternion);
+  _bc.aspect = camera.aspect; _bc.fov = camera.fov; _bc.updateProjectionMatrix(); _bc.updateMatrixWorld();
+  _fv.set(dx, dy + 1, dz).project(_bc); return onScr();
+}
+// a (quem olha) consegue ver b sem vantagem de tela?
+function fairPair(a, b) { const dx = b.pos.x - a.pos.x, dz = b.pos.z - a.pos.z; return onBase(dx, b.y - a.y, dz) && onBase(-dx, a.y - b.y, -dz); }
 function fairView(s) {
-  _fv.set(s.pos.x, s.y + 1, s.pos.z).project(camera); const eu = onScr();
-  _fv.set(2 * player.pos.x - s.pos.x, player.y + 1, 2 * player.pos.z - s.pos.z).project(camera);
-  return eu === onScr();
+  if (fairPair(player, s)) return true;
+  if (!scopeHeld || onBase(s.pos.x - player.pos.x, s.y - player.y, s.pos.z - player.pos.z)) return false;
+  _fv.set(s.pos.x, s.y + 1, s.pos.z).project(camera); return onScr();   // luneta: área extra que só a mira alcança
 }
 const inBarnS = s => s.pos.x > BARN.x0 - 0.2 && s.pos.x < BARN.x1 + 0.2 && s.pos.z > BARN.z0 - 0.2 && s.pos.z < BARN.z1 + 0.2 && s.y < BARN_Y + 3;
 const insideHouse = s => s.pos.x > HOUSE.x0 && s.pos.x < HOUSE.x1 && s.pos.z > HOUSE.z0 && s.pos.z < HOUSE.z1 && s.y < H1 - 0.6;
