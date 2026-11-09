@@ -86,8 +86,8 @@ scene.background = C(0.80, 0.71, 0.57);
 scene.fog = new THREE.Fog(scene.background.clone(), 45, 100);
 
 const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.5, 220);
-// câmera a 75° (quase de cima) e um pouco para trás: vê o mesmo tanto para cima e para baixo (justo para os dois lados)
-const CAM_OFF = new V3(0, 20.07, 6.06);
+// câmera a 80° (TESTE; antes 75° = V3(0, 20.07, 6.06)) (quase de cima) e um pouco para trás: vê o mesmo tanto para cima e para baixo (justo para os dois lados)
+const CAM_OFF = new V3(0, 20.46, 4.29);
 camera.position.copy(CAM_OFF);
 camera.lookAt(0, 0, 0.68);
 let camScale = 1, camZoom = 1;
