@@ -155,7 +155,7 @@ function updatePlayer(dt) {
   if (aimT.id !== null) {
     firing = true;
     if (Math.hypot(aimT.vx, aimT.vy) > 0.28) { aimAng = Math.atan2(aimT.vx, aimT.vy); showAim = true; }
-    else aimAng = autoAimAngle();
+    else aimAng = player.facing;   // toque sem arrastar: atira para onde já está virado (sem mira automática)
   } else if (usingMouse()) {
     const m = mouseWorld();
     if (m) { aimAng = Math.atan2(m.x - p.pos.x, m.z - p.pos.z); showAim = true; }

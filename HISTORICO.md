@@ -375,3 +375,4 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 ## 2026-11-09 — Câmera 80° (teste) e regra dos morros
 - CAM_OFF em terreno-cena.js: 75° → 80° (mesma distância, mesmo ponto de mira). Anotada regra dos morros e decisões Unity (blocos, seed, anti-cheat).
 - Câmera voltou para 75°. Imã da mira (`aimSnap` em entrada.js, puxava a mira para inimigo em altura diferente) desligado.
+- Mira automática do toque sem arrastar (`autoAimAngle`) desligada: atira para onde já está virado.
