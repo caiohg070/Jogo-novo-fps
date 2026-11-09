@@ -370,3 +370,4 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 ## 09/11/2026 — faixa dos cantos
 - Usuário achou a faixa da direita maior. Teste com bots espelhados (tela 2000×900): regra simétrica; minimapa cobre a faixa esquerda e a altura do terreno muda o limite.
 - Decidido manter a altura (morros). Adicionado sumir/aparecer suave (~0,3 s) na faixa. Testado no telhado da casa com bots à esquerda.
+- Telhado: faixa grande (~17%) porque quem está no alto aparece mais para fora na tela de quem está embaixo. Opções: altura não contar (vantagem pequena para quem está no alto no online) ou câmera em altura fixa (descartada: não resolve e dá zoom). Usuário decidiu manter como está.
