@@ -8,7 +8,7 @@
 
 ## Técnica (essencial)
 - `prototipo/index.html` (HTML) + `css/` + `js/` (ordem em `js/arquivos.js`). Sons em base64: `sons/sons.js`.
-- Câmera perspectiva fixa a 75° (quase de cima, vê o mesmo tanto para cima e para baixo) + "cantos cortados":
+- Câmera perspectiva fixa a 80° (em teste; antes 75°) (quase de cima, vê o mesmo tanto para cima e para baixo) + "cantos cortados":
   inimigo (boneco, vida e minimapa) só aparece se ele também te veria (`fairView`/`fairPair` em `camera-hud.js`; bots usam a mesma regra para mirar). AWP: câmera só muda enquanto mira (zoom pequeno, 1 m para o lado da mira, som de ferrolho ao carregar), justo para quem está em cima ou embaixo.
   **Faixa dos lados (cantos de cima):** a câmera inclinada vê um trapézio (em cima é mais largo que embaixo). Nos
   cantos de cima sobra uma faixa onde só um jogador veria o outro → ali o inimigo (boneco, sombra, vida, minimapa) fica
@@ -48,3 +48,11 @@
 
 ## Versão Unity (planejamento)
 - Decisões em `RESPOSTAS_UNITY.md` (questionário em `QUESTIONARIO_UNITY.md`). Parte 2 do BR (sortear prédios) ficou para depois.
+- Otimização fica para a Unity. Decidido: mapa do BR (~800×800 m) **dividido em blocos** (ex. 50×50 m, só os perto
+  ficam ativos) e **gerado por seed** (todos geram o mesmo mapa sem baixar; pode gerar enquanto procura partida).
+- Anti-cheat (decidido para a Unity): servidor autoritativo (jogador só manda comandos; servidor decide movimento,
+  dano, vida, munição); servidor não manda inimigos fora da visão (contra wallhack); checar se ações fazem sentido
+  (cadência, velocidade, linha de visão); detectar aimbot por estatística e marcar para revisão; denúncia + replay;
+  Easy Anti-Cheat (grátis via Epic Online Services); ranqueada só com nível mínimo/celular verificado.
+- Morros (regra para o mapa): altura máxima = altura da casa; sem diferenças bruscas de altura (ex.: nada de partes
+  muito baixas perto das casas), terreno suave em volta das construções.
