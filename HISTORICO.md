@@ -365,3 +365,8 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - Bots também seguem a visão justa: só miram em quem estaria na tela deles e que também veria eles (`fairPair` em `camera-hud.js`, usado em `ia-bots.js`). Antes matavam de fora da tela.
 - AWP: segurar a arma não muda mais a câmera; só enquanto mira (segurando para atirar) dá um zoom pequeno (0,92) e a câmera vai 4,5 m para o lado da mira. A área extra que a luneta mostra fica visível só para quem mira.
 - AWP: deslocamento da câmera ao mirar 4,5 m → 1 m, câmera desliza na metade da velocidade; som de ferrolho (sacar, mais agudo e baixo) quando a próxima bala fica pronta.
+
+
+## 09/11/2026 — faixa dos cantos
+- Usuário achou a faixa da direita maior. Teste com bots espelhados (tela 2000×900): regra simétrica; minimapa cobre a faixa esquerda e a altura do terreno muda o limite.
+- Decidido manter a altura (morros). Adicionado sumir/aparecer suave (~0,3 s) na faixa. Testado no telhado da casa com bots à esquerda.
