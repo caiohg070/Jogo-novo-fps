@@ -6,6 +6,7 @@ Leia antes de criar qualquer coisa:
 - `ESTADO_DO_PROJETO.md`: estado do protótipo HTML; parte 2 do BR ficou para depois.
 - `QUESTIONARIO_UNITY.md`: questionário original.
 - `Referencias_Visuais/GUIA_ESTILO.md` + 13 imagens: estilo visual de todos os assets.
+- `Assets_Externos/Human_Soldier_Animations_FREE.unitypackage`: pacote grátis da Asset Store (Kevin Iglesias), ainda NÃO importado. Tem animações Humanoid homem/mulher: Idle, MilitaryIdle, andar/correr em 8 direções (com e sem root motion), mirar/atirar/recarregar (rifle, fuzil de assalto, pistola, 2 pistolas, bazuca), granada, dano, 3 mortes; máscaras de corpo superior; modelos dummy HumanM/HumanF. Usar na base jogável (importar com `unity` e usar as versões SEM root motion, movimento controlado por código). Scripts de demo do pacote não usar.
 - `Prototipo_Referencia/`: clone do repositório com o protótipo HTML (`prototipo/js/`). Só referência; copiar números e regras dele.
 
 Ambiente (pronto em 09/11/2026):

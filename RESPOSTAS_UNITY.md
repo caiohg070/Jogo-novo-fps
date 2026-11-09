@@ -111,6 +111,12 @@ Público: **18+**.
 - Tela de permissão da LGPD. Unity Analytics e relatório de travamentos.
 - Atualização a cada 2 meses (temporada), com correções no meio.
 
+## Borda do mapa e zona do BR (decidido em 09/11/2026)
+- **O mapa não termina "seco":** depois do limite jogável o cenário continua (terreno, casas, objetos), só para visual, sem parede invisível aparente.
+- **Limite do mapa:** marcado por uma barreira visual (fumaça ou efeito parecido; aparência a definir). Passar desse limite dá **muito dano** (praticamente impede ficar fora).
+- **Zona que fecha (BR):** outra fumaça, **mais fraca**, que vai fechando o mapa durante a partida. Ficar nela dá **dano gradual** (aumenta conforme a fase da zona).
+- São duas coisas diferentes: barreira do limite (dano alto, fixa) × zona que fecha (dano gradual, móvel).
+
 ## Organização e prioridade
 - Projeto Unity numa pasta no computador do usuário. Os `.md` deste repositório seguem valendo.
 - **Modo principal: Battle Royale** (fazer primeiro).

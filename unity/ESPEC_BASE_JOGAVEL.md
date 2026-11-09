@@ -57,7 +57,7 @@ Tiro **hitscan**, com penetração (`pen`). Dados das armas em **ScriptableObjec
 
 ## 6. Primeira entrega (escopo da base)
 1. Cena de treino: chão 116 m, algumas caixas/paredes greybox.
-2. Jogador cápsula com movimento, câmera do item 1, controles do item 2 (teclado/mouse + toque).
+2. Jogador com o dummy Humanoid e animações do pacote `Assets_Externos/Human_Soldier_Animations_FREE.unitypackage` (andar/correr 8 direções + upper body mirando com máscara), movimento, câmera do item 1, controles do item 2 (teclado/mouse + toque).
 3. AK-47 com tiro hitscan, munição, recarga, espalhamento, linha de mira.
 4. Alvo/bot simples parado que recebe dano e morre/renasce.
 5. HUD mínimo: vida, munição, joysticks.
