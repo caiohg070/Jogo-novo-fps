@@ -50,3 +50,7 @@
 - Decisões em `RESPOSTAS_UNITY.md` (questionário em `QUESTIONARIO_UNITY.md`). Parte 2 do BR (sortear prédios) ficou para depois.
 - Otimização fica para a Unity. Decidido: mapa do BR (~800×800 m) **dividido em blocos** (ex. 50×50 m, só os perto
   ficam ativos) e **gerado por seed** (todos geram o mesmo mapa sem baixar; pode gerar enquanto procura partida).
+- Anti-cheat (decidido para a Unity): servidor autoritativo (jogador só manda comandos; servidor decide movimento,
+  dano, vida, munição); servidor não manda inimigos fora da visão (contra wallhack); checar se ações fazem sentido
+  (cadência, velocidade, linha de visão); detectar aimbot por estatística e marcar para revisão; denúncia + replay;
+  Easy Anti-Cheat (grátis via Epic Online Services); ranqueada só com nível mínimo/celular verificado.
