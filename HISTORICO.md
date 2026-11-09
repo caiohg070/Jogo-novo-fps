@@ -376,3 +376,4 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - CAM_OFF em terreno-cena.js: 75° → 80° (mesma distância, mesmo ponto de mira). Anotada regra dos morros e decisões Unity (blocos, seed, anti-cheat).
 - Câmera voltou para 75°. Imã da mira (`aimSnap` em entrada.js, puxava a mira para inimigo em altura diferente) desligado.
 - Mira automática do toque sem arrastar (`autoAimAngle`) desligada: atira para onde já está virado.
+- Traçante do tiro que pega na borda do alvo agora vai reto até o ponto de entrada (antes ia ao centro do alvo e parecia imã). `shootRay` em soldados.js.
