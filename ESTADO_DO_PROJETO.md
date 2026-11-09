@@ -48,7 +48,7 @@
 
 ## Versão Unity (planejamento)
 - Decisões em `RESPOSTAS_UNITY.md` (questionário em `QUESTIONARIO_UNITY.md`). Parte 2 do BR (sortear prédios) ficou para depois.
-- Mira sem nenhuma ajuda (`aimSnap` e `autoAimAngle` desligados em `entrada.js`).
+- Mira sem nenhuma ajuda (`aimSnap` e `autoAimAngle` desligados em `entrada.js`). Tiro na borda do alvo: traçante reto até onde pega (não vai mais ao centro).
 - Otimização fica para a Unity. Decidido: mapa do BR (~800×800 m) **dividido em blocos** (ex. 50×50 m, só os perto
   ficam ativos) e **gerado por seed** (todos geram o mesmo mapa sem baixar; pode gerar enquanto procura partida).
 - Anti-cheat (decidido para a Unity): servidor autoritativo (jogador só manda comandos; servidor decide movimento,
