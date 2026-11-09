@@ -1,0 +1,14 @@
+{
+    "name": "Jogo.Mapa",
+    "rootNamespace": "Jogo.Mapa",
+    "references": ["Jogo.Nucleo"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

@@ -1,0 +1,14 @@
+{
+    "name": "Jogo.Apresentacao",
+    "rootNamespace": "Jogo.Apresentacao",
+    "references": ["Jogo.Nucleo", "Jogo.Simulacao", "Jogo.Mapa", "Unity.InputSystem"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

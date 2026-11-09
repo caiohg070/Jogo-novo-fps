@@ -1,6 +1,6 @@
 # Estado do projeto (resumo atual)
 
-Última atualização: 08/11/2026. Histórico completo de cada chat: `HISTORICO.md` (só abrir se precisar).
+Última atualização: 09/11/2026. Histórico completo de cada chat: `HISTORICO.md` (só abrir se precisar).
 
 ## Links
 - Site: https://caiohg070.github.io/Jogo-novo-fps/ · Artifact: https://claude.ai/artifact/45WY4Ec1HckFaMj5SCsgEC
@@ -47,6 +47,10 @@
 - O usuário **não quer**: besta, barris explosivos, camuflagem afetando visão dos bots.
 
 ## Versão Unity (planejamento)
+- **Etapa 1 pronta (09/11):** pasta `JogoUnity/` (guia em `JogoUnity/LEIA-ME.md`). Simulação em C# puro com ticks de 30/s
+  e só `Comando` vindo do jogador (servidor autoritativo desde já), mapa BR por seed em blocos de 50 m, câmera 75°,
+  greybox. Testes pela CLI (`ferramentas/unity.ps1 testes`); 8 testes passando (conferidos com .NET fora da Unity).
+  Falta: o usuário instalar Unity 6 LTS + Blender, abrir o projeto e testar o Play. Depois: etapa 2 (colisão, tiro, bots, toque, HUD).
 - Decisões em `RESPOSTAS_UNITY.md` (questionário em `QUESTIONARIO_UNITY.md`). Parte 2 do BR (sortear prédios) ficou para depois.
 - Mira sem nenhuma ajuda (`aimSnap` e `autoAimAngle` desligados em `entrada.js`). Tiro na borda do alvo: traçante reto até onde pega (não vai mais ao centro). Bala sai na linha do laser (lado do cano), não do meio do peito.
 - Otimização fica para a Unity. Decidido: mapa do BR (~800×800 m) **dividido em blocos** (ex. 50×50 m, só os perto

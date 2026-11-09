@@ -1,0 +1,14 @@
+{
+    "name": "Jogo.Editor",
+    "rootNamespace": "Jogo.EditorTools",
+    "references": ["Jogo.Nucleo", "Jogo.Simulacao", "Jogo.Mapa", "Jogo.Apresentacao"],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
