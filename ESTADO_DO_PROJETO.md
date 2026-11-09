@@ -16,6 +16,8 @@
   personagem na tela não resolve (já está no ponto ótimo); só câmera mais reta diminui a faixa.
   A regra é igual para esquerda e direita (testado); diferença de altura muda o limite. Inimigo entra/sai da faixa
   com efeito suave de ~0,3 s (`fadeSoldier` em `camera-hud.js`, clona os materiais do boneco).
+  No alto (telhado 3 m) a faixa fica grande (~17% da largura): decidido **manter assim** (100% justo). Alternativa
+  guardada para o online: altura não contar na faixa (fica ~4%, mas quem está no alto vê um pouco antes na beirada).
   Personagens 3D de caixas, física própria (círculo × caixas).
 - Tiro hitscan: acerto 2D (`HIT_R`), bloqueio 3D com `shotBlock` em 3 trechos. Regras especiais em
   `js/base/fisica-visao.js`: `roofBlocked`/`parapetPoint` (terraço e telhado do barracão: chão a < 3 m não acerta),
