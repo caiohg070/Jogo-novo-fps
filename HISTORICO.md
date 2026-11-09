@@ -377,3 +377,4 @@ O sniper perder a AWP ao morrer na Bomba é de propósito (não mexer).
 - Câmera voltou para 75°. Imã da mira (`aimSnap` em entrada.js, puxava a mira para inimigo em altura diferente) desligado.
 - Mira automática do toque sem arrastar (`autoAimAngle`) desligada: atira para onde já está virado.
 - Traçante do tiro que pega na borda do alvo agora vai reto até o ponto de entrada (antes ia ao centro do alvo e parecia imã). `shootRay` em soldados.js.
+- Bala sai na mesma linha do laser: origem do tiro deslocada para o lado do cano (até 0,3 m; pistola 0,2 m, fuzis 0,08 m). Antes saía do meio do peito e o tiro ia mais para o centro do alvo que o laser. `tryFire` em soldados.js (vale para bots também).

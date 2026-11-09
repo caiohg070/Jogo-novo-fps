@@ -238,6 +238,8 @@ class Soldier {
     if (this !== player && this.team !== player.team && dp < (quiet ? 10 : 45)) addPing(this.pos.x, this.pos.z, 'shot');
     if (this === player && (w.scope || w.pellets)) shakeT = 0.12;
     for (const b of bots) if (b.alive && b.team !== this.team && b.pos.distanceTo(this.pos) < (quiet ? 8 : 32)) botHeard(b, this.pos);
+    // bala sai na mesma linha do laser (o cano fica de lado): desloca a origem só para o lado, sem passar do corpo
+    if (!this.turret) { const rx = Math.cos(ang), rz = -Math.sin(ang), side = clamp((muzzle.x - origin.x) * rx + (muzzle.z - origin.z) * rz, -0.3, 0.3); origin.x += rx * side; origin.z += rz * side; }
     for (let i = 0; i < (w.pellets || 1); i++) this.shootRay(ang + (Math.random() - 0.5) * 2 * spread, origin.clone(), muzzle, w, enemies, range);
     if (this.mag === 0 && !this.turret) this.startReload();
     return true;
