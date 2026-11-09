@@ -14,6 +14,8 @@
   cantos de cima sobra uma faixa onde só um jogador veria o outro → ali o inimigo (boneco, sombra, vida, minimapa) fica
   escondido e os bots não miram. Tamanho da faixa: ~9% da tela em 75° (6% em 80°, 0% em 90°). Mudar a posição do
   personagem na tela não resolve (já está no ponto ótimo); só câmera mais reta diminui a faixa.
+  A regra é igual para esquerda e direita (testado); diferença de altura muda o limite. Inimigo entra/sai da faixa
+  com efeito suave de ~0,3 s (`fadeSoldier` em `camera-hud.js`, clona os materiais do boneco).
   Personagens 3D de caixas, física própria (círculo × caixas).
 - Tiro hitscan: acerto 2D (`HIT_R`), bloqueio 3D com `shotBlock` em 3 trechos. Regras especiais em
   `js/base/fisica-visao.js`: `roofBlocked`/`parapetPoint` (terraço e telhado do barracão: chão a < 3 m não acerta),

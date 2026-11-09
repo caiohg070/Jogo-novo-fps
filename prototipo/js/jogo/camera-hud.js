@@ -34,6 +34,19 @@ function fairView(s) {
   if (!scopeHeld || onBase(s.pos.x - player.pos.x, s.y - player.y, s.pos.z - player.pos.z)) return false;
   _fv.set(s.pos.x, s.y + 1, s.pos.z).project(camera); return onScr();   // luneta: área extra que só a mira alcança
 }
+// entra/sai da faixa escondida devagar (~0,3 s) em vez de piscar
+function fadeSoldier(s, goal) {
+  const dt = Math.min(0.1, Math.max(0, now - (s.fadeAt ?? now))); s.fadeAt = now;
+  const a = s.fadeA ?? 1, na = goal > a ? Math.min(goal, a + dt / 0.3) : Math.max(goal, a - dt / 0.3); s.fadeA = na;
+  if (na <= 0) { s.m.root.visible = false; return; }
+  if (na >= 1 && !s.fadeMats) return;
+  if (!s.fadeMats) {   // materiais próprios do boneco (podem ser compartilhados com outros)
+    s.fadeMats = []; const seen = new Map();
+    s.m.root.traverse(o => { if (!o.isMesh || o === s.ghost) return; const one = m => { if (!seen.has(m)) { const c = m.clone(); c.userData.op = m.opacity; c.userData.tr = m.transparent; seen.set(m, c); s.fadeMats.push(c); } return seen.get(m); };
+      o.material = Array.isArray(o.material) ? o.material.map(one) : one(o.material); });
+  }
+  for (const m of s.fadeMats) { const t = na < 1 || m.userData.tr; if (m.transparent !== t) { m.transparent = t; m.needsUpdate = true; } m.opacity = m.userData.op * na; }
+}
 const inBarnS = s => s.pos.x > BARN.x0 - 0.2 && s.pos.x < BARN.x1 + 0.2 && s.pos.z > BARN.z0 - 0.2 && s.pos.z < BARN.z1 + 0.2 && s.y < BARN_Y + 3;
 const insideHouse = s => s.pos.x > HOUSE.x0 && s.pos.x < HOUSE.x1 && s.pos.z > HOUSE.z0 && s.pos.z < HOUSE.z1 && s.y < H1 - 0.6;
 const inSmoke = s => smokes.some(k => k.age > 0.8 && eye(s, 1.2).distanceTo(k.pos) < k.r * 0.85);
@@ -74,7 +87,8 @@ function updateWalls() {
     s.ghost.visible = s.seen && occl && (s.team === player.team || s.revealT > 0 || !high);
     // cantos cortados: inimigo só aparece se ele também conseguiria te ver na tela dele (perspectiva mostra mais nos cantos de cima)
     s.fairHid = s.team !== player.team && s.alive && !player.air && !s.air && !(s.revealT > 0) && !kcNow && !fairView(s);
-    if (s.fairHid) { s.m.root.visible = false; s.ghost.visible = false; s.seen = false; }
+    if (s.fairHid) { s.ghost.visible = false; s.seen = false; }
+    fadeSoldier(s, s.fairHid ? 0 : 1);
   }
   const kc = killCamTarget(); if (kc) kc.ghost.visible = true;
   for (const [who, h] of targets) {
