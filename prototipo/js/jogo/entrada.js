@@ -168,7 +168,7 @@ function updatePlayer(dt) {
   p.move(mx, mz, p.w.speed * (firing && p.w.kind === 'gun' ? 0.82 : 1) * (p.walking ? 0.5 : 1), dt);
   // passos correndo: bots inimigos por perto ouvem
   if (p.moving && !p.walking && (stepT -= dt) <= 0) { stepT = 0.5; for (const b of enemiesOf(p)) if (b.isBot && b.pos.distanceTo(p.pos) < 13) botHeard(b, p.pos); }
-  if (aimAng !== null && showAim) aimAng = aimSnap(aimAng);
+  // imã da mira (aimSnap) desligado a pedido do usuário
   if (aimAng !== null) p.facing = aimAng; else if (p.moving) p.facing = Math.atan2(mx, mz);
   // AWP (luneta): segurar = mirar com a linha vermelha; soltar = atirar
   if (p.w.scope) {
