@@ -1,0 +1,1 @@
+{ "name": "Jogo.Rede", "rootNamespace": "Jogo.Rede", "references": ["Jogo.Nucleo", "Jogo.Jogador"], "autoReferenced": true }

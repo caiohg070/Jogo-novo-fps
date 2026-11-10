@@ -1,0 +1,14 @@
+# Pastas geradas pelo Unity (não versionar)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/Screenshots/
+*.apk
+*.aab
+.vs/
+*.csproj
+*.sln

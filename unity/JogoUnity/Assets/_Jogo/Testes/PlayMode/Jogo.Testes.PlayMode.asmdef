@@ -1,0 +1,1 @@
+{ "name": "Jogo.Testes.PlayMode", "references": ["Jogo.Nucleo", "Jogo.Armas", "Jogo.Jogador", "Jogo.Camera", "Jogo.Rede", "UnityEngine.TestRunner"], "overrideReferences": true, "precompiledReferences": ["nunit.framework.dll"], "defineConstraints": ["UNITY_INCLUDE_TESTS"], "autoReferenced": false }

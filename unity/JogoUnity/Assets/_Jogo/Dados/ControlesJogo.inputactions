@@ -1,0 +1,69 @@
+{
+    "name": "ControlesJogo",
+    "maps": [
+        {
+            "name": "Jogador",
+            "id": "6c1f2b9e-3a51-4c8e-9a10-000000000001",
+            "actions": [
+                { "name": "Mover", "type": "Value", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000101", "expectedControlType": "Vector2", "processors": "", "interactions": "", "initialStateCheck": true },
+                { "name": "MirarAnalogico", "type": "Value", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000102", "expectedControlType": "Vector2", "processors": "", "interactions": "", "initialStateCheck": true },
+                { "name": "PonteiroMouse", "type": "PassThrough", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000103", "expectedControlType": "Vector2", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Atirar", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000104", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Devagar", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000105", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "AlternarAndar", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000106", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Recarregar", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000107", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "TrocarArma", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000108", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Agachar", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000109", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Correr", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000110", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Pular", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000111", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Interagir", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000112", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Granada", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000113", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Mochila", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000114", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Mapa", "type": "Button", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000115", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
+            ],
+            "bindings": [
+                { "name": "WASD", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000201", "path": "2DVector", "interactions": "", "processors": "", "groups": "", "action": "Mover", "isComposite": true, "isPartOfComposite": false },
+                { "name": "up", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000202", "path": "<Keyboard>/w", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mover", "isComposite": false, "isPartOfComposite": true },
+                { "name": "down", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000203", "path": "<Keyboard>/s", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mover", "isComposite": false, "isPartOfComposite": true },
+                { "name": "left", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000204", "path": "<Keyboard>/a", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mover", "isComposite": false, "isPartOfComposite": true },
+                { "name": "right", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000205", "path": "<Keyboard>/d", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mover", "isComposite": false, "isPartOfComposite": true },
+                { "name": "Setas", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000206", "path": "2DVector", "interactions": "", "processors": "", "groups": "", "action": "Mover", "isComposite": true, "isPartOfComposite": false },
+                { "name": "up", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000207", "path": "<Keyboard>/upArrow", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mover", "isComposite": false, "isPartOfComposite": true },
+                { "name": "down", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000208", "path": "<Keyboard>/downArrow", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mover", "isComposite": false, "isPartOfComposite": true },
+                { "name": "left", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000209", "path": "<Keyboard>/leftArrow", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mover", "isComposite": false, "isPartOfComposite": true },
+                { "name": "right", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000210", "path": "<Keyboard>/rightArrow", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mover", "isComposite": false, "isPartOfComposite": true },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000211", "path": "<Gamepad>/leftStick", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "Mover", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000212", "path": "<Gamepad>/rightStick", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "MirarAnalogico", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000213", "path": "<Mouse>/position", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "PonteiroMouse", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000214", "path": "<Mouse>/leftButton", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Atirar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000215", "path": "<Gamepad>/rightTrigger", "interactions": "", "processors": "", "groups": "Gamepad", "action": "Atirar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000216", "path": "<Keyboard>/shift", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Devagar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000217", "path": "<Keyboard>/capsLock", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "AlternarAndar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000218", "path": "<Gamepad>/leftStickPress", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "AlternarAndar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000219", "path": "<Keyboard>/r", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Recarregar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000220", "path": "<Gamepad>/buttonWest", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "Recarregar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000221", "path": "<Keyboard>/q", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "TrocarArma", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000222", "path": "<Gamepad>/buttonNorth", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "TrocarArma", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000223", "path": "<Keyboard>/c", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Agachar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000224", "path": "<Gamepad>/buttonEast", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "Agachar", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000225", "path": "<Keyboard>/leftCtrl", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Correr", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000226", "path": "<Gamepad>/rightStickPress", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "Correr", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000227", "path": "<Keyboard>/space", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Pular", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000228", "path": "<Gamepad>/buttonSouth", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "Pular", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000229", "path": "<Keyboard>/e", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Interagir", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000230", "path": "<Gamepad>/rightShoulder", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "Interagir", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000231", "path": "<Keyboard>/g", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Granada", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000232", "path": "<Gamepad>/leftTrigger", "interactions": "", "processors": "", "groups": "Gamepad", "action": "Granada", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000233", "path": "<Keyboard>/tab", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mochila", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000234", "path": "<Gamepad>/select", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "Mochila", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000235", "path": "<Keyboard>/m", "interactions": "", "processors": "", "groups": "TecladoMouse", "action": "Mapa", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "6c1f2b9e-3a51-4c8e-9a10-000000000236", "path": "<Gamepad>/start", "interactions": "", "processors": "", "groups": "Gamepad;Toque", "action": "Mapa", "isComposite": false, "isPartOfComposite": false }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        { "name": "TecladoMouse", "bindingGroup": "TecladoMouse", "devices": [ { "devicePath": "<Keyboard>", "isOptional": false, "isOR": false }, { "devicePath": "<Mouse>", "isOptional": false, "isOR": false } ] },
+        { "name": "Gamepad", "bindingGroup": "Gamepad", "devices": [ { "devicePath": "<Gamepad>", "isOptional": false, "isOR": false } ] },
+        { "name": "Toque", "bindingGroup": "Toque", "devices": [ { "devicePath": "<Touchscreen>", "isOptional": false, "isOR": false } ] }
+    ]
+}

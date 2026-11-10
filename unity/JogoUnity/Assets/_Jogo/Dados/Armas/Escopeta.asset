@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bec1050218bc4347bffce0679ffcc4f, type: 3}
+  m_Name: Escopeta
+  m_EditorClassIdentifier: Jogo.Nucleo::Jogo.Nucleo.DadosArma
+  nome: Escopeta
+  tipo: 0
+  slot: 0
+  pente: 6
+  reserva: 30
+  cadencia: 0.85
+  recarga: 2.8
+  danoMin: 14
+  danoMax: 19
+  chumbos: 8
+  penetracao: 0.3
+  espalhamento: 0.08
+  espalhamentoAndando: 0
+  alcance: 15
+  velocidade: 5
+  luneta: 0

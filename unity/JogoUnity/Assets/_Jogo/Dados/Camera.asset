@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8fcbebc95b85274db4cab4a61535f66, type: 3}
+  m_Name: Camera
+  m_EditorClassIdentifier: Jogo.Nucleo::Jogo.Nucleo.DadosCamera
+  fovVertical: 38
+  perto: 0.5
+  longe: 220
+  deslocamento: {x: 0, y: 20.07, z: -6.06}
+  pontoOlhar: {x: 0, y: 0, z: -0.68}
+  alturaAlvo: 0.9
+  seguir: 8
+  seguirKillcam: 4
+  zoomVelocidade: 3
+  lunetaVelocidade: 2
+  escalaRetrato: 1.55
+  escalaQuaseQuadrada: 1.2
+  escalaUltraLarga: 1.18
+  zoomAviao: 1.5
+  zoomParaquedas: 1.35
+  zoomVeiculo: 1.25
+  zoomVeiculoPorVelocidade: 0.016666668
+  zoomLuneta: 0.92
+  zoomAcessorioMira: 1.15
+  zoomMetralhadoraFixa: 1.2
+  deslocamentoLuneta: 1
+  killcamInicio: 0.5
+  killcamFim: 2.8
+  forcaTremor: 1.2
+  alturaPontoVisao: 1
+  fadeVisao: 0.3

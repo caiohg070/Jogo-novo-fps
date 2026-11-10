@@ -1,0 +1,1 @@
+{ "name": "Jogo.Editor", "rootNamespace": "Jogo.Editor", "references": ["Jogo.Nucleo", "Jogo.Armas", "Jogo.Jogador", "Jogo.Rede", "Jogo.Bots", "Jogo.Modos", "Jogo.Camera", "Jogo.UI", "Unity.InputSystem", "Unity.RenderPipelines.Core.Runtime", "Unity.RenderPipelines.Universal.Runtime"], "includePlatforms": ["Editor"], "autoReferenced": true }

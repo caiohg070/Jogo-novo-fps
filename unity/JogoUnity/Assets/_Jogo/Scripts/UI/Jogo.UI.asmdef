@@ -1,0 +1,1 @@
+{ "name": "Jogo.UI", "rootNamespace": "Jogo.UI", "references": ["Jogo.Nucleo", "Jogo.Armas", "Jogo.Jogador", "Unity.InputSystem", "UnityEngine.UI"], "autoReferenced": true }

@@ -1,7 +1,8 @@
 # Jogo (Battle Royale / tático visto de cima, em Unity)
 
 Leia antes de criar qualquer coisa:
-- `ESPEC_BASE_JOGAVEL.md`: **próximo passo** — especificação da base jogável (câmera, FOV, controles, regras, engenharia). Começar por aqui.
+- `ESPEC_BASE_JOGAVEL.md`: especificação da base jogável. **Base feita em 09/11/2026** em `JogoUnity/Assets/_Jogo/` (cena `Cenas/Treino.unity`, recriar pelo menu Jogo > Recriar cena de treino). Seguir as regras dela em tudo que vier depois.
+- APK Android: menu Jogo > Gerar APK Android → `C:/JogoBuilds/Jogo.apk` + cópia em `Jogo/Jogo.apk` (OneDrive). Nunca recompilar com Play Mode ligado.
 - `RESPOSTAS_UNITY.md`: decisões do jogo (modos, armas, acessórios, skins, Blender/MPFB, sons). Fonte mais recente; se divergir do `ESTADO_DO_PROJETO.md`, vale esta.
 - `ESTADO_DO_PROJETO.md`: estado do protótipo HTML; parte 2 do BR ficou para depois.
 - `QUESTIONARIO_UNITY.md`: questionário original.
